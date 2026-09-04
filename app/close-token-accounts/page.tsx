@@ -6,6 +6,7 @@ import { BrandMark } from '../brand-mark';
 import { SITE_NAME, SITE_URL, SOURCE_URL } from '../site-config';
 import { ToolToggle } from '../game/tool-toggle';
 import { ToolCompare } from '../tool-compare';
+import { TokenPortrait } from '../token-portrait';
 import {
   calculateServiceFeeLamports,
   closeTokenAccounts,
@@ -41,19 +42,6 @@ function buildDemoAccounts(): ClosableTokenAccount[] {
   }));
 }
 
-function TokenPortrait({ mint }: { mint: string }) {
-  let hash = 0;
-  for (const character of mint) hash = (hash * 31 + character.charCodeAt(0)) % 360;
-  return (
-    <span
-      className="token-portrait"
-      style={{ '--token-hue': hash } as React.CSSProperties}
-      aria-label={`Token mint ${shortenAddress(mint, 4)}`}
-    >
-      <b aria-hidden="true">{mint.slice(0, 2).toUpperCase()}</b>
-    </span>
-  );
-}
 
 export default function CloseTokenAccountsPage() {
   const [state, setState] = useState<CloserState>('idle');
@@ -142,6 +130,15 @@ export default function CloseTokenAccountsPage() {
     }, 700);
   }
 
+  function backToOverview() {
+    setState('idle');
+    setAccounts([]);
+    setScannedCount(0);
+    setSignatures([]);
+    setProgress('');
+    setNotice('Connect a wallet to find empty token accounts on Solana mainnet.');
+  }
+
   function toggleAccount(address: string) {
     setAccounts(current => current.map(account => account.address === address
       ? { ...account, selected: !account.selected }
@@ -226,8 +223,7 @@ export default function CloseTokenAccountsPage() {
           <div className="closer-copy closer-inventory" aria-live="polite">
             <div className="live-results-head">
               <div><small>{state === 'demo' ? 'DEMO EMPTY-ACCOUNT REVIEW' : 'EMPTY TOKEN ACCOUNT REVIEW'}</small><h2>{state === 'demo' ? 'Sample wallet' : wallet ? shortenAddress(wallet, 6) : 'Connected wallet'}</h2></div>
-              <span className={state === 'demo' ? 'demo' : ''}>{state === 'demo' ? 'DEMO DATA' : 'SOLANA MAINNET'}</span>
-            </div>
+              <div className="results-head-actions"><button className="inventory-back" type="button" onClick={backToOverview}><span aria-hidden="true">←</span> BACK</button><span className={state === 'demo' ? 'demo' : ''}>{state === 'demo' ? 'DEMO DATA' : 'SOLANA MAINNET'}</span></div></div>
 
             {foundNothing ? (
               <div className="inventory-empty closer-empty">

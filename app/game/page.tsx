@@ -31,6 +31,7 @@ import {
 import { SITE_NAME, SITE_URL, SOURCE_URL } from '../site-config';
 import { StageAmount, type AmountMode } from './stage-amount';
 import { ToolCompare } from '../tool-compare';
+import { TokenPortrait } from '../token-portrait';
 import { BrandMark } from '../brand-mark';
 import { ToolToggle } from './tool-toggle';
 
@@ -312,8 +313,7 @@ export default function GamePrototype() {
                 <small>{quest === 'demo' ? 'DEMO INVENTORY' : 'LIVE WALLET INVENTORY'}</small>
                 <h2>{wallet ? shortenAddress(wallet, 6) : 'Sample wallet'}</h2>
               </div>
-              <span className={quest === 'demo' ? 'demo' : ''}>{quest === 'demo' ? 'DEMO DATA' : 'SOLANA MAINNET'}</span>
-            </div>
+              <div className="results-head-actions"><button className="inventory-back" type="button" onClick={backToOverview}><span aria-hidden="true">←</span> BACK</button><span className={quest === 'demo' ? 'demo' : ''}>{quest === 'demo' ? 'DEMO DATA' : 'SOLANA MAINNET'}</span></div></div>
 
             {foundNothing ? (
               <div className="inventory-empty">
@@ -348,6 +348,7 @@ export default function GamePrototype() {
                 <label key={account.address} className={account.selected ? 'selected' : ''}>
                   <input type="checkbox" checked={account.selected} onChange={() => toggleAccount(account.address)} disabled={busy || quest === 'won'} />
                   <i>{account.selected ? '✓' : ''}</i>
+                  <TokenPortrait mint={account.mint} />
                   <span><b>{account.program === 'token-2022' ? 'Token-2022 account' : 'Token account'}</b><small>{shortenAddress(account.address, 6)} · mint {shortenAddress(account.mint, 4)}</small></span>
                   <strong>+{formatSol(account.excessLamports, 6)} SOL</strong>
                 </label>
