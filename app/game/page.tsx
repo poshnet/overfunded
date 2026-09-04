@@ -26,6 +26,7 @@ import {
   type ReclaimableAccount,
 } from './solana-reclaim';
 import { SITE_NAME, SITE_URL, SOURCE_URL } from '../site-config';
+import { StageAmount, type AmountMode } from './stage-amount';
 import { BrandMark } from '../brand-mark';
 
 type QuestState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'reclaiming' | 'won' | 'error' | 'demo';
@@ -218,12 +219,12 @@ export default function GamePrototype() {
           : quest === 'demo' ? 'SAMPLE TREASURE FOUND'
             : quest === 'ready' && accounts.length === 0 ? 'ALREADY AT THE RENT FLOOR'
               : quest === 'ready' ? 'TREASURE FOUND' : 'UNCLAIMED SOL';
-  // '???' is the unknown-yet hook. Once a scan has finished, the answer is
-  // known even when it is zero, so it must not keep teasing an amount.
-  const stageAmount = busy ? '••••'
-    : foundNothing ? 'ALL CAUGHT UP'
-      : accounts.length ? `${formatSol(selectedLamports, 5)} SOL`
-        : '??? SOL';
+  // '?' only survives while the answer is genuinely unknown. Once a scan has
+  // finished the figure is known, even when it is zero.
+  const amountMode: AmountMode = busy ? 'scanning'
+    : foundNothing ? 'verdict'
+      : accounts.length ? 'value'
+        : 'unknown';
 
   // One action at a time: the hero shows either the marketing CTA or the
   // inventory's own button, never two copies of the same control.
@@ -398,7 +399,7 @@ export default function GamePrototype() {
           <div className="game-stage-head"><span>QUEST 01 / WALLET SCAN</span><b>{quest === 'won' ? 'COMPLETE' : quest === 'error' ? 'CHECK LOG' : busy ? 'ACTIVE' : 'READY'}</b></div>
           <div className="game-stars" aria-hidden="true"><i /><i /><i /><i /><i /></div>
           <div className="game-chest" aria-hidden="true"><div className="chest-glow" /><div className="chest-dust" /><div className="chest-lid" /><div className="chest-body"><i /></div><span className="coin coin-one">◎</span><span className="coin coin-two">◎</span><span className="coin coin-three">◎</span><span className="coin coin-four">◎</span><span className="coin coin-five">◎</span></div>
-          <div className={foundNothing ? 'game-result is-verdict' : 'game-result'}><small>{stageLabel}</small><strong>{stageAmount}</strong></div>
+          <div className={foundNothing ? 'game-result is-verdict' : 'game-result'}><small>{stageLabel}</small><StageAmount mode={amountMode} lamports={selectedLamports} verdict="ALL CAUGHT UP" replay={quest} /></div>
           <p>LIVE MAINNET · {SERVICE_FEE_PERCENT}% SUCCESS FEE · NOTHING RECOVERED, NOTHING CHARGED · YOU APPROVE EVERY TRANSACTION</p>
         </div>
       </section>

@@ -191,7 +191,6 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
   .ladder-foot>div:nth-child(-n+2){border-bottom:1px solid #202c22}
 }
 @media(max-width:640px){.ladder-foot{grid-template-columns:1fr}.ladder-foot>div{border-right:0;border-bottom:1px solid #202c22}}
-.game-result.is-verdict strong{color:var(--g-lime);font-size:clamp(25px,2.7vw,38px);letter-spacing:.01em}
 
 /* Hero rollout panel: the staged rent cut is the pitch, so it leads with which
    gate is live and what the remaining gates are worth. */
@@ -289,3 +288,31 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
 .ladder-row.stage-testnet>span:last-child{color:var(--g-gold)}
 .stage-ladder>small em{color:#a9bcac;font-style:normal}
 .stage-ladder>small a{color:var(--g-lime);text-underline-offset:3px}
+
+/* The reveal. Unknown glyphs breathe, a scan spins the digits, a result
+   counts up and locks. Digits are tabular so nothing jitters mid-count. */
+.game-result strong{display:inline-flex;align-items:baseline;gap:.24em;font-variant-numeric:tabular-nums}
+.game-result strong b{color:#8aa08d;font-size:.34em;font-weight:900;letter-spacing:.1em}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+.stage-unknown{color:#7f9384}
+.stage-unknown em{display:inline-block;font-style:normal;animation:glyph-breathe 2.1s ease-in-out infinite}
+@keyframes glyph-breathe{0%,100%{opacity:.3;transform:translateY(0)}45%{opacity:1;transform:translateY(-3px)}}
+
+.stage-spinning{color:var(--g-lime);text-shadow:0 0 22px rgba(170,255,62,.35)}
+.stage-value{color:#fff}
+.quest-won .stage-value{color:var(--g-lime);text-shadow:0 0 30px rgba(170,255,62,.4);animation:value-land .62s cubic-bezier(.34,1.56,.64,1) both}
+.quest-ready .stage-value,.quest-demo .stage-value{animation:value-land .5s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes value-land{0%{transform:scale(.82);opacity:.4}62%{transform:scale(1.05);opacity:1}100%{transform:scale(1);opacity:1}}
+
+.stage-verdict{color:var(--g-lime);font-size:clamp(25px,2.7vw,38px);letter-spacing:.01em;animation:value-land .5s cubic-bezier(.34,1.56,.64,1) both}
+
+/* A ring of light behind the number at the moment of a win. */
+.quest-won .game-result{position:relative}
+.quest-won .game-result:before{content:'';position:absolute;left:50%;top:50%;width:280px;height:280px;margin:-140px 0 0 -140px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(170,255,62,.28),transparent 62%);animation:win-flare 1.1s ease-out both}
+@keyframes win-flare{0%{transform:scale(.3);opacity:0}35%{opacity:1}100%{transform:scale(1.5);opacity:0}}
+
+@media(prefers-reduced-motion:reduce){
+  .stage-unknown em,.stage-value,.stage-verdict,.quest-won .game-result:before{animation:none!important}
+  .stage-unknown em{opacity:.75}
+}
