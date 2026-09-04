@@ -530,9 +530,15 @@ export default function GamePrototype() {
       <section className="game-ledger">
         <div className="ledger-title"><small>WORLD MAP</small><h2>What the cut<br /><em>is actually worth.</em></h2><p>Every figure here is either published by Solana or read live from the chain. Your own result is calculated from the public state of the accounts in your wallet.</p></div>
         <div className="ledger-screen primary">
+          <span>REDEEMABLE ONCE SIMD-0437-5 LANDS</span>
+          <strong>~$307M<em>3,425,373 SOL</em></strong>
+          <p>Network-wide surplus left stranded in accounts funded under the legacy rate, once all five gates activate. Moves with the SOL price and with live account state.</p>
+          <i>ESTIMATE · NOT A LIVE BALANCE</i>
+        </div>
+        <div className="ledger-screen">
           <span>SAVED PER MILLION TOKEN ACCOUNTS</span>
           <strong>$143,100</strong>
-          <p>Solana’s own worked example: a business opening a million token accounts pays $159,000 under the legacy rate and $15,900 once all five gates land.</p>
+          <p>Solana’s own worked example: opening a million token accounts costs $159,000 under the legacy rate and $15,900 once the cut completes.</p>
           <a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">PUBLISHED BY SOLANA ↗</a>
         </div>
         <div className="ledger-screen">
@@ -541,7 +547,18 @@ export default function GamePrototype() {
           <p>Read live from the treasury’s on-chain history. Every reclaim that charges a fee settles here, so this counter moves on its own.</p>
           <a href={`https://solscan.io/account/${TREASURY_ADDRESS}`} target="_blank" rel="noreferrer">VERIFY ON SOLSCAN ↗</a>
         </div>
-        <div className="ledger-screen"><span>ACCOUNTS CLOSED</span><strong>0</strong><p>The defining score. No reclaim transaction this site builds contains a CloseAccount instruction, so it never moves.</p><i>NON-DESTRUCTIVE FOREVER</i></div>
+        <div className="ledger-screen locked">
+          <span>TOKEN ACCOUNTS CLOSED</span>
+          <strong>
+            0
+            <svg className="lock-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7.6 10.4V7.4a4.4 4.4 0 0 1 8.8 0v3" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" />
+              <rect x="3.9" y="10.4" width="16.2" height="11.2" rx="2.6" fill="currentColor" />
+            </svg>
+          </strong>
+          <p>Locked at zero by construction. A reclaim transaction can only contain WithdrawExcessLamports and one disclosed fee transfer — there is no CloseAccount instruction for it to use.</p>
+          <i>CANNOT MOVE</i>
+        </div>
       </section>
 
       <section className="game-finale">

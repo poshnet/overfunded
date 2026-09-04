@@ -1,15 +1,15 @@
 /**
  * Single source of truth for the site's public identity.
  *
- * SITE_URL feeds metadataBase, canonicals, the sitemap and robots, so pointing
- * a real domain at the deployment is a one-variable change. Set
- * NEXT_PUBLIC_SITE_URL at build time; the fallback is the current host.
+ * SITE_URL feeds metadataBase, canonicals, the sitemap and robots. Override it
+ * at build time with NEXT_PUBLIC_SITE_URL when deploying to a preview host.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://lamport-reclaim-sol.hunrtech.chatgpt.site'
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://overfunded.app'
 ).replace(/\/$/, '');
 
 export const SITE_NAME = 'Overfunded';
+export const TWITTER_HANDLE = '@reclaimsol';
 
 /** Public source repository. Update here and every link on the site follows. */
 export const SOURCE_URL = 'https://github.com/poshnet/overfunded';

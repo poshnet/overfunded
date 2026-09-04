@@ -9,10 +9,9 @@ const PLACEHOLDER = '?.?????';
 export type AmountMode = 'unknown' | 'scanning' | 'value' | 'verdict';
 
 /**
- * The only visual answer the site gives, so it earns an animation:
- * unknown glyphs flicker, a scan spins the digits like a counter, and a
- * result counts up to the real figure. Motion is skipped entirely when the
- * visitor asks for that.
+ * Unknown glyphs breathe and a live scan spins the digits, because at those
+ * moments the figure genuinely is not known yet. The result itself simply
+ * appears — the amounts are small and a counting animation oversells them.
  */
 export function StageAmount({ mode, lamports = 0, verdict = '', replay = '' }: {
   mode: AmountMode;
@@ -42,16 +41,7 @@ export function StageAmount({ mode, lamports = 0, verdict = '', replay = '' }: {
       return () => cancelAnimationFrame(raf.current);
     }
 
-    if (reduceMotion || lamports === 0) { setText(formatSol(lamports, DECIMALS)); return; }
-    const started = performance.now();
-    const countUp = (now: number) => {
-      const progress = Math.min(1, (now - started) / 900);
-      const eased = 1 - (1 - progress) ** 4;
-      setText(formatSol(Math.round(lamports * eased), DECIMALS));
-      if (progress < 1) raf.current = requestAnimationFrame(countUp);
-    };
-    raf.current = requestAnimationFrame(countUp);
-    return () => cancelAnimationFrame(raf.current);
+    setText(formatSol(lamports, DECIMALS));
   }, [mode, lamports, replay]);
 
   if (mode === 'verdict') return <strong className="stage-verdict">{verdict}</strong>;

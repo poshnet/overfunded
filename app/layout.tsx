@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist_Mono } from 'next/font/google';
-import { SITE_NAME, SITE_URL } from './site-config';
+import { SITE_NAME, SITE_URL, TWITTER_HANDLE } from './site-config';
 import './globals.css';
 import './game/game.css';
 import './game/game-sections.css';
@@ -31,6 +31,8 @@ export const metadata: Metadata = {
   applicationName: SITE_NAME,
   twitter: {
     card: 'summary_large_image',
+    site: TWITTER_HANDLE,
+    creator: TWITTER_HANDLE,
     title: 'Reclaim Solana Rent — Recover Excess SOL Without Closing Token Accounts',
     description: 'Solana lowered the rent-exempt minimum under SIMD-0437. Scan your SPL token accounts and reclaim the excess rent with WithdrawExcessLamports — no accounts closed, no tokens touched.',
     images: ['/og.png'],

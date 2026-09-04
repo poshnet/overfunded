@@ -65,6 +65,40 @@ npm start
 npm run lint
 ```
 
+## Deploying to Cloudflare Workers
+
+The build emits a complete Worker config at `dist/server/wrangler.json`
+(entry `index.js`, static assets from `dist/client`, `nodejs_compat` on), and
+`.wrangler/deploy/config.json` points Wrangler at it. Nothing needs to be
+hand-written.
+
+```bash
+npx wrangler login          # once, opens a browser
+npm run deploy:dry          # build + verify without uploading
+npm run deploy              # build + upload
+```
+
+Then attach the domain in the Cloudflare dashboard under
+**Workers & Pages → overfunded → Settings → Domains & Routes → Add custom
+domain**, pointing `overfunded.app` at the Worker. Cloudflare issues the
+certificate automatically.
+
+The canonical host lives in `app/site-config.ts` and feeds `metadataBase`,
+every canonical URL, the sitemap and robots. Deploying somewhere else needs
+only `NEXT_PUBLIC_SITE_URL=https://preview.example npm run deploy`.
+
+### Before taking real traffic
+
+- **Swap the RPC endpoint.** `app/api/solana-rpc/route.ts` proxies to a free
+  public node that will rate-limit under load. Point `SOLANA_RPC_URL` at a
+  paid provider.
+- **The relay's rate limiter is per-isolate.** It is an in-memory map, so on
+  Workers it caps one isolate rather than the deployment. A Durable Object or
+  KV counter is needed for a real global limit.
+- **Fund the treasury.** A fee transfer to an account below the rent-exempt
+  minimum fails the whole transaction; the code waives the fee rather than
+  breaking the reclaim, so an unfunded treasury silently earns nothing.
+
 ## Licence
 
 MIT — see [LICENSE](./LICENSE).
