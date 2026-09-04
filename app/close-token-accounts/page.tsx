@@ -5,6 +5,7 @@ import { PublicKey } from '@solana/web3.js';
 import { BrandMark } from '../brand-mark';
 import { SITE_NAME, SITE_URL, SOURCE_URL } from '../site-config';
 import { ToolToggle } from '../game/tool-toggle';
+import { ToolCompare } from '../tool-compare';
 import {
   calculateServiceFeeLamports,
   closeTokenAccounts,
@@ -312,10 +313,7 @@ export default function CloseTokenAccountsPage() {
 
       <section className="closer-choice">
         <div><small>YES — THIS ONE IS</small><h2>This is<br /><em>an incinerator.</em></h2><p>The rent reclaim tool is careful to tell you it is not one. This is the other tool. It deletes the account, returns the whole deposit, and the address stops working — so reach for it only when the balance is zero and you are finished with that address for good.</p></div>
-        <div className="closer-choice-grid">
-          <a href="/"><i><BrandMark /></i><span><b>GREEN / KEEP OPEN</b><strong>Withdraw excess rent</strong><small>Token account stays usable</small></span><em>GO →</em></a>
-          <a className="active" href="/close-token-accounts"><i>×</i><span><b>RED / CLOSE EMPTY</b><strong>Recover full rent</strong><small>Token account is removed</small></span><em>YOU ARE HERE</em></a>
-        </div>
+        <ToolCompare current="close" />
       </section>
 
       <section className="closer-finale"><small>READY TO CLEAN YOUR WALLET?</small><h2>Close the empty.<br /><em>Bring the rent home.</em></h2><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN MAINNET ▶</button><p>{SERVICE_FEE_PERCENT}% service fee only on successful recoveries · same public fee wallet</p></section>

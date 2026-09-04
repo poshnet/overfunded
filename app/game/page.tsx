@@ -30,6 +30,7 @@ import {
 } from './solana-reclaim';
 import { SITE_NAME, SITE_URL, SOURCE_URL } from '../site-config';
 import { StageAmount, type AmountMode } from './stage-amount';
+import { ToolCompare } from '../tool-compare';
 import { BrandMark } from '../brand-mark';
 import { ToolToggle } from './tool-toggle';
 
@@ -542,11 +543,7 @@ export default function GamePrototype() {
 
       <section className="game-battle" id="safety">
         <div className="battle-head"><small>KNOW YOUR OPPONENT</small><h2>This is not<br /><em>an incinerator.</em></h2><p>Traditional cleanup tools reclaim rent by closing eligible accounts. Overfunded’s target is different: surplus rent inside accounts you want to keep.</p></div>
-        <div className="battle-arena">
-          <article className="battle-card enemy"><div className="battle-name"><span>ACCOUNT CLOSER</span><b>DESTRUCTIVE MOVE</b></div><i className="battle-icon">×</i><strong>CLOSE ACCOUNT</strong><ul><li>Account is deleted</li><li>Address stops working</li><li>Empty balance required</li></ul><em>USE ON DEAD ACCOUNTS</em></article>
-          <div className="battle-vs">VS</div>
-          <article className="battle-card hero"><div className="battle-name"><span>OVERFUNDED</span><b>SAFE MOVE</b></div><i className="battle-icon"><BrandMark /></i><strong>WITHDRAW EXCESS</strong><ul><li>Account stays open</li><li>Address stays usable</li><li>Tokens stay untouched</li></ul><em>USE ON LIVE ACCOUNTS</em></article>
-        </div>
+        <ToolCompare current="reclaim" />
         <div className="battle-alert"><b>!</b><span><strong>TOKEN ACCOUNT CLOSING: BLOCKED</strong>Overfunded never adds a CloseAccount instruction. Your token accounts stay open and usable.</span><i>0 CLOSED</i></div>
         <div className="battle-source"><div><b>DON’T TAKE OUR WORD FOR IT</b><span>Every instruction this site builds is in the open. Read the transaction builder, check the fee maths, and verify the rent floor against your own node.</span></div><a href={SOURCE_URL} target="_blank" rel="noreferrer">READ THE SOURCE ON GITHUB ↗</a></div>
       </section>

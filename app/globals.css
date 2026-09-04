@@ -163,3 +163,8 @@ button:disabled { cursor: wait; opacity: .8; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
 .game-brand > i svg, .blog-brand > i svg, .srr-brand > i svg, .fun-brand > i svg { display: block; width: 22px; height: 22px; }
+/* Tool identity colours. Fixed on both pages so the green card always means
+   the rent tool and the terracotta card always means the closer, regardless
+   of which shell theme is around them. */
+:root { --tool-keep: #aaff3e; --tool-keep-edge: #5b8138; --tool-keep-deep: #18311d; --tool-keep-shadow: #274519;
+        --tool-close: #e28d69; --tool-close-edge: #8b5138; --tool-close-deep: #2a1811; --tool-close-shadow: #4a2c1e; }
