@@ -1,4 +1,25 @@
-const SOLANA_RPC_URL = 'https://public.rpc.solanavibestation.com';
+/**
+ * Upstream Solana RPC. Set SOLANA_RPC_URL as a Worker secret to point this at
+ * a paid provider — the public fallback rate-limits under any real traffic:
+ *
+ *   npx wrangler secret put SOLANA_RPC_URL
+ *
+ * Read per request rather than at module load so a rotated secret takes effect
+ * without a redeploy.
+ */
+const PUBLIC_FALLBACK_RPC = 'https://public.rpc.solanavibestation.com';
+
+function upstreamRpcUrl() {
+  const configured = process.env.SOLANA_RPC_URL?.trim();
+  if (!configured) return PUBLIC_FALLBACK_RPC;
+  try {
+    const url = new URL(configured);
+    if (url.protocol !== 'https:') return PUBLIC_FALLBACK_RPC;
+    return url.toString();
+  } catch {
+    return PUBLIC_FALLBACK_RPC;
+  }
+}
 
 const ALLOWED_METHODS = new Set([
   'getAccountInfo',
@@ -100,7 +121,7 @@ export async function POST(request: Request) {
   if (rejected) return errorResponse(rejected.id, -32601, 'RPC method is not available through this relay.');
 
   try {
-    const upstream = await fetch(SOLANA_RPC_URL, {
+    const upstream = await fetch(upstreamRpcUrl(), {
       method: 'POST',
       headers: {
         'accept': 'application/json',

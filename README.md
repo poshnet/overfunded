@@ -89,9 +89,17 @@ only `NEXT_PUBLIC_SITE_URL=https://preview.example npm run deploy`.
 
 ### Before taking real traffic
 
-- **Swap the RPC endpoint.** `app/api/solana-rpc/route.ts` proxies to a free
-  public node that will rate-limit under load. Point `SOLANA_RPC_URL` at a
-  paid provider.
+- **Swap the RPC endpoint.** The relay falls back to a free public node that
+  will rate-limit under load. Point it at a paid provider (Helius, Triton,
+  QuickNode) with a Worker secret:
+
+  ```bash
+  npx wrangler secret put SOLANA_RPC_URL --config dist/server/wrangler.json
+  # paste the full https:// endpoint when prompted
+  ```
+
+  It is read per request, so rotating the secret takes effect without a
+  redeploy, and a missing or non-https value falls back rather than breaking.
 - **The relay's rate limiter is per-isolate.** It is an in-memory map, so on
   Workers it caps one isolate rather than the deployment. A Durable Object or
   KV counter is needed for a real global limit.
