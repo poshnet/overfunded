@@ -68,13 +68,6 @@
 .chest-lid{transform-origin:left bottom}
 .chest-glow{opacity:.55}
 .chest-dust{position:absolute;z-index:4;left:50%;top:96px;width:74px;height:34px;margin-left:-37px;border-radius:50%;opacity:0;background:radial-gradient(circle,rgba(196,214,190,.5),transparent 70%);pointer-events:none}
-.coin-four{left:40px;top:64px}
-.coin-five{right:36px;top:62px}
-.coin-one{--cx:-40px;--cy:-58px;--cr:-260deg}
-.coin-two{--cx:-4px;--cy:-78px;--cr:220deg}
-.coin-three{--cx:36px;--cy:-62px;--cr:300deg}
-.coin-four{--cx:-66px;--cy:-26px;--cr:-190deg}
-.coin-five{--cx:64px;--cy:-30px;--cr:250deg}
 
 .quest-idle .game-chest{animation:chest-breathe 3.6s steps(6) infinite}
 .quest-idle .chest-glow{animation:chest-glow-idle 3.6s steps(6) infinite}
@@ -85,18 +78,14 @@
 .quest-scanning .chest-lid{animation:chest-lid-jitter .24s steps(2) infinite}
 
 .has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.has-loot.quest-reclaiming .chest-lid{animation:chest-lid-open .55s cubic-bezier(.34,1.56,.64,1) both}
-.has-loot.quest-ready .coin,.quest-demo .coin,.has-loot.quest-reclaiming .coin{animation:coin-rise .62s steps(7) both}
+.has-loot.quest-ready .coin,.quest-demo .coin,.has-loot.quest-reclaiming .coin{animation:coin-fly .9s cubic-bezier(.2,.72,.35,1) both}
 .has-loot.quest-ready .chest-glow,.quest-demo .chest-glow{animation:chest-glow-flare .6s ease-out both}
 
 .quest-won .chest-lid{animation:chest-lid-open .55s cubic-bezier(.34,1.56,.64,1) both}
 .quest-won .game-chest{animation:chest-pop .5s steps(4) both}
-.quest-won .coin{animation:coin-burst .95s steps(9) both}
+.quest-won .coin{animation:coin-fly .9s cubic-bezier(.2,.72,.35,1) both}
 .quest-won .chest-glow{animation:chest-glow-win 1.1s ease-out both}
 
-.coin-two{animation-delay:.07s!important}
-.coin-three{animation-delay:.14s!important}
-.coin-four{animation-delay:.2s!important}
-.coin-five{animation-delay:.26s!important}
 
 /* Empty wallet: the box opens, and there is visibly nothing in it. */
 .no-loot.quest-ready .chest-lid{animation:chest-lid-crack .9s steps(5) both}
@@ -117,8 +106,6 @@
 @keyframes chest-glow-win{0%{opacity:.4;transform:scale(.75)}30%{opacity:1;transform:scale(1.65)}100%{opacity:.85;transform:scale(1.2)}}
 @keyframes chest-glow-dim{0%{opacity:.55;transform:scale(1)}100%{opacity:.14;transform:scale(.88);filter:grayscale(1)}}
 @keyframes chest-dust{0%{opacity:0;transform:translateY(6px) scale(.5)}30%{opacity:.7}100%{opacity:0;transform:translateY(-30px) scale(1.6)}}
-@keyframes coin-rise{0%{opacity:0;transform:translate(0,16px) scale(.5) rotate(0)}22%{opacity:1}100%{opacity:1;transform:translate(var(--cx),var(--cy)) scale(1) rotate(var(--cr))}}
-@keyframes coin-burst{0%{opacity:0;transform:translate(0,16px) scale(.5) rotate(0)}18%{opacity:1}70%{opacity:1;transform:translate(calc(var(--cx)*1.5),calc(var(--cy)*1.45)) scale(1.12) rotate(var(--cr))}100%{opacity:0;transform:translate(calc(var(--cx)*1.85),calc(var(--cy)*.55)) scale(.85) rotate(calc(var(--cr)*1.3))}}
 
 .inventory-empty{display:flex;flex-direction:column;align-items:center;gap:13px;padding:30px 20px 24px;border:1px solid #2e3c30;border-top:0;background:#0b110c;text-align:center}
 .inventory-empty>i{display:grid;width:56px;height:56px;place-items:center;border:1px solid #3d4f40;border-radius:50%;background:#101710;color:#6f8474;font:400 26px/1 Georgia,serif;font-style:normal}
@@ -138,7 +125,7 @@
   .game-chest,.chest-lid,.chest-glow,.chest-dust,.coin,.chest-body i{animation:none!important}
   .has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.quest-won .chest-lid,.has-loot.quest-reclaiming .chest-lid{transform:translateY(-30px) rotate(-9deg)}
   .no-loot.quest-ready .chest-lid{transform:translateY(-9px) rotate(-3deg)}
-  .has-loot.quest-ready .coin,.quest-demo .coin,.quest-won .coin,.has-loot.quest-reclaiming .coin{opacity:1;transform:translate(var(--cx),var(--cy))}
+  .coin{opacity:0!important}
 }
 
 /* Hero lead: the rent change is the pitch, so it carries the mechanism by name
@@ -327,3 +314,51 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
   100%{transform:translateY(0) scale(1);opacity:1}
 }
 @media(prefers-reduced-motion:reduce){.stage-value{animation:none!important}}
+
+/* Coins spill from the chest mouth, arc outward and fall away like confetti. */
+@keyframes coin-fly{
+  0%{opacity:0;transform:translate(0,0) scale(.4) rotate(0)}
+  10%{opacity:1;transform:translate(calc(var(--cx)*.18),calc(var(--cy)*.42)) scale(1) rotate(calc(var(--rot)*.18))}
+  45%{opacity:1;transform:translate(calc(var(--cx)*.72),var(--cy)) scale(1) rotate(calc(var(--rot)*.55))}
+  100%{opacity:0;transform:translate(var(--cx),var(--fall)) scale(.72) rotate(var(--rot))}
+}
+/* The scan indicator is the one thing that should read as working. */
+.stage-scanning{display:inline-flex;gap:.16em}
+.stage-scanning em{display:inline-block;font-style:normal;animation:dot-bob .95s ease-in-out infinite}
+@keyframes dot-bob{0%,72%,100%{opacity:.28;transform:translateY(0)}36%{opacity:1;transform:translateY(-12px)}}
+@media(prefers-reduced-motion:reduce){.stage-scanning em{animation:none;opacity:.7}}
+
+/* Hero pass: one clear story on the left, with the full technical rollout below. */
+.game-hero{grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);gap:clamp(38px,5vw,78px);min-height:auto;padding-top:62px;padding-bottom:72px}
+.game-copy{max-width:690px}
+.game-copy h1{margin:25px 0 18px}
+.game-copy>p.hero-lead{max-width:600px;font-size:16px;line-height:1.55}
+.rollout-panel.rollout-compact{max-width:600px;margin-top:20px}
+.rollout-compact .rollout-head{padding:11px 13px}
+.rollout-compact .rollout-pips{padding:0 13px 11px}
+.rollout-compact .rollout-values{grid-template-columns:repeat(2,1fr)}
+.rollout-compact .rollout-values>div{min-height:62px;padding:10px 13px}
+.rollout-more{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-top:1px solid #2b3a2e;color:var(--g-lime);font-size:10px;font-weight:900;letter-spacing:.11em;text-decoration:none}
+.rollout-more:hover{background:rgba(170,255,62,.08)}
+.rollout-more span{font-size:14px}
+.game-actions{margin-top:22px}
+.game-warning{margin-top:24px}
+
+/* The chest remains the reward, but no longer consumes half the opening screen. */
+.game-stage{width:100%;max-width:470px;min-height:445px;justify-self:end;padding:49px 26px 22px}
+.game-chest{scale:.78;margin:-22px 0 -29px}
+.game-stage>p{max-width:390px;line-height:1.5}
+
+@media(max-width:940px){
+  .game-hero{grid-template-columns:1fr;padding-top:58px}
+  .game-stage{justify-self:center}
+}
+@media(max-width:640px){
+  .rollout-compact .rollout-head{gap:7px}
+  .rollout-compact .rollout-values{grid-template-columns:1fr 1fr}
+  .rollout-compact .rollout-values>div{min-height:66px;padding:10px}
+  .rollout-compact .rollout-values span{font-size:8px}
+  .rollout-compact .rollout-values b{font-size:12px}
+  .game-stage{min-height:420px}
+  .game-chest{scale:.68;transform:none;margin:-31px 0 -42px}
+}

@@ -17,7 +17,15 @@ export function StageAmount({ mode, lamports = 0, verdict = '' }: {
   verdict?: string;
 }) {
   if (mode === 'verdict') return <strong className="stage-verdict">{verdict}</strong>;
-  if (mode === 'scanning') return <strong className="stage-scanning">••••</strong>;
+  if (mode === 'scanning') {
+    return (
+      <strong className="stage-scanning" aria-label="Scanning your accounts">
+        {[0, 1, 2].map(index => (
+          <em key={index} style={{ animationDelay: `${index * 0.16}s` }} aria-hidden="true">•</em>
+        ))}
+      </strong>
+    );
+  }
   if (mode === 'unknown') {
     return (
       <strong className="stage-unknown" aria-label="Amount unknown until you scan">

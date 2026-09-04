@@ -32,6 +32,24 @@ import { BrandMark } from '../brand-mark';
 
 type QuestState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'reclaiming' | 'won' | 'error' | 'demo';
 
+// Each coin gets its own arc out of the chest mouth: sideways drift, peak
+// height, where it falls to, spin and start offset. Fixed values keep the
+// server and client markup identical.
+const COIN_ARCS = [
+  { cx: -96, cy: -74, fall: 78, rot: -430, delay: 0 },
+  { cx: -62, cy: -104, fall: 66, rot: 380, delay: 0.04 },
+  { cx: -34, cy: -66, fall: 88, rot: -300, delay: 0.08 },
+  { cx: -12, cy: -118, fall: 58, rot: 470, delay: 0.12 },
+  { cx: 14, cy: -82, fall: 82, rot: -360, delay: 0.02 },
+  { cx: 40, cy: -110, fall: 62, rot: 420, delay: 0.06 },
+  { cx: 68, cy: -70, fall: 90, rot: -480, delay: 0.1 },
+  { cx: 98, cy: -92, fall: 70, rot: 340, delay: 0.14 },
+  { cx: -78, cy: -50, fall: 96, rot: 260, delay: 0.18 },
+  { cx: 82, cy: -46, fall: 94, rot: -270, delay: 0.05 },
+  { cx: -4, cy: -50, fall: 100, rot: 520, delay: 0.2 },
+  { cx: 54, cy: -128, fall: 54, rot: -410, delay: 0.11 },
+];
+
 const demoAccounts: ReclaimableAccount[] = [
   { address: '8kP3demoAccountxR42', dataLength: 165, excessLamports: 22_180_000, mint: 'USDCdemoMint', program: 'token', rentFloorLamports: 1_400_000, selected: true },
   { address: '3Dw9demoAccountkN18', dataLength: 165, excessLamports: 18_620_000, mint: 'BONKdemoMint', program: 'token', rentFloorLamports: 1_400_000, selected: true },
@@ -49,7 +67,6 @@ export default function GamePrototype() {
   const [chargedFeeLamports, setChargedFeeLamports] = useState(0);
   const [liveFloorLamports, setLiveFloorLamports] = useState<number | null>(null);
   const [scannedCount, setScannedCount] = useState(0);
-  const [stagesOpen, setStagesOpen] = useState(false);
   const [treasury, setTreasury] = useState<{ reclaimedLamports: number; feesCollectedLamports: number } | null>(null);
 
   // Read the cluster's own rent-exempt minimum so the reduction section quotes a
@@ -103,10 +120,6 @@ export default function GamePrototype() {
   const finalStage = RENT_STAGES[RENT_STAGES.length - 1];
   const finalFloorLamports = rentFloorFor(TOKEN_ACCOUNT_SPACE, finalStage.lamportsPerByte);
   const finalSurplusLamports = LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS - finalFloorLamports;
-  const rolloutMultiplier = perAccountUnlockedLamports && perAccountUnlockedLamports > 0
-    ? finalSurplusLamports / perAccountUnlockedLamports
-    : null;
-
   function focusQuest() {
     const hero = document.getElementById('quest');
     if (!hero) return;
@@ -346,15 +359,9 @@ export default function GamePrototype() {
             <div className="game-level"><b>NEW QUEST</b><span>RENT FLOOR REDUCTION</span></div>
             <h1>Rent dropped.<br /><em>Your accounts didn’t notice.</em></h1>
             <p className="hero-lead">Solana lowered the rent-exempt minimum. Your token accounts were funded at the old floor, and nothing sweeps the difference back to you.</p>
-            <a className="hero-mech" href={SOURCE_URL} target="_blank" rel="noreferrer">
-              <b>VERIFIED CODE</b>
-              <span>Every instruction this site builds is public. Read the scanner, the transaction builder and the fee maths before you connect.</span>
-              <i aria-hidden="true">↗</i>
-            </a>
-
-            <div className="rollout-panel">
+            <div className="rollout-panel rollout-compact">
               <div className="rollout-head">
-                <span>SIMD-0437 · RENT ROLLOUT</span>
+                <span>SIMD-0437 · LIVE RENT UPDATE</span>
                 <b className={liveFloorLamports === null ? 'pending' : ''}>
                   {liveFloorLamports === null ? 'READING MAINNET…' : `STAGE ${stagesLive} OF ${RENT_STAGES.length} LIVE`}
                 </b>
@@ -367,35 +374,10 @@ export default function GamePrototype() {
               </div>
 
               <div className="rollout-values">
-                <div><span>UNLOCKED NOW</span><b>{perAccountUnlockedLamports === null ? '—' : `+${formatSol(perAccountUnlockedLamports, 8)}`}</b></div>
-                <div className="rollout-target"><span>AT FULL ROLLOUT</span><b>+{formatSol(finalSurplusLamports, 8)}</b></div>
-                <div><span>PER ACCOUNT</span><b>{rolloutMultiplier === null ? '—' : `${Math.round(rolloutMultiplier * 10) / 10}× more`}</b></div>
+                <div><span>CURRENT FLOOR / ACCOUNT</span><b>{liveFloorLamports === null ? '—' : formatSol(liveFloorLamports, 8)}</b></div>
+                <div className="rollout-target"><span>UNLOCKED NOW / ACCOUNT</span><b>{perAccountUnlockedLamports === null ? '—' : `+${formatSol(perAccountUnlockedLamports, 8)}`}</b></div>
               </div>
-
-              <button className="rollout-toggle" type="button" onClick={() => setStagesOpen(open => !open)} aria-expanded={stagesOpen}>
-                {stagesOpen ? 'HIDE STAGES ▴' : `SEE ALL ${RENT_STAGES.length} STAGES ▾`}
-              </button>
-
-              {stagesOpen && (
-                <div className="rollout-stages">
-                  {RENT_STAGES.map((stage, index) => {
-                    const state = stageState(index, stageIndex);
-                    return (
-                      <div key={stage.id} className={`stage-${state}`}>
-                        <i />
-                        <span>{stage.id}</span>
-                        <em>{stage.lamportsPerByte.toLocaleString('en-US')} / byte</em>
-                        <b>−{stageReductionPercent(stage.lamportsPerByte)}%</b>
-                        <small>{state === 'live' ? 'MAINNET' : stage.short}</small>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              <small className="rollout-source">
-                Rent floor <code>{liveFloorLamports === null ? '—' : `${formatSol(liveFloorLamports, 8)} SOL`}</code> read live with <code>getMinimumBalanceForRentExemption({TOKEN_ACCOUNT_SPACE})</code>. Active gates are derived from it, not assumed.
-              </small>
+              <a className="rollout-more" href="#reduction">SEE THE 5-STAGE ROLLOUT <span>↓</span></a>
             </div>
             <div className="game-actions">
               <button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN ▶</button>
@@ -410,7 +392,19 @@ export default function GamePrototype() {
         <div className="game-stage">
           <div className="game-stage-head"><span>QUEST 01 / WALLET SCAN</span><b>{quest === 'won' ? 'COMPLETE' : quest === 'error' ? 'CHECK LOG' : busy ? 'ACTIVE' : 'READY'}</b></div>
           <div className="game-stars" aria-hidden="true"><i /><i /><i /><i /><i /></div>
-          <div className="game-chest" aria-hidden="true"><div className="chest-glow" /><div className="chest-dust" /><div className="chest-lid" /><div className="chest-body"><i /></div><span className="coin coin-one">◎</span><span className="coin coin-two">◎</span><span className="coin coin-three">◎</span><span className="coin coin-four">◎</span><span className="coin coin-five">◎</span></div>
+          <div className="game-chest" aria-hidden="true"><div className="chest-glow" /><div className="chest-dust" /><div className="chest-lid" /><div className="chest-body"><i /></div>{COIN_ARCS.map((arc, index) => (
+            <span
+              key={index}
+              className="coin"
+              style={{
+                '--cx': `${arc.cx}px`,
+                '--cy': `${arc.cy}px`,
+                '--fall': `${arc.fall}px`,
+                '--rot': `${arc.rot}deg`,
+                animationDelay: `${arc.delay}s`,
+              } as React.CSSProperties}
+            >◎</span>
+          ))}</div>
           <div className={foundNothing ? 'game-result is-verdict' : 'game-result'}><small>{stageLabel}</small><StageAmount mode={amountMode} lamports={selectedLamports} verdict="ALL CAUGHT UP" /></div>
           <p>LIVE MAINNET · {SERVICE_FEE_PERCENT}% SUCCESS FEE · NOTHING RECOVERED, NOTHING CHARGED · YOU APPROVE EVERY TRANSACTION</p>
         </div>
