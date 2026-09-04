@@ -269,3 +269,19 @@ p.hero-mech span{color:#818f85;font-family:Arial,sans-serif;font-size:12px;line-
   .reduction-panel-head b:before,.bar-new,.reduction-delta strong{animation:none!important}
   .reduction-panel{transform:none}
 }
+/* Rollout status: mainnet is verified from the chain, testnet and scheduled
+   gates are the published timeline and are coloured to say so. */
+.rollout-stages>div.stage-live{background:rgba(170,255,62,.045);color:#a9bcac}
+.rollout-stages>div.stage-live i{border-color:var(--g-lime);background:var(--g-lime);box-shadow:0 0 8px var(--g-lime)}
+.rollout-stages>div.stage-live span,.rollout-stages>div.stage-live small{color:var(--g-lime)}
+.rollout-stages>div.stage-testnet i{border-color:var(--g-gold);background:rgba(255,226,74,.35)}
+.rollout-stages>div.stage-testnet small,.rollout-stages>div.stage-testnet span{color:var(--g-gold)}
+.ladder-row.stage-live{background:rgba(170,255,62,.045);color:#a9bcac}
+.ladder-row.stage-live>span:first-child{color:var(--g-lime)}
+.ladder-row.stage-live>span:first-child i{border-color:var(--g-lime);background:var(--g-lime);box-shadow:0 0 9px var(--g-lime)}
+.ladder-row.stage-live>span:last-child{color:var(--g-lime)}
+.ladder-row.stage-testnet>span:first-child{color:var(--g-gold)}
+.ladder-row.stage-testnet>span:first-child i{border-color:var(--g-gold);background:rgba(255,226,74,.3)}
+.ladder-row.stage-testnet>span:last-child{color:var(--g-gold)}
+.stage-ladder>small em{color:#a9bcac;font-style:normal}
+.stage-ladder>small a{color:var(--g-lime);text-underline-offset:3px}

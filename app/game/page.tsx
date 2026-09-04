@@ -12,8 +12,10 @@ import {
   lamportsPerByteFromFloor,
   LEGACY_LAMPORTS_PER_BYTE,
   LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS,
+  RENT_SOURCE_URL,
   RENT_STAGES,
   rentFloorFor,
+  stageState,
   stageReductionPercent,
   reclaimAccounts,
   scanReclaimableAccounts,
@@ -359,15 +361,18 @@ export default function GamePrototype() {
 
               {stagesOpen && (
                 <div className="rollout-stages">
-                  {RENT_STAGES.map((stage, index) => (
-                    <div key={stage.id} className={index <= stageIndex ? 'on' : ''}>
-                      <i />
-                      <span>{stage.id}</span>
-                      <em>{stage.lamportsPerByte.toLocaleString('en-US')} / byte</em>
-                      <b>−{stageReductionPercent(stage.lamportsPerByte)}%</b>
-                      <small>{index <= stageIndex ? 'ACTIVE' : 'PENDING'}</small>
-                    </div>
-                  ))}
+                  {RENT_STAGES.map((stage, index) => {
+                    const state = stageState(index, stageIndex);
+                    return (
+                      <div key={stage.id} className={`stage-${state}`}>
+                        <i />
+                        <span>{stage.id}</span>
+                        <em>{stage.lamportsPerByte.toLocaleString('en-US')} / byte</em>
+                        <b>−{stageReductionPercent(stage.lamportsPerByte)}%</b>
+                        <small>{state === 'live' ? 'MAINNET' : stage.short}</small>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
@@ -460,15 +465,15 @@ export default function GamePrototype() {
             </div>
             {RENT_STAGES.map((stage, index) => {
               const floor = rentFloorFor(TOKEN_ACCOUNT_SPACE, stage.lamportsPerByte);
-              const live = index <= stageIndex;
+              const state = stageState(index, stageIndex);
               return (
-                <div key={stage.id} className={live ? 'ladder-row live' : 'ladder-row'}>
+                <div key={stage.id} className={`ladder-row stage-${state}`}>
                   <span><i />{stage.id}</span>
                   <span>{stage.lamportsPerByte.toLocaleString('en-US')}</span>
                   <span>{formatSol(floor, 8)} SOL</span>
                   <span>{formatSol(LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS - floor, 8)} SOL</span>
                   <span>−{stageReductionPercent(stage.lamportsPerByte)}%</span>
-                  <span>{live ? 'ACTIVE' : 'PENDING'}</span>
+                  <span title={stage.eta || stage.declared}>{state === 'live' ? 'MAINNET' : stage.short}</span>
                 </div>
               );
             })}
@@ -479,7 +484,9 @@ export default function GamePrototype() {
             <div><span>UNLOCKED NOW</span><b>{perAccountUnlockedLamports === null ? '—' : `${formatSol(perAccountUnlockedLamports, 8)} SOL`}</b></div>
             <div className="ladder-target"><span>AT FULL ROLLOUT</span><b>{formatSol(finalSurplusLamports, 8)} SOL</b></div>
           </div>
-          <small>Stage rates are the published SIMD-0437 schedule. Which gates are active is derived from this cluster’s own rent-exempt minimum, so pending rows become active on their own as the rollout advances — and your wallet gains more to reclaim at each one.</small>
+          <small>
+            SIMD-0437-2 is live on testnet with mainnet activation expected mid-September 2026. The remaining three gates are delayed until the Agave 4.4 client release in November 2026, so the full 90% reduction lands late in the year. Whether a gate is live <em>here</em> is never assumed — it is derived from this cluster’s own rent-exempt minimum, so rows flip to MAINNET on their own as the rollout advances. Schedule per <a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">solana.com/upgrades/reduced-rent</a>.
+          </small>
         </div>
       </section>
 

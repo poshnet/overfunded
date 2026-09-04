@@ -36,13 +36,27 @@ export const LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS = 2_039_280;
 // actually live is never assumed, it is derived from the cluster's own floor.
 export const RENT_ACCOUNT_OVERHEAD_BYTES = 128;
 export const LEGACY_LAMPORTS_PER_BYTE = 6_960;
+export const RENT_SOURCE_URL = 'https://solana.com/upgrades/reduced-rent';
+
+/**
+ * Published rollout status per gate. Whether a gate is live *on mainnet* is
+ * never taken from this table — it is derived from the cluster's own rent floor
+ * by activeStageIndex(). These fields only describe what has been announced for
+ * the gates that have not landed yet.
+ */
 export const RENT_STAGES = [
-  { id: 'SIMD-0437-1', lamportsPerByte: 6_333 },
-  { id: 'SIMD-0437-2', lamportsPerByte: 5_080 },
-  { id: 'SIMD-0437-3', lamportsPerByte: 2_575 },
-  { id: 'SIMD-0437-4', lamportsPerByte: 1_322 },
-  { id: 'SIMD-0437-5', lamportsPerByte: 696 },
+  { id: 'SIMD-0437-1', lamportsPerByte: 6_333, short: 'MAINNET', declared: 'Live on mainnet', eta: '' },
+  { id: 'SIMD-0437-2', lamportsPerByte: 5_080, short: 'TESTNET', declared: 'Live on testnet', eta: 'Mainnet expected mid-September 2026' },
+  { id: 'SIMD-0437-3', lamportsPerByte: 2_575, short: 'AGAVE 4.4', declared: 'Expected in Agave 4.4', eta: 'November 2026' },
+  { id: 'SIMD-0437-4', lamportsPerByte: 1_322, short: 'AGAVE 4.4', declared: 'Expected in Agave 4.4', eta: 'November 2026' },
+  { id: 'SIMD-0437-5', lamportsPerByte: 696, short: 'AGAVE 4.4', declared: 'Expected in Agave 4.4', eta: 'November 2026' },
 ] as const;
+
+/** Class hint for a stage row: live on mainnet (verified), on testnet, or scheduled. */
+export function stageState(index: number, activeIndex: number) {
+  if (index <= activeIndex) return 'live' as const;
+  return RENT_STAGES[index].short === 'TESTNET' ? 'testnet' as const : 'scheduled' as const;
+}
 
 export function rentFloorFor(space: number, lamportsPerByte: number) {
   return (RENT_ACCOUNT_OVERHEAD_BYTES + space) * lamportsPerByte;

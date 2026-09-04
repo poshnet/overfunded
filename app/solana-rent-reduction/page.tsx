@@ -8,8 +8,10 @@ import {
   lamportsPerByteFromFloor,
   LEGACY_LAMPORTS_PER_BYTE,
   RENT_ACCOUNT_OVERHEAD_BYTES,
+  RENT_SOURCE_URL,
   RENT_STAGES,
   rentFloorFor,
+  stageState,
   stageReductionPercent,
   TOKEN_ACCOUNT_SPACE,
 } from '../game/solana-reclaim';
@@ -25,6 +27,10 @@ const FAQ = [
   {
     q: 'How much SOL can I reclaim?',
     a: 'It depends on how many accounts you hold and which stages are live. At the first stage a 165-byte SPL token account strands about 0.00018 SOL; at full rollout that rises to roughly 0.00184 SOL per account. Larger accounts such as mints and multisigs strand proportionally more, and accounts overfunded beyond the rent floor can hold far more than the schedule implies.',
+  },
+  {
+    q: 'When does the full 90% Solana rent reduction take effect?',
+    a: 'Not all at once. SIMD-0437-1 is live on mainnet today, giving a 9% reduction. SIMD-0437-2 is live on testnet with mainnet activation expected mid-September 2026, taking it to 27%. The final three gates are delayed until the Agave 4.4 client release in November 2026, so the full 90% reduction lands late in the year. Each activation leaves a fresh surplus in accounts funded before it, so reclaiming is worth repeating after each one.',
   },
   {
     q: 'Why has the SOL not come back automatically?',
@@ -125,16 +131,29 @@ export default function RentCutPage() {
               <i><em style={{ width: '100%' }} /></i>
               <b>{LEGACY_LAMPORTS_PER_BYTE.toLocaleString('en-US')}</b>
             </div>
-            {RENT_STAGES.map((stage, index) => (
-              <div key={stage.id} className={index <= stageIndex ? 'rate-row live' : 'rate-row'}>
-                <span>{stage.id.replace('SIMD-0437-', 'GATE ')}</span>
-                <i><em style={{ width: `${(stage.lamportsPerByte / LEGACY_LAMPORTS_PER_BYTE) * 100}%` }} /></i>
-                <b>{stage.lamportsPerByte.toLocaleString('en-US')}</b>
-                <small>{index <= stageIndex ? 'ACTIVE' : 'PENDING'}</small>
-              </div>
-            ))}
+            {RENT_STAGES.map((stage, index) => {
+              const state = stageState(index, stageIndex);
+              return (
+                <div key={stage.id} className={`rate-row stage-${state}`}>
+                  <span>{stage.id.replace('SIMD-0437-', 'GATE ')}</span>
+                  <i><em style={{ width: `${(stage.lamportsPerByte / LEGACY_LAMPORTS_PER_BYTE) * 100}%` }} /></i>
+                  <b>{stage.lamportsPerByte.toLocaleString('en-US')}</b>
+                  <small>{state === 'live' ? 'MAINNET' : stage.short}</small>
+                </div>
+              );
+            })}
           </div>
           <p className="chart-note">Bar length is the rate itself, relative to the legacy {LEGACY_LAMPORTS_PER_BYTE.toLocaleString('en-US')}. {floorLamports === null ? 'The live rate could not be read just now.' : `This cluster currently reports ${liveRate?.toLocaleString('en-US')} lamports per byte, which puts it at stage ${stagesLive}.`}</p>
+
+          <div className="stage-status">
+            <b>WHERE EACH GATE STANDS</b>
+            <ul>
+              <li><i className="dot-live" /><span><b>SIMD-0437-1</b> — live on mainnet. This is the reduction your wallet can act on today.</span></li>
+              <li><i className="dot-testnet" /><span><b>SIMD-0437-2</b> — live on testnet, with mainnet activation expected mid-September 2026. It roughly triples the surplus per account.</span></li>
+              <li><i className="dot-scheduled" /><span><b>SIMD-0437-3, -4 and -5</b> — delayed until the Agave 4.4 client release, expected November 2026. The full 90% reduction lands with them.</span></li>
+            </ul>
+            <a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">Solana’s official rollout status ↗</a>
+          </div>
         </div>
       </section>
 
