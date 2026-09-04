@@ -352,6 +352,10 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
 .game-result strong{font-family:var(--font-geist-mono),monospace;font-size:clamp(30px,3.5vw,48px);font-weight:900;letter-spacing:-.06em}
 .game-result .stage-verdict{font-size:clamp(19px,2vw,27px);letter-spacing:.025em}
 .stage-fees{position:absolute;right:22px;bottom:20px;left:22px;color:#5f7463;font-size:8px;letter-spacing:.08em;text-align:center;white-space:nowrap}
+.reduction-copy h2#rollout{scroll-margin-top:28px}
+.game-battle{column-gap:clamp(65px,10vw,150px);row-gap:18px}
+.battle-alert,.battle-source{margin-top:0}
+.battle-icon svg{display:block;width:52px;height:52px}
 
 @media(max-width:940px){
   .game-hero{grid-template-columns:1fr;padding-top:58px}

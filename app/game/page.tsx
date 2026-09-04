@@ -387,7 +387,7 @@ export default function GamePrototype() {
                 <div><span>CURRENT FLOOR / ACCOUNT</span><b>{liveFloorLamports === null ? '—' : formatSol(liveFloorLamports, 8)}</b></div>
                 <div className="rollout-target"><span>UNLOCKED NOW / ACCOUNT</span><b>{perAccountUnlockedLamports === null ? '—' : `+${formatSol(perAccountUnlockedLamports, 8)}`}</b></div>
               </div>
-              <a className="rollout-more" href="#reduction">SEE THE 5-STAGE ROLLOUT <span>↓</span></a>
+              <a className="rollout-more" href="#rollout">SEE THE 5-STAGE ROLLOUT <span>↓</span></a>
             </div>
             <div className="game-actions">
               <button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN ▶</button>
@@ -431,7 +431,7 @@ export default function GamePrototype() {
       <section className="game-reduction" id="reduction">
         <div className="reduction-copy">
           <small>PATCH NOTES · RENT FLOOR</small>
-          <h2>Five gates.<br /><em>One shrinking floor.</em></h2>
+          <h2 id="rollout">Five gates.<br /><em>One shrinking floor.</em></h2>
           <p>Rent is <code>(128 + data_len) × lamports_per_byte</code>. SIMD-0437 steps that rate down in five gated stages, from the legacy 6,960 to 696 — a 90% cut by the end. Each stage that activates widens the gap between what your accounts were funded with and what they now need, and nothing sweeps the difference back.</p>
           <div className="reduction-facts">
             <article><b>01</b><span>The floor moves down</span><p>The rent-exempt minimum for a 165-byte account is recalculated by the network.</p></article>
@@ -531,9 +531,9 @@ export default function GamePrototype() {
         <div className="battle-arena">
           <article className="battle-card enemy"><div className="battle-name"><span>ACCOUNT CLOSER</span><b>DESTRUCTIVE MOVE</b></div><i className="battle-icon">×</i><strong>CLOSE ACCOUNT</strong><ul><li>Account is deleted</li><li>Address stops working</li><li>Empty balance required</li></ul><em>USE ON DEAD ACCOUNTS</em></article>
           <div className="battle-vs">VS</div>
-          <article className="battle-card hero"><div className="battle-name"><span>OVERFUNDED</span><b>SAFE MOVE</b></div><i className="battle-icon">L</i><strong>WITHDRAW EXCESS</strong><ul><li>Account stays open</li><li>Address stays usable</li><li>Tokens stay untouched</li></ul><em>USE ON LIVE ACCOUNTS</em></article>
+          <article className="battle-card hero"><div className="battle-name"><span>OVERFUNDED</span><b>SAFE MOVE</b></div><i className="battle-icon"><BrandMark /></i><strong>WITHDRAW EXCESS</strong><ul><li>Account stays open</li><li>Address stays usable</li><li>Tokens stay untouched</li></ul><em>USE ON LIVE ACCOUNTS</em></article>
         </div>
-        <div className="battle-alert"><b>!</b><span><strong>PERMADEATH DISABLED</strong>No account-closing instruction appears in a Overfunded reclaim transaction.</span><i>0 CLOSED</i></div>
+        <div className="battle-alert"><b>!</b><span><strong>ACCOUNT DELETION: BLOCKED</strong>Overfunded never adds a CloseAccount instruction. Your token accounts stay open and usable.</span><i>0 CLOSED</i></div>
         <div className="battle-source"><div><b>DON’T TAKE OUR WORD FOR IT</b><span>Every instruction this site builds is in the open. Read the transaction builder, check the fee maths, and verify the rent floor against your own node.</span></div><a href={SOURCE_URL} target="_blank" rel="noreferrer">READ THE SOURCE ON GITHUB ↗</a></div>
       </section>
 
