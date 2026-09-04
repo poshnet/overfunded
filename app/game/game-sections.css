@@ -436,3 +436,19 @@ a.battle-card.hero>em{color:var(--tool-keep)}
 .battle-card.is-here{opacity:.72}
 .battle-card.is-here>em{color:#8fa293;letter-spacing:.12em}
 @media(prefers-reduced-motion:reduce){a.battle-card{transition:none}a.battle-card:hover{transform:none}}
+
+/* Plain-English primer. Sits before the technical ladder so a visitor who
+   does not know what rent is gets the idea before meeting lamports-per-byte. */
+.plain-english{padding:clamp(80px,9vw,120px) clamp(22px,7vw,110px);border-bottom:1px solid #1b241d;background:#080c09;content-visibility:auto;contain-intrinsic-size:auto 620px}
+.plain-head{max-width:820px}
+.plain-head>small{display:block;margin-bottom:20px;color:var(--g-lime);font-size:10px;font-weight:900;letter-spacing:.14em}
+.plain-head h2{margin:0;font-family:Arial,sans-serif;font-size:clamp(34px,3.8vw,54px);font-weight:900;line-height:1;letter-spacing:-.03em;text-transform:uppercase}
+.plain-head h2 em{color:var(--g-lime);font-family:Georgia,serif;font-weight:500;text-transform:none}
+.plain-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:clamp(38px,4vw,56px)}
+.plain-steps article{display:flex;flex-direction:column;padding:24px;border:1px solid #2e3c30;background:#0b110c}
+.plain-steps b{display:grid;width:38px;height:38px;place-items:center;margin-bottom:18px;border:1px solid #3d5140;background:#101810;color:var(--g-lime);font-size:11px}
+.plain-steps h3{margin:0 0 12px;color:#e6efe2;font-family:Arial,sans-serif;font-size:19px;line-height:1.25;letter-spacing:-.01em}
+.plain-steps p{margin:0;color:#a1b3a5;font-family:Arial,sans-serif;font-size:14px;line-height:1.7}
+.plain-close{max-width:760px;margin:clamp(30px,3vw,42px) 0 0;padding-left:18px;border-left:3px solid var(--g-lime);color:#c3d2c0;font-family:Arial,sans-serif;font-size:16px;line-height:1.7}
+@media(max-width:900px){.plain-steps{grid-template-columns:1fr}}
+@media(max-width:640px){.plain-english{padding:70px 18px}.plain-head h2{font-size:33px}.plain-close{font-size:14px}}

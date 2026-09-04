@@ -443,6 +443,31 @@ export default function GamePrototype() {
 
       <div className="game-modebar"><span><i /> SAFE MODE ACTIVE</span><b>WITHDRAW EXCESS</b><b>KEEP ACCOUNTS</b><b>TOUCH ZERO TOKENS</b><a href={SOURCE_URL} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a><a href="/solana-rent-reduction">HOW THE CUT WORKS ↗</a></div>
 
+      <section className="plain-english" id="plain-english">
+        <div className="plain-head">
+          <small>IN PLAIN ENGLISH</small>
+          <h2>You paid a deposit.<br /><em>It just got smaller.</em></h2>
+        </div>
+        <div className="plain-steps">
+          <article>
+            <b>01</b>
+            <h3>You already paid one</h3>
+            <p>Every token you have ever held opened an account in your wallet, and each one asked for a small refundable deposit to stay alive. Roughly two thousandths of a SOL, paid once, without you really noticing.</p>
+          </article>
+          <article>
+            <b>02</b>
+            <h3>Solana is cutting it by 90%</h3>
+            <p>The network decided those deposits are far larger than they need to be, so it is lowering the amount it asks for — in five steps, ending at a tenth of the original.</p>
+          </article>
+          <article>
+            <b>03</b>
+            <h3>Nobody hands back the difference</h3>
+            <p>Your accounts were funded at the old, bigger amount and nothing adjusts them. The gap between what you paid and what is now required just sits there, still yours, until something moves it.</p>
+          </article>
+        </div>
+        <p className="plain-close">That gap is the whole product. Overfunded finds it, moves it back to your wallet, and leaves the account exactly where it was — still open, still holding your tokens.</p>
+      </section>
+
       <section className="game-reduction" id="reduction">
         <div className="reduction-copy">
           <small>PATCH NOTES · RENT FLOOR</small>

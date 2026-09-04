@@ -276,7 +276,6 @@ export default function CloseTokenAccountsPage() {
           </div>
         ) : (
           <div className="closer-copy">
-            <small className="closer-kicker">DESTRUCTIVE MODE · EMPTY TOKEN ACCOUNT CLOSER</small>
             <h1>Dead accounts.<br /><em>Live SOL.</em></h1>
             <p>Close zero-balance Solana token accounts you no longer need and return their full rent deposits to your wallet.</p>
             <div className="closer-rules">
