@@ -68,7 +68,7 @@
 .closer-section-head{display:grid;grid-template-columns:1fr 1.2fr;column-gap:60px;max-width:1040px}
 .closer-section-head>small,.closer-choice>div:first-child>small{grid-column:1/-1;margin-bottom:16px;color:#e19b7d;font-size:9px;font-weight:900;letter-spacing:.14em}
 .closer-section-head h2,.closer-choice h2{margin:0;font-family:Arial,sans-serif;font-size:clamp(36px,4.4vw,62px);font-weight:950;line-height:.95;letter-spacing:-.04em;text-transform:uppercase}
-.closer-section-head h2 em{color:#e09a7c;font-family:Georgia,serif;font-weight:500;text-transform:none}
+.closer-section-head h2 em,.closer-choice h2 em{color:#e09a7c;font-family:Georgia,serif;font-weight:500;text-transform:none}
 .closer-section-head>p,.closer-choice>div:first-child>p{margin:4px 0 0;color:#987176;font-family:Arial,sans-serif;font-size:14px;line-height:1.7}
 .closer-step-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;max-width:1180px;margin-top:53px;border:1px solid #482329;background:#482329}
 .closer-step-grid article{position:relative;min-height:240px;padding:28px;background:#100708}
@@ -92,7 +92,7 @@
 .closer-shell .tool-toggle-close>a:last-child{color:#1c120e;background:#dd977a;box-shadow:0 0 18px rgba(221,151,122,.1)}
 .closer-shell .tool-toggle>a:last-child:hover{color:#e8b49f;background:#2a201b}
 .closer-kicker:before{background:#dc8f6f;color:#21130e}
-.closer-copy h1 em,.closer-rules b,.closer-stage .game-stage-head b,.closer-shell .live-results-head span,.closer-shell .live-summary b,.closer-shell .live-account-list label strong,.closer-shell .live-approval b,.closer-shell .live-approval a,.closer-shell .live-signatures a,.closer-section-head>small,.closer-choice>div:first-child>small,.closer-section-head h2 em,.closer-finale h2 em,.closer-finale small{color:#e29f82}
+.closer-copy h1 em,.closer-rules b,.closer-stage .game-stage-head b,.closer-shell .live-results-head span,.closer-shell .live-summary b,.closer-shell .live-account-list label strong,.closer-shell .live-approval b,.closer-shell .live-approval a,.closer-shell .live-signatures a,.closer-section-head>small,.closer-choice>div:first-child>small,.closer-section-head h2 em,.closer-choice h2 em,.closer-finale h2 em,.closer-finale small{color:#e29f82}
 .closer-warning{border-color:#765044;background:rgba(218,142,110,.055)}
 .closer-warning>i{border-color:#d78d6e;color:#dd997d}
 .closer-warning b{color:#e29f82}.closer-warning span{color:#a28c81}

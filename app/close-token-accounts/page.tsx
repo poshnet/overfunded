@@ -311,7 +311,7 @@ export default function CloseTokenAccountsPage() {
       </section>
 
       <section className="closer-choice">
-        <div><small>TWO TOOLS · TWO DIFFERENT JOBS</small><h2>Keep it—or clear it.</h2><p>Use the green Solana rent reclaim tool when a token account should stay alive. Use this red token account closer only when its balance is zero and you are finished with its address.</p></div>
+        <div><small>YES — THIS ONE IS</small><h2>This is<br /><em>an incinerator.</em></h2><p>The rent reclaim tool is careful to tell you it is not one. This is the other tool. It deletes the account, returns the whole deposit, and the address stops working — so reach for it only when the balance is zero and you are finished with that address for good.</p></div>
         <div className="closer-choice-grid">
           <a href="/"><i><BrandMark /></i><span><b>GREEN / KEEP OPEN</b><strong>Withdraw excess rent</strong><small>Token account stays usable</small></span><em>GO →</em></a>
           <a className="active" href="/close-token-accounts"><i>×</i><span><b>RED / CLOSE EMPTY</b><strong>Recover full rent</strong><small>Token account is removed</small></span><em>YOU ARE HERE</em></a>
