@@ -208,7 +208,7 @@ export default function CloseTokenAccountsPage() {
           </div>
         ) : (
           <div className="closer-copy">
-            <small className="closer-kicker">EMPTY TOKEN ACCOUNT CLOSER</small>
+            <small className="closer-kicker">DESTRUCTIVE MODE · EMPTY TOKEN ACCOUNT CLOSER</small>
             <h1>Dead accounts.<br /><em>Live SOL.</em></h1>
             <p>Close zero-balance Solana token accounts you no longer need and return their full rent deposits to your wallet.</p>
             <div className="closer-rules">
@@ -218,7 +218,7 @@ export default function CloseTokenAccountsPage() {
             </div>
             <div className="game-actions"><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + FIND EMPTY ACCOUNTS ▶</button><a href="#how-it-works">HOW IT WORKS ↓</a></div>
             {state === 'error' && <p className="live-notice error">{notice}</p>}
-            <div className="closer-warning"><i>!</i><div><b>THIS MODE CLOSES TOKEN ACCOUNTS</b><span>The selected token account addresses are permanently removed. Your wallet and tokens are not closed.</span></div></div>
+            <div className="closer-warning"><i>!</i><div><b>DESTRUCTIVE: THIS MODE CLOSES TOKEN ACCOUNTS</b><span>Selected empty token-account addresses are permanently deleted. Tokens are never burned, and your wallet is never closed.</span></div></div>
           </div>
         )}
 
@@ -231,7 +231,7 @@ export default function CloseTokenAccountsPage() {
         </div>
       </section>
 
-      <div className="closer-modebar"><span><i /> CLOSER MODE ACTIVE</span><b>ZERO-BALANCE ONLY</b><b>FULL RENT RETURNED</b><b>YOU PICK EVERY ADDRESS</b><a href={SOURCE_URL} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a></div>
+      <div className="closer-modebar"><span><i /> DESTRUCTIVE CLOSER MODE</span><b>ZERO-BALANCE ONLY</b><b>TOKEN ACCOUNT DELETED</b><b>TOKENS NEVER BURNED</b><a href={SOURCE_URL} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a></div>
 
       <section className="closer-steps" id="how-it-works">
         <div className="closer-section-head"><small>THE CLEANUP RUN</small><h2>Three checks.<br /><em>Then the exit.</em></h2><p>The red tool is intentionally separate from the green reclaim tool. It is for token accounts you are finished with—not active ones you want to keep.</p></div>

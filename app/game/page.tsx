@@ -395,7 +395,7 @@ export default function GamePrototype() {
               <a href="/solana-rent-reduction">HOW THE CUT WORKS →</a>
             </div>
             {quest === 'error' && <p className="live-notice error">{notice}</p>}
-            <div className="game-warning"><i>!</i><div><b>NO TOKEN ACCOUNTS ARE EVER CLOSED</b><span>Only excess rent moves. Tokens and account addresses stay intact.</span></div></div>
+            <div className="game-warning"><i>!</i><div><b>KEEP-OPEN MODE NEVER DELETES TOKENS</b><span>No tokens or token accounts are deleted. Balances and account addresses stay intact.</span></div></div>
           </div>
         )}
 
