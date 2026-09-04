@@ -62,6 +62,8 @@ export default function GamePrototype() {
   const networkFeeLamports = estimatedNetworkFeeLamports(selectedAccounts.length);
   const serviceFeeLamports = calculateServiceFeeLamports(selectedLamports);
   const estimatedReceiveLamports = Math.max(0, selectedLamports - serviceFeeLamports - networkFeeLamports);
+  const chargedOrQuotedFee = quest === 'won' ? chargedFeeLamports : serviceFeeLamports;
+  const totalFeeLamports = chargedOrQuotedFee + networkFeeLamports;
   const busy = quest === 'connecting' || quest === 'scanning' || quest === 'reclaiming';
   const showInventory = busy || quest === 'ready' || quest === 'won' || quest === 'demo' || (quest === 'error' && wallet !== '');
   // A finished scan that found nothing gets its own state. The chest must not
@@ -285,8 +287,7 @@ export default function GamePrototype() {
             <div className="live-summary">
               <div><span>Selected excess</span><b>{formatSol(selectedLamports, 6)} SOL</b></div>
               <div><span>Est. you receive</span><b>~{formatSol(estimatedReceiveLamports, 6)} SOL</b></div>
-              <div><span>Service fee ({SERVICE_FEE_PERCENT}%)</span><b>{formatSol(quest === 'won' ? chargedFeeLamports : serviceFeeLamports, 6)} SOL</b></div>
-              <div><span>Est. network fee</span><b>~{formatSol(networkFeeLamports, 6)} SOL</b></div>
+              <div><span>Total fees</span><b>~{formatSol(totalFeeLamports, 6)} SOL</b><em>{SERVICE_FEE_PERCENT}% service {formatSol(chargedOrQuotedFee, 6)} + network ~{formatSol(networkFeeLamports, 6)}</em></div>
             </div>
 
             <div className="live-account-list">
