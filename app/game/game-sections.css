@@ -329,7 +329,7 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
 @media(prefers-reduced-motion:reduce){.stage-scanning em{animation:none;opacity:.7}}
 
 /* Hero pass: one clear story on the left, with the full technical rollout below. */
-.game-hero{grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);gap:clamp(22px,2.7vw,42px);min-height:auto;padding-top:48px;padding-bottom:52px}
+.game-hero{grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);gap:clamp(22px,2.7vw,42px);min-height:calc(100svh - 82px);padding-top:48px;padding-bottom:72px}
 .game-copy{max-width:690px}
 .game-copy h1{margin:25px 0 18px;font-size:clamp(40px,3.9vw,59px)}
 .game-copy>p.hero-lead{max-width:600px;font-size:16px;line-height:1.55}
@@ -342,7 +342,19 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
 .rollout-more:hover{background:rgba(170,255,62,.08)}
 .rollout-more span{font-size:14px}
 .game-actions{margin-top:22px}
+.game-actions a.game-text-link{min-width:0;padding:17px 5px;border:0;border-radius:0;background:transparent;color:#a9bcac;text-decoration:underline;text-decoration-color:#5e765f;text-decoration-thickness:1px;text-underline-offset:5px;box-shadow:none}
+.game-actions a.game-text-link:hover{border:0;background:transparent;color:var(--g-lime);text-decoration-color:var(--g-lime)}
 .game-warning{margin-top:24px}
+.hero-scroll-cue{position:absolute;z-index:3;right:0;bottom:19px;left:0;display:flex;width:max-content;align-items:center;gap:9px;margin:auto;color:#708274;font-size:8px;font-weight:900;letter-spacing:.14em;text-decoration:none}
+.hero-scroll-cue span{display:inline-block;color:var(--g-lime);font-size:13px;animation:scroll-cue 1.8s ease-in-out infinite}
+@keyframes scroll-cue{0%,100%{transform:translateY(-2px);opacity:.45}50%{transform:translateY(3px);opacity:1}}
+
+/* Skip layout and paint work for long explainers until the visitor approaches
+   them. Intrinsic sizes keep the scroll bar stable while content is deferred. */
+.game-reduction,.game-missions,.game-battle,.game-ledger,.game-finale,.closer-steps,.closer-choice,.closer-finale,.game-footer{content-visibility:auto;contain-intrinsic-size:auto 760px}
+
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.16s;animation-timing-function:ease-out}
 
 /* The chest remains the reward, but no longer consumes half the opening screen. */
 .game-stage{width:100%;max-width:470px;min-height:400px;justify-self:start;padding:49px 26px 20px}
@@ -378,6 +390,8 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
   .game-actions{display:grid;grid-template-columns:1fr 1fr}
   .game-actions button:not(.game-demo-link){grid-column:1/-1;justify-content:center}
   .game-actions .game-demo-link,.game-actions a{min-width:0;padding-right:10px;padding-left:10px;justify-content:center}
+  .game-actions a.game-text-link{padding-right:4px;padding-left:4px}
+  .hero-scroll-cue{bottom:13px}
 }
 
 /* The product switch is navigation, not a cosmetic state: each side has its
@@ -409,4 +423,4 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
    feel restless. */
 .game-warning>i,.battle-alert>b,.closer-warning>i{animation:disclaimer-nudge 3.8s ease-in-out infinite;transform-origin:center}
 @keyframes disclaimer-nudge{0%,76%,100%{transform:translateY(0) rotate(0)}82%{transform:translateY(-3px) rotate(-6deg)}88%{transform:translateY(1px) rotate(5deg)}94%{transform:translateY(-1px) rotate(-2deg)}}
-@media(prefers-reduced-motion:reduce){.game-warning>i,.battle-alert>b,.closer-warning>i{animation:none}}
+@media(prefers-reduced-motion:reduce){.game-warning>i,.battle-alert>b,.closer-warning>i,.hero-scroll-cue span{animation:none}}

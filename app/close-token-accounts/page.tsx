@@ -12,6 +12,7 @@ import {
   formatSol,
   getWalletProvider,
   getRememberedWalletAddress,
+  LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS,
   rememberWalletAddress,
   scanClosableTokenAccounts,
   SERVICE_FEE_PERCENT,
@@ -20,7 +21,24 @@ import {
   type ClosableTokenAccount,
 } from '../game/solana-reclaim';
 
-type CloserState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'closing' | 'won' | 'error';
+type CloserState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'closing' | 'won' | 'error' | 'demo';
+
+const DEMO_MINTS = [
+  'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+  'DezXAZ8z7PnrnRJjz3wXBoRgixCa6hXNBWwG9Uj',
+  'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN',
+  'HZ1JovNiVvGrGNiiYvEozEVgB5PhnCSuXzLNBHGomr',
+];
+
+function buildDemoAccounts(): ClosableTokenAccount[] {
+  return Array.from({ length: 8 }, (_, index) => ({
+    address: `SampleEmptyTokenAccount${String(index + 1).padStart(2, '0')}Rent`,
+    mint: DEMO_MINTS[index % DEMO_MINTS.length],
+    program: index === 3 || index === 7 ? 'token-2022' as const : 'token' as const,
+    recoverableLamports: LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS,
+    selected: true,
+  }));
+}
 
 function TokenPortrait({ mint }: { mint: string }) {
   let hash = 0;
@@ -67,7 +85,7 @@ export default function CloseTokenAccountsPage() {
   const estimatedReceiveLamports = Math.max(0, selectedLamports - serviceFeeLamports - networkFeeLamports);
   const displayedServiceFee = state === 'won' ? chargedFeeLamports : serviceFeeLamports;
   const busy = state === 'connecting' || state === 'scanning' || state === 'closing';
-  const showInventory = busy || state === 'ready' || state === 'won' || (state === 'error' && wallet !== '');
+  const showInventory = busy || state === 'ready' || state === 'won' || state === 'demo' || (state === 'error' && wallet !== '');
   const foundNothing = state === 'ready' && accounts.length === 0;
 
   function focusTool() {
@@ -107,6 +125,23 @@ export default function CloseTokenAccountsPage() {
       setState('error');
       setNotice(error instanceof Error ? error.message : 'The wallet scan was cancelled or could not complete.');
     }
+  }
+
+  function playDemo() {
+    focusTool();
+    setState('scanning');
+    setAccounts([]);
+    setSignatures([]);
+    setProgress('');
+    setChargedFeeLamports(0);
+    setNotice('Running a sample empty-account scan. No wallet or network request is being used.');
+    window.setTimeout(() => {
+      const demoAccounts = buildDemoAccounts();
+      setAccounts(demoAccounts);
+      setScannedCount(demoAccounts.length);
+      setState('demo');
+      setNotice('Demo result: eight empty token accounts funded at the standard legacy rent deposit. Nothing here can be closed—connect your wallet for live mainnet results.');
+    }, 700);
   }
 
   function toggleAccount(address: string) {
@@ -157,6 +192,8 @@ export default function CloseTokenAccountsPage() {
 
   const action = state === 'won'
     ? { label: 'SCAN AGAIN ↻', onClick: connectAndScan, disabled: busy }
+    : state === 'demo'
+      ? { label: 'CONNECT A REAL WALLET →', onClick: connectAndScan, disabled: busy }
     : state === 'error'
       ? { label: 'TRY AGAIN ↻', onClick: connectAndScan, disabled: busy }
       : busy
@@ -173,6 +210,7 @@ export default function CloseTokenAccountsPage() {
     : state === 'scanning' ? 'SEARCHING FOR EMPTY TOKEN ACCOUNTS…'
       : state === 'closing' ? (progress || 'WAITING FOR APPROVAL…')
         : state === 'won' ? 'RENT RECOVERED'
+          : state === 'demo' ? 'SAMPLE CLEANUP REWARD'
           : foundNothing ? 'NO EMPTY TOKEN ACCOUNTS FOUND'
             : accounts.length ? 'READY TO CLOSE' : 'CLEANUP REWARD';
 
@@ -189,8 +227,8 @@ export default function CloseTokenAccountsPage() {
         {showInventory ? (
           <div className="closer-copy closer-inventory" aria-live="polite">
             <div className="live-results-head">
-              <div><small>EMPTY TOKEN ACCOUNT REVIEW</small><h2>{wallet ? shortenAddress(wallet, 6) : 'Connected wallet'}</h2></div>
-              <span>SOLANA MAINNET</span>
+              <div><small>{state === 'demo' ? 'DEMO EMPTY-ACCOUNT REVIEW' : 'EMPTY TOKEN ACCOUNT REVIEW'}</small><h2>{state === 'demo' ? 'Sample wallet' : wallet ? shortenAddress(wallet, 6) : 'Connected wallet'}</h2></div>
+              <span className={state === 'demo' ? 'demo' : ''}>{state === 'demo' ? 'DEMO DATA' : 'SOLANA MAINNET'}</span>
             </div>
 
             {foundNothing ? (
@@ -245,7 +283,7 @@ export default function CloseTokenAccountsPage() {
               <span><b>✓</b> YOU REVIEW EVERY ADDRESS</span>
               <span><b>5%</b> SUCCESS FEE</span>
             </div>
-            <div className="game-actions"><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + FIND EMPTY ACCOUNTS ▶</button><a href="#how-it-works">HOW IT WORKS ↓</a></div>
+            <div className="game-actions"><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + FIND EMPTY ACCOUNTS ▶</button><button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button><a className="game-text-link" href="#how-it-works">HOW IT WORKS ↓</a></div>
             {state === 'error' && <p className="live-notice error">{notice}</p>}
             <div className="closer-warning"><i>!</i><div><b>DESTRUCTIVE: THIS MODE CLOSES TOKEN ACCOUNTS</b><span>Selected empty token-account addresses are permanently deleted. Tokens are never burned, and your wallet is never closed.</span></div></div>
           </div>
@@ -258,6 +296,7 @@ export default function CloseTokenAccountsPage() {
           <div className="closer-stage-guard"><span>EMPTY ONLY</span><span>OWNER VERIFIED</span><span>DRY-RUN FIRST</span></div>
           <small className="closer-stage-fees">SERVICE + NETWORK</small>
         </div>
+        <a className="hero-scroll-cue" href="#how-it-works">MORE DETAILS <span>↓</span></a>
       </section>
 
       <div className="closer-modebar"><span><i /> DESTRUCTIVE CLOSER MODE</span><b>ZERO-BALANCE ONLY</b><b>TOKEN ACCOUNT DELETED</b><b>TOKENS NEVER BURNED</b><a href={SOURCE_URL} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a></div>
