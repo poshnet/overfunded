@@ -16,6 +16,17 @@ const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqC
 export const TREASURY_ADDRESS = '1Jpbzs17ihaezC18SaoBtJKMjoNx4ekjGKNDYs6NczM';
 export const SERVICE_FEE_PERCENT = 5;
 const TREASURY_PUBLIC_KEY = new PublicKey(TREASURY_ADDRESS);
+
+/**
+ * Lamports sitting in the treasury before any fee had been collected — its
+ * seed funding, measured on-chain. Everything above this line arrived as
+ * service fees, and since the fee is a fixed share of the surplus, the total
+ * reclaimed for users is recoverable from it.
+ *
+ * Withdrawing from the treasury lowers the balance and therefore this figure,
+ * so raise the baseline by the amount swept whenever that happens.
+ */
+export const TREASURY_BASELINE_LAMPORTS = 25_009_342;
 const SERVICE_FEE_BASIS_POINTS = SERVICE_FEE_PERCENT * 100;
 const RPC_ENDPOINT = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || (
   typeof window === 'undefined'
@@ -219,7 +230,15 @@ export async function getTreasuryActivity() {
     connection.getSignaturesForAddress(TREASURY_PUBLIC_KEY, { limit: 1000 }, 'confirmed'),
     connection.getBalance(TREASURY_PUBLIC_KEY, 'confirmed'),
   ]);
-  return { transactions: signatures.length, balanceLamports };
+  const feesCollectedLamports = Math.max(0, balanceLamports - TREASURY_BASELINE_LAMPORTS);
+  return {
+    transactions: signatures.length,
+    balanceLamports,
+    feesCollectedLamports,
+    // The fee is SERVICE_FEE_PERCENT of the gross surplus, so the surplus that
+    // reached wallets is the inverse of what the treasury received.
+    reclaimedLamports: Math.round(feesCollectedLamports * (100 / SERVICE_FEE_PERCENT)),
+  };
 }
 
 export async function scanReclaimableAccounts(owner: PublicKey): Promise<WalletScan> {

@@ -50,7 +50,7 @@ export default function GamePrototype() {
   const [liveFloorLamports, setLiveFloorLamports] = useState<number | null>(null);
   const [scannedCount, setScannedCount] = useState(0);
   const [stagesOpen, setStagesOpen] = useState(false);
-  const [treasury, setTreasury] = useState<{ transactions: number; balanceLamports: number } | null>(null);
+  const [treasury, setTreasury] = useState<{ reclaimedLamports: number; feesCollectedLamports: number } | null>(null);
 
   // Read the cluster's own rent-exempt minimum so the reduction section quotes a
   // number the visitor can verify instead of a marketing figure.
@@ -542,9 +542,9 @@ export default function GamePrototype() {
           <a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">PUBLISHED BY SOLANA ↗</a>
         </div>
         <div className="ledger-screen">
-          <span>FEE WALLET TRANSACTIONS</span>
-          <strong>{treasury === null ? '—' : treasury.transactions.toLocaleString('en-US')}</strong>
-          <p>Read live from the treasury’s on-chain history. Every reclaim that charges a fee settles here, so this counter moves on its own.</p>
+          <span>SOL SAVED FOR USERS</span>
+          <strong>{treasury === null ? '—' : formatSol(treasury.reclaimedLamports, 4)}<em>{treasury === null ? 'reading mainnet' : `${formatSol(treasury.feesCollectedLamports, 4)} SOL in fees`}</em></strong>
+          <p>Derived from what the fee wallet has actually received: the fee is {SERVICE_FEE_PERCENT}% of each recovery, so the surplus that reached wallets is twenty times it.</p>
           <a href={`https://solscan.io/account/${TREASURY_ADDRESS}`} target="_blank" rel="noreferrer">VERIFY ON SOLSCAN ↗</a>
         </div>
         <div className="ledger-screen locked">
