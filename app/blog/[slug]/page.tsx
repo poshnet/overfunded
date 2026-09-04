@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { findPost, POSTS, type Block } from '../posts';
 import { SOURCE_URL } from '../../site-config';
+import { BrandMark } from '../../brand-mark';
 
 export function generateStaticParams() {
   return POSTS.map(post => ({ slug: post.slug }));
@@ -57,7 +58,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   return (
     <main className="blog-shell">
       <nav className="blog-nav">
-        <a className="blog-brand" href="/"><i>O</i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a>
+        <a className="blog-brand" href="/"><i><BrandMark /></i><span><b>SOLRENT</b><small>SOLANA RENT</small></span></a>
         <a className="blog-nav-cta" href="/">SCAN MY WALLET →</a>
       </nav>
 
@@ -77,7 +78,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         <div className="post-inline-cta">
           <div>
             <b>SEE IT ON YOUR OWN WALLET</b>
-            <span>Overfunded scans your SPL token accounts against the live rent floor and withdraws only the surplus. Nothing is closed, no tokens move, and the source is public.</span>
+            <span>SolRent scans your SPL token accounts against the live rent floor and withdraws only the surplus. Nothing is closed, no tokens move, and the source is public.</span>
           </div>
           <a href="/">SCAN MY WALLET →</a>
         </div>
@@ -100,14 +101,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           description: post.description,
           datePublished: post.published,
           dateModified: post.published,
-          author: { '@type': 'Organization', name: 'Overfunded' },
-          publisher: { '@type': 'Organization', name: 'Overfunded' },
+          author: { '@type': 'Organization', name: 'SolRent' },
+          publisher: { '@type': 'Organization', name: 'SolRent' },
           mainEntityOfPage: { '@type': 'WebPage', '@id': `/blog/${post.slug}` },
         }) }}
       />
 
       <footer className="blog-footer">
-        <a className="blog-brand" href="/"><i>O</i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a>
+        <a className="blog-brand" href="/"><i><BrandMark /></i><span><b>SOLRENT</b><small>SOLANA RENT</small></span></a>
         <div>
           <a href="/">Scanner</a>
           <a href="/blog">Writing</a>

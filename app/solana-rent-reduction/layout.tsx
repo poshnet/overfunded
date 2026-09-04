@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Solana Rent Reduction Explained — SIMD-0437, Stage by Stage',
     description: 'A field guide to SIMD-0437 — the five-stage rent-exempt minimum reduction, and the SOL it leaves behind in your token accounts.',
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Overfunded — how the Solana rent cut works' }],
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'SolRent — how the Solana rent cut works' }],
   },
 };
 

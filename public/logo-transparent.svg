@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="760" viewBox="0 0 760 760">
+  
+  <g transform="translate(60,334) scale(1.55)"><rect x="17" y="10" width="30" height="18" rx="3.5" fill="#AAFF3E"/>
+  <rect x="13" y="31.5" width="38" height="4.4" rx="2.2" fill="#AAFF3E"/>
+  <rect x="17" y="40" width="30" height="12" rx="3.5" fill="#24351C" stroke="#3A5626" stroke-width="1.6"/></g>
+  <text x="228" y="396" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="66" font-weight="800" letter-spacing="-0.02em"><tspan fill="#AAFF3E">SOL</tspan><tspan fill="#F4F7DF">RENT</tspan></text>
+  <text x="231" y="430" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="17" font-weight="600" letter-spacing="0.16em" fill="#8FA293">RECLAIM SOLANA RENT</text>
+</svg>

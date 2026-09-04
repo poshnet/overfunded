@@ -52,7 +52,7 @@ export default function Home() {
       </div>
 
       <nav className="nav">
-        <a className="brand" href="#top" aria-label="Overfunded home"><span className="brand-mark" aria-hidden="true">L</span><span>OVERFUNDED</span></a>
+        <a className="brand" href="#top" aria-label="SolRent home"><span className="brand-mark" aria-hidden="true">L</span><span>SOLRENT</span></a>
         <div className="nav-links"><a href="#difference">Why different</a><a href="#how">How it works</a><a href="#safety">Safety</a></div>
         <a className="wallet-button" href="/">Open the live app <span aria-hidden="true">↗</span></a>
       </nav>
@@ -85,7 +85,7 @@ export default function Home() {
           </div>
           <div className="never-close-alert" role="note">
             <strong>NO TOKEN ACCOUNTS ARE EVER CLOSED</strong>
-            <span>Overfunded withdraws only excess rent. Your accounts and token balances stay intact.</span>
+            <span>SolRent withdraws only excess rent. Your accounts and token balances stay intact.</span>
           </div>
           {isResults && <div className="fee-preview"><span>Service fee <b>0.004210 SOL</b></span><span>You receive <strong>0.079985 SOL</strong></span></div>}
           <button className="reclaim-button" type="button" disabled={busy} onClick={isResults ? reclaimDemo : loadDemo}>{isResults ? 'Play the demo reclaim (0.079985 SOL)' : busy ? 'Scanning accounts…' : 'Run the demo scan'}</button>
@@ -109,7 +109,7 @@ export default function Home() {
         <div className="update-facts">
           <article><span>01</span><b>The network lowers rent</b><p>The required minimum changes as the reduced-rent rollout advances.</p></article>
           <article><span>02</span><b>Your account keeps the old deposit</b><p>Nothing automatically sweeps the surplus back to your wallet.</p></article>
-          <article><span>03</span><b>Overfunded returns the difference</b><p>Withdraw only the excess and leave the account live and rent-exempt.</p></article>
+          <article><span>03</span><b>SolRent returns the difference</b><p>Withdraw only the excess and leave the account live and rent-exempt.</p></article>
           <a href="https://solana.com/upgrades/reduced-rent" target="_blank" rel="noreferrer">Follow Solana’s official rollout <span>↗</span></a>
         </div>
       </section>
@@ -128,7 +128,7 @@ export default function Home() {
             <i>MODELLED ESTIMATE • NOT A LIVE BALANCE</i>
           </article>
           <article>
-            <span>CLAIMED THROUGH OVERFUNDED</span>
+            <span>CLAIMED THROUGH SOLRENT</span>
             <strong>$0</strong>
             <p>Pre-launch baseline. This counter will increase only after confirmed reclaim transactions.</p>
             <i>VERIFIABLE PRODUCT COUNTER</i>
@@ -170,7 +170,7 @@ export default function Home() {
         <div className="difference-heading">
           <p className="section-kicker">NOT ANOTHER INCINERATOR</p>
           <h2>Recover the surplus.<br /><em>Keep the account.</em></h2>
-          <p>Traditional cleanup tools recover rent by permanently closing eligible token accounts. Overfunded uses a different Token Program instruction that withdraws only what sits above today’s rent floor.</p>
+          <p>Traditional cleanup tools recover rent by permanently closing eligible token accounts. SolRent uses a different Token Program instruction that withdraws only what sits above today’s rent floor.</p>
         </div>
         <div className="comparison-wrap">
           <div className="comparison-cards">
@@ -181,13 +181,13 @@ export default function Home() {
             </article>
             <div className="versus">VS</div>
             <article className="compare-card lamport-card">
-              <div className="compare-top"><span>OVERFUNDED RECLAIM</span><i>NON-DESTRUCTIVE</i></div>
+              <div className="compare-top"><span>SOLRENT RECLAIM</span><i>NON-DESTRUCTIVE</i></div>
               <div className="account-visual"><div className="account-symbol">◎</div><div><b>Token account</b><span>8kP3…xR42</span></div><strong>OPEN</strong></div>
               <p>Recovers only the excess. The account keeps its address, tokens, and current rent reserve.</p>
             </article>
           </div>
-          <div className="comparison-table" role="table" aria-label="Account closer compared with Overfunded">
-            <div className="compare-row compare-head" role="row"><span role="columnheader">WHAT CHANGES</span><b role="columnheader">ACCOUNT CLOSER</b><strong role="columnheader">OVERFUNDED</strong></div>
+          <div className="comparison-table" role="table" aria-label="Account closer compared with SolRent">
+            <div className="compare-row compare-head" role="row"><span role="columnheader">WHAT CHANGES</span><b role="columnheader">ACCOUNT CLOSER</b><strong role="columnheader">SOLRENT</strong></div>
             <div className="compare-row" role="row"><span role="cell">Instruction</span><b role="cell">CloseAccount</b><strong role="cell">WithdrawExcessLamports</strong></div>
             <div className="compare-row" role="row"><span role="cell">Account afterward</span><b role="cell">Deleted</b><strong role="cell">Stays open</strong></div>
             <div className="compare-row" role="row"><span role="cell">Token balance</span><b role="cell">Must be handled first</b><strong role="cell">Untouched</strong></div>
@@ -195,7 +195,7 @@ export default function Home() {
             <div className="compare-row" role="row"><span role="cell">SOL recovered</span><b role="cell">Entire rent reserve</b><strong role="cell">Only the new surplus</strong></div>
             <div className="compare-row" role="row"><span role="cell">Best for</span><b role="cell">Dead, empty accounts</b><strong role="cell">Active accounts you keep</strong></div>
           </div>
-          <p className="difference-note"><b>Zero close instructions.</b> A Overfunded reclaim transaction contains no account-closing step. You review every instruction before signing.</p>
+          <p className="difference-note"><b>Zero close instructions.</b> A SolRent reclaim transaction contains no account-closing step. You review every instruction before signing.</p>
         </div>
       </section>
 
@@ -253,7 +253,7 @@ export default function Home() {
       </section>
 
       <footer>
-        <a className="brand footer-brand" href="#top"><span className="brand-mark" aria-hidden="true">L</span><span>OVERFUNDED</span></a>
+        <a className="brand footer-brand" href="#top"><span className="brand-mark" aria-hidden="true">L</span><span>SOLRENT</span></a>
         <p>Built for Solana’s reduced-rent era.</p>
         <div><a href="https://solana.com/upgrades/reduced-rent" target="_blank" rel="noreferrer">Rent rollout</a><a href="/">Live app</a><a href="#safety">Safety</a></div>
       </footer>

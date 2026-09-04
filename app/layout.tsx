@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     title: 'Reclaim Solana Rent — Recover Excess SOL Without Closing Token Accounts',
     description: 'Solana lowered the rent-exempt minimum under SIMD-0437. Scan your SPL token accounts and reclaim the excess rent with WithdrawExcessLamports — no accounts closed, no tokens touched.',
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Overfunded — reclaim excess Solana rent' }],
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'SolRent — reclaim excess Solana rent' }],
   },
   applicationName: SITE_NAME,
   twitter: {

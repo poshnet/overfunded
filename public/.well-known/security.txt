@@ -1,0 +1,5 @@
+Contact: https://github.com/poshnet/overfunded/security/advisories/new
+Expires: 2027-09-04T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://lamport-reclaim-sol.hunrtech.chatgpt.site/.well-known/security.txt
+Policy: https://github.com/poshnet/overfunded#security

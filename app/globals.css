@@ -162,3 +162,4 @@ button:disabled { cursor: wait; opacity: .8; }
   footer { min-height: 150px; grid-template-columns: 1fr; gap: 20px; padding-top: 28px; padding-bottom: 28px; } footer > div { justify-content: flex-start; flex-wrap: wrap; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+.game-brand > i svg, .blog-brand > i svg, .srr-brand > i svg, .fun-brand > i svg { display: block; width: 22px; height: 22px; }
