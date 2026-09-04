@@ -539,3 +539,10 @@ a.battle-card:hover{opacity:1}
 .verify-strip span{color:#8fa293;font-family:Arial,sans-serif;font-size:13px}
 .verify-strip>a{flex:none;padding:12px 15px;border:1px solid var(--g-lime);background:#17311c;color:var(--g-lime);font-size:10px;font-weight:900;letter-spacing:.08em;text-decoration:none;box-shadow:3px 3px 0 var(--btn-shadow,#31511e)}
 @media(max-width:760px){.verify-strip{align-items:stretch;flex-direction:column;gap:16px}.verify-strip>a{text-align:center}}
+/* What is still owed after the remaining gates. A reason to come back that
+   asks for nothing — no address, no email, just the number. */
+.future-value{display:flex;align-items:baseline;gap:12px;margin:16px 0 0;padding:13px 15px;border:1px solid #33452f;border-left:3px solid var(--g-lime);background:linear-gradient(90deg,rgba(170,255,62,.08),rgba(170,255,62,0) 80%)}
+.future-value b{flex:none;color:var(--g-lime);font-size:9px;letter-spacing:.11em}
+.future-value span{color:#9db0a2;font-family:Arial,sans-serif;font-size:12px;line-height:1.6}
+.future-value strong{color:var(--g-lime);font-weight:700}
+@media(max-width:640px){.future-value{align-items:flex-start;flex-direction:column;gap:8px}}

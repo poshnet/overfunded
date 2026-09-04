@@ -9,6 +9,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/close-token-accounts`, lastModified, changeFrequency: 'daily', priority: 0.95 },
     { url: `${SITE_URL}/solana-rent-reduction`, lastModified, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${SITE_URL}/blog`, lastModified, changeFrequency: 'weekly', priority: 0.7 },
+    ...['terms', 'privacy', 'risk'].map(doc => ({
+      url: `${SITE_URL}/legal/${doc}`,
+      lastModified,
+      changeFrequency: 'yearly' as const,
+      priority: 0.3,
+    })),
     ...POSTS.map(post => ({
       url: `${SITE_URL}/blog/${post.slug}`,
       lastModified: new Date(post.published),

@@ -382,7 +382,7 @@ export default function CloseTokenAccountsPage() {
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', description: `${SERVICE_FEE_PERCENT}% success fee on recovered rent.` },
       }) }} />
 
-      <footer className="game-footer"><a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/">Keep token accounts</a><a href="/blog">Blog</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a></div></footer>
+      <footer className="game-footer"><a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/">Keep token accounts</a><a href="/blog">Blog</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href="/legal/risk">Risk</a><a href="/legal/terms">Terms</a><a href="/legal/privacy">Privacy</a></div></footer>
     </main>
   );
 }

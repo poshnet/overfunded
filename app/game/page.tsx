@@ -142,6 +142,14 @@ export default function GamePrototype() {
   const stagesLive = stageIndex + 1;
   const finalStage = RENT_STAGES[RENT_STAGES.length - 1];
   const finalFloorLamports = rentFloorFor(TOKEN_ACCOUNT_SPACE, finalStage.lamportsPerByte);
+
+  // What this exact wallet will be owed once every gate lands, derived per
+  // account from its real size rather than assuming they are all 165 bytes.
+  const futureSurplusLamports = accounts.reduce((sum, account) => {
+    const heldNow = account.rentFloorLamports + account.excessLamports;
+    return sum + Math.max(0, heldNow - rentFloorFor(account.dataLength, finalStage.lamportsPerByte));
+  }, 0);
+  const stagesRemaining = RENT_STAGES.length - stagesLive;
   const finalSurplusLamports = LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS - finalFloorLamports;
   function focusQuest() {
     const hero = document.getElementById('quest');
@@ -371,6 +379,14 @@ export default function GamePrototype() {
             </>
             )}
 
+            {!foundNothing && accounts.length > 0 && liveFloorLamports !== null && stagesRemaining > 0 && futureSurplusLamports > selectedLamports && (
+              <p className="future-value">
+                <b>STILL COMING</b>
+                <span>
+                  {stagesRemaining} more {stagesRemaining === 1 ? 'gate' : 'gates'} of Solana’s rent cut are scheduled. Once they all land, this wallet will have about <strong>{formatSol(futureSurplusLamports, 5)} SOL</strong> waiting in the same accounts.
+                </span>
+              </p>
+            )}
             {!foundNothing && <p className={quest === 'error' ? 'live-notice error' : 'live-notice'}>{notice}</p>}
             {signatures.length > 0 && (
               <div className="live-signatures">
@@ -654,7 +670,7 @@ export default function GamePrototype() {
         ]) }}
       />
 
-      <footer className="game-footer"><a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/blog">Blog</a><a href="/solana-rent-reduction">How the cut works</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href="#safety">Safety</a></div></footer>
+      <footer className="game-footer"><a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/blog">Blog</a><a href="/solana-rent-reduction">How the cut works</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href="/legal/risk">Risk</a><a href="/legal/terms">Terms</a><a href="/legal/privacy">Privacy</a></div></footer>
     </main>
   );
 }
