@@ -13,10 +13,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: 'Reclaim Solana Rent — Recover Excess SOL Without Closing Token Accounts',
-  description: 'Solana lowered the rent-exempt minimum under SIMD-0437. Scan your SPL token accounts and reclaim the excess rent with WithdrawExcessLamports — no accounts closed, no tokens touched.',
+  description: 'Solana’s rent floor reduction lowered the rent-exempt minimum under SIMD-0437. Reclaim excess SOL while keeping token accounts open, or use the separate empty token account closer.',
   icons: { icon: '/favicon.svg' },
   keywords: ['solana rent', 'reclaim solana rent', 'solana rent refund', 'SIMD-0437',
-    'WithdrawExcessLamports', 'solana rent exempt minimum', 'recover SOL', 'excess lamports'],
+    'WithdrawExcessLamports', 'solana rent exempt minimum', 'recover SOL', 'excess lamports',
+    'close empty Solana token accounts', 'Solana token account closer'],
   alternates: { canonical: '/' },
   robots: { index: true, follow: true },
   openGraph: {

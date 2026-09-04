@@ -379,3 +379,28 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
   .game-actions button:not(.game-demo-link){grid-column:1/-1;justify-content:center}
   .game-actions .game-demo-link,.game-actions a{min-width:0;padding-right:10px;padding-left:10px;justify-content:center}
 }
+
+/* The product switch is navigation, not a cosmetic state: each side has its
+   own crawlable URL and its own explicit safety contract. */
+.tool-toggle{display:grid;grid-template-columns:1fr 1fr;min-width:390px;padding:4px;border:1px solid #27342a;background:#090f0a;box-shadow:inset 0 0 0 1px #050805;font-family:var(--font-geist-mono),monospace}
+.tool-toggle>a{position:relative;display:flex;align-items:center;gap:9px;min-height:48px;padding:7px 13px;color:#607264;text-decoration:none;transition:background .18s ease,color .18s ease,box-shadow .18s ease}
+.tool-toggle>a:hover{color:#c8d4ca;background:#101712}
+.tool-toggle>a+a{border-left:1px solid #27342a}
+.tool-toggle>a>i{width:9px;height:9px;flex:none;border:1px solid currentColor;border-radius:50%;background:#253128}
+.tool-toggle>a>span{display:flex;flex-direction:column;gap:2px;line-height:1}
+.tool-toggle>a b{font-size:10px;letter-spacing:.09em}
+.tool-toggle>a small{font-size:7px;letter-spacing:.06em;text-transform:uppercase;opacity:.72}
+.tool-toggle-reclaim>a:first-child,.tool-toggle-close>a:last-child{color:#071007;background:var(--g-lime);box-shadow:0 0 22px rgba(170,255,62,.12)}
+.tool-toggle-reclaim>a:first-child>i,.tool-toggle-close>a:last-child>i{border-color:#071007;background:#071007;box-shadow:0 0 0 3px rgba(7,16,7,.15)}
+.tool-toggle>a:last-child:hover{color:#ff6a70;background:#241012}
+.tool-toggle-close>a:last-child{color:#180506;background:#ff4e55;box-shadow:0 0 22px rgba(255,78,85,.15)}
+
+@media(max-width:940px){
+  .game-nav{grid-template-columns:1fr auto}
+  .game-nav>.tool-toggle{grid-column:1/-1;grid-row:2;width:100%;min-width:0;margin-top:8px}
+}
+@media(max-width:520px){
+  .tool-toggle>a{min-height:44px;padding:6px 8px;gap:7px}
+  .tool-toggle>a b{font-size:9px}
+  .tool-toggle>a small{font-size:6px}
+}

@@ -29,6 +29,7 @@ import {
 import { SITE_NAME, SITE_URL, SOURCE_URL } from '../site-config';
 import { StageAmount, type AmountMode } from './stage-amount';
 import { BrandMark } from '../brand-mark';
+import { ToolToggle } from './tool-toggle';
 
 type QuestState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'reclaiming' | 'won' | 'error' | 'demo';
 
@@ -283,7 +284,7 @@ export default function GamePrototype() {
     <main className={`game-shell quest-${quest} ${accounts.length ? 'has-loot' : 'no-loot'}`}>
       <nav className="game-nav">
         <a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a>
-        <div className="game-nav-stats"><span>MODE <b>SAFE</b></span><span>ACCOUNTS CLOSED <b>0</b></span><span>NETWORK <b>MAINNET</b></span></div>
+        <ToolToggle mode="reclaim" />
         <button type="button" onClick={connectAndScan} disabled={busy}>{wallet ? shortenAddress(wallet) : busy ? 'SCANNING…' : 'CONNECT WALLET'} <span>+</span></button>
       </nav>
 
@@ -366,9 +367,8 @@ export default function GamePrototype() {
           </div>
         ) : (
           <div className="game-copy">
-            <div className="game-level"><b>NEW QUEST</b><span>RENT FLOOR REDUCTION</span></div>
             <h1>Rent dropped.<br /><em>Your accounts didn’t notice.</em></h1>
-            <p className="hero-lead">Solana lowered the rent-exempt minimum. Your token accounts were funded at the old floor, and nothing sweeps the difference back to you.</p>
+            <p className="hero-lead">Solana’s rent floor reduction lowered the rent-exempt minimum. Your token accounts were funded at the old floor, and nothing sweeps the difference back to you.</p>
             <div className="rollout-panel rollout-compact">
               <div className="rollout-head">
                 <span>SIMD-0437 · LIVE RENT UPDATE</span>

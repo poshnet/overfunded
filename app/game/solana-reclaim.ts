@@ -8,8 +8,14 @@ import {
   VersionedTransaction,
   type ParsedAccountData,
 } from '@solana/web3.js';
-import { WITHDRAW_EXCESS_LAMPORTS_DISCRIMINATOR as TOKEN_WITHDRAW_DISCRIMINATOR } from '@solana-program/token';
-import { WITHDRAW_EXCESS_LAMPORTS_DISCRIMINATOR as TOKEN_2022_WITHDRAW_DISCRIMINATOR } from '@solana-program/token-2022';
+import {
+  CLOSE_ACCOUNT_DISCRIMINATOR as TOKEN_CLOSE_DISCRIMINATOR,
+  WITHDRAW_EXCESS_LAMPORTS_DISCRIMINATOR as TOKEN_WITHDRAW_DISCRIMINATOR,
+} from '@solana-program/token';
+import {
+  CLOSE_ACCOUNT_DISCRIMINATOR as TOKEN_2022_CLOSE_DISCRIMINATOR,
+  WITHDRAW_EXCESS_LAMPORTS_DISCRIMINATOR as TOKEN_2022_WITHDRAW_DISCRIMINATOR,
+} from '@solana-program/token-2022';
 
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
@@ -174,10 +180,25 @@ export type ReclaimOutcome = {
   totalBatches: number;
 };
 
+export type ClosableTokenAccount = {
+  address: string;
+  mint: string;
+  program: 'token' | 'token-2022';
+  recoverableLamports: number;
+  selected: boolean;
+};
+
+export type WalletCloseScan = {
+  accounts: ClosableTokenAccount[];
+  scannedCount: number;
+};
+
 type ParsedTokenInfo = {
+  closeAuthority?: string;
   isNative?: boolean;
   mint?: string;
   owner?: string;
+  tokenAmount?: { amount?: string };
 };
 
 export function getWalletProvider(): WalletProvider | null {
@@ -289,6 +310,47 @@ export async function scanReclaimableAccounts(owner: PublicKey): Promise<WalletS
   return { accounts, scannedCount: candidates.length };
 }
 
+/**
+ * Finds only zero-balance, non-native token accounts the connected wallet is
+ * allowed to close. Accounts delegated to a different close authority are
+ * omitted rather than presented as actions that will fail later.
+ */
+export async function scanClosableTokenAccounts(owner: PublicKey): Promise<WalletCloseScan> {
+  const [legacyResponse, token2022Response] = await Promise.all([
+    connection.getParsedTokenAccountsByOwner(owner, { programId: TOKEN_PROGRAM_ID }, 'confirmed'),
+    connection.getParsedTokenAccountsByOwner(owner, { programId: TOKEN_2022_PROGRAM_ID }, 'confirmed'),
+  ]);
+
+  const supported = [
+    ...legacyResponse.value.map(entry => ({ entry, program: 'token' as const })),
+    ...token2022Response.value.map(entry => ({ entry, program: 'token-2022' as const })),
+  ];
+  const ownerAddress = owner.toBase58();
+
+  const accounts = supported.flatMap(({ entry, program }) => {
+    const data = entry.account.data as ParsedAccountData;
+    const info = data.parsed?.info as ParsedTokenInfo | undefined;
+    const walletCanClose = !info?.closeAuthority || info.closeAuthority === ownerAddress;
+    if (
+      !info?.mint
+      || info.owner !== ownerAddress
+      || info.isNative
+      || info.tokenAmount?.amount !== '0'
+      || !walletCanClose
+    ) return [];
+
+    return [{
+      address: entry.pubkey.toBase58(),
+      mint: info.mint,
+      program,
+      recoverableLamports: entry.account.lamports,
+      selected: true,
+    }];
+  }).sort((a, b) => b.recoverableLamports - a.recoverableLamports);
+
+  return { accounts, scannedCount: supported.length };
+}
+
 function chunk<T>(items: T[], size: number) {
   return Array.from({ length: Math.ceil(items.length / size) }, (_, index) => (
     items.slice(index * size, index * size + size)
@@ -338,6 +400,62 @@ async function getFreshInstruction(account: ReclaimableAccount, authority: Publi
   };
 }
 
+/** Revalidates every irreversible close against raw on-chain data. */
+async function getFreshCloseInstruction(account: ClosableTokenAccount, authority: PublicKey) {
+  const source = new PublicKey(account.address);
+  const expectedProgram = account.program === 'token' ? TOKEN_PROGRAM_ID : TOKEN_2022_PROGRAM_ID;
+  const freshAccount = await connection.getAccountInfo(source, 'confirmed');
+
+  if (!freshAccount || !freshAccount.owner.equals(expectedProgram)) {
+    throw new Error(`${shortenAddress(account.address)} is no longer owned by the expected Token Program.`);
+  }
+  if (freshAccount.data.length < TOKEN_ACCOUNT_SPACE) {
+    throw new Error(`${shortenAddress(account.address)} is not a supported token account.`);
+  }
+
+  const tokenOwner = new PublicKey(freshAccount.data.subarray(32, 64));
+  if (!tokenOwner.equals(authority)) {
+    throw new Error(`Wallet ownership changed for ${shortenAddress(account.address)}.`);
+  }
+  if (freshAccount.data.readBigUInt64LE(64) !== 0n) {
+    throw new Error(`${shortenAddress(account.address)} received tokens after the scan and was not closed.`);
+  }
+  if (freshAccount.data[108] === 0) {
+    throw new Error(`${shortenAddress(account.address)} is not an initialized token account.`);
+  }
+  if (freshAccount.data.readUInt32LE(109) !== 0) {
+    throw new Error(`Wrapped SOL account ${shortenAddress(account.address)} was not closed.`);
+  }
+
+  const closeAuthorityOption = freshAccount.data.readUInt32LE(129);
+  if (closeAuthorityOption !== 0 && closeAuthorityOption !== 1) {
+    throw new Error(`${shortenAddress(account.address)} has an unsupported close authority state.`);
+  }
+  if (closeAuthorityOption === 1) {
+    const closeAuthority = new PublicKey(freshAccount.data.subarray(133, 165));
+    if (!closeAuthority.equals(authority)) {
+      throw new Error(`Close authority changed for ${shortenAddress(account.address)}.`);
+    }
+  }
+
+  const discriminator = account.program === 'token'
+    ? TOKEN_CLOSE_DISCRIMINATOR
+    : TOKEN_2022_CLOSE_DISCRIMINATOR;
+
+  return {
+    recoverableLamports: freshAccount.lamports,
+    instruction: new TransactionInstruction({
+      programId: expectedProgram,
+      keys: [
+        { pubkey: source, isSigner: false, isWritable: true },
+        { pubkey: authority, isSigner: false, isWritable: true },
+        { pubkey: authority, isSigner: true, isWritable: false },
+      ],
+      data: new Uint8Array([discriminator]) as unknown as Buffer,
+    }),
+  };
+}
+
 /**
  * Smallest fee transfer the treasury can legally receive.
  *
@@ -358,13 +476,15 @@ async function minimumTreasuryTransferLamports() {
 }
 
 /** Turns a raw simulation error into something the person reading it can act on. */
-function explainSimulationError(simulationError: unknown, logs: string[]) {
+function explainSimulationError(simulationError: unknown, logs: string[], operation: 'withdraw' | 'close') {
   const text = typeof simulationError === 'string' ? simulationError : JSON.stringify(simulationError);
   if (logs.some(line => /invalid instruction data|InvalidInstructionData|not supported|unknown instruction/i.test(line))) {
-    return 'The Token Program on this cluster does not support WithdrawExcessLamports yet, so nothing was signed.';
+    return operation === 'withdraw'
+      ? 'The Token Program on this cluster does not support WithdrawExcessLamports yet, so nothing was signed.'
+      : 'The Token Program rejected the token account close instruction, so nothing was signed.';
   }
   if (/AccountNotFound/i.test(text)) {
-    return 'This wallet has no SOL on mainnet, so it cannot pay the network fee for the withdrawal. Send it a small amount of SOL and scan again.';
+    return `This wallet has no SOL on mainnet, so it cannot pay the network fee for the ${operation === 'withdraw' ? 'withdrawal' : 'cleanup'}. Send it a small amount of SOL and scan again.`;
   }
   if (/InsufficientFundsForRent/i.test(text)) {
     return 'The transaction would leave an account below the rent-exempt minimum, so it was not signed.';
@@ -384,7 +504,7 @@ function explainSimulationError(simulationError: unknown, logs: string[]) {
  * leaves zero signatures on a message that requires one, and the runtime cannot
  * sanitize that. VersionedTransaction fills the placeholder correctly.
  */
-async function assertBatchSimulates(transaction: Transaction) {
+async function assertBatchSimulates(transaction: Transaction, operation: 'withdraw' | 'close') {
   let logs: string[] = [];
   let simulationError: unknown;
   try {
@@ -398,7 +518,7 @@ async function assertBatchSimulates(transaction: Transaction) {
     return;
   }
   if (!simulationError) return;
-  throw new Error(explainSimulationError(simulationError, logs));
+  throw new Error(explainSimulationError(simulationError, logs, operation));
 }
 
 /**
@@ -462,7 +582,7 @@ export async function reclaimAccounts(
         }));
       }
 
-      await assertBatchSimulates(transaction);
+      await assertBatchSimulates(transaction, 'withdraw');
 
       let signature: string;
       if (provider.signTransaction) {
@@ -491,6 +611,104 @@ export async function reclaimAccounts(
         error: error instanceof Error
           ? error.message
           : 'The transaction was cancelled or failed.',
+        recoveredLamports,
+        serviceFeeLamports,
+        signatures,
+        totalBatches: batches.length,
+      };
+    }
+  }
+
+  return {
+    completedBatches,
+    serviceFeeWaived,
+    error: null,
+    recoveredLamports,
+    serviceFeeLamports,
+    signatures,
+    totalBatches: batches.length,
+  };
+}
+
+/**
+ * Closes reviewed empty token accounts in small atomic batches. CloseAccount
+ * sends their rent to the owner first; the disclosed service-fee transfer is
+ * last, so recovered SOL is available before the fee instruction executes.
+ */
+export async function closeTokenAccounts(
+  provider: WalletProvider,
+  owner: PublicKey,
+  accounts: ClosableTokenAccount[],
+  onProgress?: (completed: number, total: number) => void,
+): Promise<ReclaimOutcome> {
+  const signatures: string[] = [];
+  const batches = chunk(accounts, ACCOUNTS_PER_TRANSACTION);
+  const [priorityMicroLamports, minimumFeeTransfer] = await Promise.all([
+    getPriorityMicroLamports(),
+    minimumTreasuryTransferLamports(),
+  ]);
+  let recoveredLamports = 0;
+  let serviceFeeLamports = 0;
+  let completedBatches = 0;
+  let serviceFeeWaived = false;
+
+  for (let batchIndex = 0; batchIndex < batches.length; batchIndex += 1) {
+    try {
+      const freshAccounts = await Promise.all(
+        batches[batchIndex].map(account => getFreshCloseInstruction(account, owner)),
+      );
+      const batchRecoveredLamports = freshAccounts.reduce((sum, account) => sum + account.recoverableLamports, 0);
+      const chargeableFeeLamports = Math.floor(
+        (batchRecoveredLamports * SERVICE_FEE_BASIS_POINTS) / 10_000,
+      );
+      const batchServiceFeeLamports = chargeableFeeLamports >= minimumFeeTransfer ? chargeableFeeLamports : 0;
+      if (chargeableFeeLamports > 0 && batchServiceFeeLamports === 0) serviceFeeWaived = true;
+
+      const latestBlockhash = await connection.getLatestBlockhash('confirmed');
+      const transaction = new Transaction({
+        feePayer: owner,
+        recentBlockhash: latestBlockhash.blockhash,
+      }).add(
+        ComputeBudgetProgram.setComputeUnitLimit({ units: computeUnitLimitFor(freshAccounts.length) }),
+        ComputeBudgetProgram.setComputeUnitPrice({ microLamports: priorityMicroLamports }),
+        ...freshAccounts.map(account => account.instruction),
+      );
+
+      if (batchServiceFeeLamports > 0) {
+        transaction.add(SystemProgram.transfer({
+          fromPubkey: owner,
+          toPubkey: TREASURY_PUBLIC_KEY,
+          lamports: batchServiceFeeLamports,
+        }));
+      }
+
+      await assertBatchSimulates(transaction, 'close');
+
+      let signature: string;
+      if (provider.signTransaction) {
+        const signed = await provider.signTransaction(transaction);
+        signature = await connection.sendRawTransaction(signed.serialize(), {
+          maxRetries: 3,
+          skipPreflight: false,
+        });
+      } else if (provider.signAndSendTransaction) {
+        const result = await provider.signAndSendTransaction(transaction);
+        signature = typeof result === 'string' ? result : result.signature;
+      } else {
+        throw new Error('This wallet cannot sign Solana transactions from the browser.');
+      }
+
+      await confirmSignature(signature, latestBlockhash.lastValidBlockHeight);
+      signatures.push(signature);
+      recoveredLamports += batchRecoveredLamports;
+      serviceFeeLamports += batchServiceFeeLamports;
+      completedBatches += 1;
+      onProgress?.(completedBatches, batches.length);
+    } catch (error) {
+      return {
+        completedBatches,
+        serviceFeeWaived,
+        error: error instanceof Error ? error.message : 'The transaction was cancelled or failed.',
         recoveredLamports,
         serviceFeeLamports,
         signatures,
