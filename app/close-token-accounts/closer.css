@@ -44,7 +44,7 @@
 .closer-won .closer-stage-result strong{color:#e2a085;text-shadow:0 0 24px rgba(221,144,112,.32)}
 
 
-.closer-stage-fees{position:absolute;right:18px;bottom:14px;left:18px;color:#70494d;font-size:7px;letter-spacing:.09em;text-align:center}
+.closer-stage-fees{position:static;display:block;margin-top:5px;color:#70494d;font-size:7px;line-height:1.4;letter-spacing:.09em;text-align:center;white-space:normal}
 .closer-connecting .radar-ping,.closer-scanning .radar-ping,.closer-closing .radar-ping{animation-duration:1.1s}.closer-connecting .radar-blip,.closer-scanning .radar-blip,.closer-closing .radar-blip{animation-duration:1.1s}
 
 .closer-inventory{width:100%;max-width:720px}

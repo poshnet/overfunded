@@ -637,3 +637,43 @@ a.battle-card:hover{opacity:1}
 .source-link{color:inherit;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px;text-decoration-color:currentColor;white-space:nowrap}
 .source-link:hover{color:var(--g-lime);text-decoration-thickness:2px}
 .source-link span{margin-left:3px;font-size:.85em;opacity:.8}
+
+/* Responsive reward panel. Keep the animated chest and the panel signature
+   inside their own layout box so neither can crowd the hero copy at compact
+   laptop or phone widths. */
+.game-stage,.closer-stage{min-width:0;overflow:clip}
+.game-chest-frame{max-width:100%}
+.stage-mark{max-width:100%;line-height:1.45;overflow-wrap:anywhere}
+
+@media(max-width:1050px) and (min-width:641px){
+  .game-hero{grid-template-columns:1fr;padding-top:56px}
+  .game-copy{max-width:760px}
+  .game-stage,.closer-stage{
+    display:grid;
+    width:min(690px,100%);
+    max-width:690px;
+    min-height:276px;
+    grid-template-columns:210px minmax(0,1fr);
+    grid-template-rows:auto auto;
+    column-gap:24px;
+    align-items:center;
+    justify-self:center;
+    padding:50px 30px 24px;
+  }
+  .game-stage .game-chest-frame,.closer-stage .game-chest-frame{grid-row:1/3;grid-column:1}
+  .game-stage .game-result,.closer-stage .closer-stage-result{grid-row:1;grid-column:2;align-self:end;margin:0}
+  .game-stage .stage-mark,.closer-stage .stage-mark{grid-row:2;grid-column:2;align-self:start;margin-top:10px}
+  .closer-stage .closer-stage-fees{grid-row:2;grid-column:2;align-self:start;margin-top:31px}
+}
+
+@media(max-width:640px){
+  .game-hero{min-height:auto;padding-bottom:66px}
+  .game-stage,.closer-stage{width:100%;max-width:430px;min-height:338px;padding:45px 14px 18px}
+  .game-chest-frame{width:156px;height:130px}
+  .game-chest{bottom:-1px;scale:.58;transform:none;margin-left:-130px}
+  .game-result,.closer-stage-result{min-height:54px;margin-top:5px}
+  .stage-mark{margin-top:8px;font-size:8px;letter-spacing:.15em}
+  .game-stage-head{gap:10px;padding:13px 12px;font-size:8px}
+  .game-stage-head span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .game-stage-head b{flex:none}
+}
