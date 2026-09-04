@@ -139,3 +139,4 @@
   .gap-arrow{transform:rotate(90deg)}
   .gap-bar{width:min(200px,60vw);height:170px}
 }
+.cut-callout>small a{color:var(--g-lime);text-underline-offset:3px}

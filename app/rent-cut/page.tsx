@@ -13,6 +13,7 @@ import {
   stageReductionPercent,
   TOKEN_ACCOUNT_SPACE,
 } from '../game/solana-reclaim';
+import { SOURCE_URL } from '../site-config';
 
 const ACCOUNT_KINDS = [
   { bytes: 82, label: 'Mint account', note: 'SPL token mint' },
@@ -214,6 +215,7 @@ export default function RentCutPage() {
               <code>{floorLamports === null ? '{"jsonrpc":"2.0","result": …, "id":1}' : `{"jsonrpc":"2.0","result":${floorLamports},"id":1}`}</code>
             </div>
           </div>
+          <div className="cut-callout"><span>AND THE CODE ITSELF</span><code>{SOURCE_URL.replace('https://', '')}</code><small>The scanner, the transaction builder, and the fee maths are all public. <a href={SOURCE_URL} target="_blank" rel="noreferrer">Read the source ↗</a></small></div>
           <p className="chart-note">Divide that result by {chargeableBytes} and you get the live <code>lamports_per_byte</code>. Match it against the ladder above and you know which gates are active — which is precisely how this page decides what to label ACTIVE.</p>
         </div>
       </section>
@@ -229,7 +231,7 @@ export default function RentCutPage() {
       <footer className="cut-footer">
         <a className="cut-brand" href="/"><i>L</i><span><b>LAMPORT</b><small>FIELD GUIDE</small></span></a>
         <p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p>
-        <div><a href="/">Scanner</a><a href="#top">Top</a></div>
+        <div><a href="/">Scanner</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a></div>
       </footer>
     </main>
   );

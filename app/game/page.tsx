@@ -24,6 +24,7 @@ import {
   TREASURY_ADDRESS,
   type ReclaimableAccount,
 } from './solana-reclaim';
+import { SOURCE_URL } from '../site-config';
 
 type QuestState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'reclaiming' | 'won' | 'error' | 'demo';
 
@@ -392,7 +393,7 @@ export default function GamePrototype() {
         </div>
       </section>
 
-      <div className="game-modebar"><span><i /> SAFE MODE ACTIVE</span><b>WITHDRAW EXCESS</b><b>KEEP ACCOUNTS</b><b>TOUCH ZERO TOKENS</b><a href="/rent-cut">HOW THE CUT WORKS ↗</a></div>
+      <div className="game-modebar"><span><i /> SAFE MODE ACTIVE</span><b>WITHDRAW EXCESS</b><b>KEEP ACCOUNTS</b><b>TOUCH ZERO TOKENS</b><a href={SOURCE_URL} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a><a href="/rent-cut">HOW THE CUT WORKS ↗</a></div>
 
       <section className="game-reduction" id="reduction">
         <div className="reduction-copy">
@@ -498,6 +499,7 @@ export default function GamePrototype() {
           <article className="battle-card hero"><div className="battle-name"><span>LAMPORT</span><b>SAFE MOVE</b></div><i className="battle-icon">L</i><strong>WITHDRAW EXCESS</strong><ul><li>Account stays open</li><li>Address stays usable</li><li>Tokens stay untouched</li></ul><em>USE ON LIVE ACCOUNTS</em></article>
         </div>
         <div className="battle-alert"><b>!</b><span><strong>PERMADEATH DISABLED</strong>No account-closing instruction appears in a Lamport reclaim transaction.</span><i>0 CLOSED</i></div>
+        <div className="battle-source"><div><b>DON’T TAKE OUR WORD FOR IT</b><span>Every instruction this site builds is in the open. Read the transaction builder, check the fee maths, and verify the rent floor against your own node.</span></div><a href={SOURCE_URL} target="_blank" rel="noreferrer">READ THE SOURCE ON GITHUB ↗</a></div>
       </section>
 
       <section className="game-ledger">
@@ -512,7 +514,7 @@ export default function GamePrototype() {
         <small>READY PLAYER WALLET?</small><h2>Find the hidden SOL.<br /><em>Keep every account alive.</em></h2><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN MAINNET ▶</button><a href="/rent-cut">READ: HOW THE RENT CUT WORKS ↗</a>
       </section>
 
-      <footer className="game-footer"><a className="game-brand" href="/"><i>L</i><span><b>LAMPORT</b><small>RENT QUEST</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/rent-cut">How the cut works</a><a href="#reduction">Rent change</a><a href="#safety">Safety</a></div></footer>
+      <footer className="game-footer"><a className="game-brand" href="/"><i>L</i><span><b>LAMPORT</b><small>RENT QUEST</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href="/rent-cut">How the cut works</a><a href="#safety">Safety</a></div></footer>
     </main>
   );
 }
