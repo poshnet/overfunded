@@ -392,19 +392,21 @@ export default function GamePrototype() {
         <div className="game-stage">
           <div className="game-stage-head"><span>QUEST 01 / WALLET SCAN</span><b>{quest === 'won' ? 'COMPLETE' : quest === 'error' ? 'CHECK LOG' : busy ? 'ACTIVE' : 'READY'}</b></div>
           <div className="game-stars" aria-hidden="true"><i /><i /><i /><i /><i /></div>
-          <div className="game-chest" aria-hidden="true"><div className="chest-glow" /><div className="chest-dust" /><div className="chest-lid" /><div className="chest-body"><i /></div>{COIN_ARCS.map((arc, index) => (
-            <span
-              key={index}
-              className="coin"
-              style={{
-                '--cx': `${arc.cx}px`,
-                '--cy': `${arc.cy}px`,
-                '--fall': `${arc.fall}px`,
-                '--rot': `${arc.rot}deg`,
-                animationDelay: `${arc.delay}s`,
-              } as React.CSSProperties}
-            >◎</span>
-          ))}</div>
+          <div className="game-chest-frame">
+            <div className="game-chest" aria-hidden="true"><div className="chest-glow" /><div className="chest-dust" /><div className="chest-lid" /><div className="chest-body"><i /></div>{COIN_ARCS.map((arc, index) => (
+              <span
+                key={index}
+                className="coin"
+                style={{
+                  '--cx': `${arc.cx}px`,
+                  '--cy': `${arc.cy}px`,
+                  '--fall': `${arc.fall}px`,
+                  '--rot': `${arc.rot}deg`,
+                  animationDelay: `${arc.delay}s`,
+                } as React.CSSProperties}
+              >◎</span>
+            ))}</div>
+          </div>
           <div className={foundNothing ? 'game-result is-verdict' : 'game-result'}><small>{stageLabel}</small><StageAmount mode={amountMode} lamports={selectedLamports} verdict="ALL CAUGHT UP" /></div>
           <p>LIVE MAINNET · {SERVICE_FEE_PERCENT}% SUCCESS FEE · NOTHING RECOVERED, NOTHING CHARGED · YOU APPROVE EVERY TRANSACTION</p>
         </div>

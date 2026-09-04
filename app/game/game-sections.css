@@ -69,8 +69,8 @@
 .chest-glow{opacity:.55}
 .chest-dust{position:absolute;z-index:4;left:50%;top:96px;width:74px;height:34px;margin-left:-37px;border-radius:50%;opacity:0;background:radial-gradient(circle,rgba(196,214,190,.5),transparent 70%);pointer-events:none}
 
-.quest-idle .game-chest{animation:chest-breathe 3.6s steps(6) infinite}
-.quest-idle .chest-glow{animation:chest-glow-idle 3.6s steps(6) infinite}
+.quest-idle .game-chest{animation:chest-breathe 3.2s ease-in-out infinite}
+.quest-idle .chest-glow{animation:chest-glow-idle 3.2s ease-in-out infinite}
 .quest-idle .chest-body i{animation:chest-glint 4.2s steps(4) infinite}
 
 .quest-connecting .game-chest,.quest-scanning .game-chest{animation:chest-rattle .19s steps(2) infinite}
@@ -287,7 +287,7 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
 .stage-value{color:#fff}
 .quest-won .stage-value{color:var(--g-lime);text-shadow:0 0 26px rgba(170,255,62,.32)}
 
-.stage-verdict{color:var(--g-lime);font-size:clamp(25px,2.7vw,38px);letter-spacing:.01em}
+.stage-verdict{color:var(--g-lime);font-size:clamp(19px,2vw,27px);letter-spacing:.025em}
 
 
 @media(prefers-reduced-motion:reduce){
@@ -329,9 +329,9 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
 @media(prefers-reduced-motion:reduce){.stage-scanning em{animation:none;opacity:.7}}
 
 /* Hero pass: one clear story on the left, with the full technical rollout below. */
-.game-hero{grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);gap:clamp(38px,5vw,78px);min-height:auto;padding-top:62px;padding-bottom:72px}
+.game-hero{grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);gap:clamp(22px,2.7vw,42px);min-height:auto;padding-top:48px;padding-bottom:52px}
 .game-copy{max-width:690px}
-.game-copy h1{margin:25px 0 18px}
+.game-copy h1{margin:25px 0 18px;font-size:clamp(40px,3.9vw,59px)}
 .game-copy>p.hero-lead{max-width:600px;font-size:16px;line-height:1.55}
 .rollout-panel.rollout-compact{max-width:600px;margin-top:20px}
 .rollout-compact .rollout-head{padding:11px 13px}
@@ -345,8 +345,12 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
 .game-warning{margin-top:24px}
 
 /* The chest remains the reward, but no longer consumes half the opening screen. */
-.game-stage{width:100%;max-width:470px;min-height:445px;justify-self:end;padding:49px 26px 22px}
-.game-chest{scale:.78;margin:-22px 0 -29px}
+.game-stage{width:100%;max-width:470px;min-height:400px;justify-self:start;padding:49px 26px 20px}
+.game-chest-frame{position:relative;width:210px;height:176px;flex:none}
+.game-chest{position:absolute;left:50%;bottom:0;scale:.78;margin:0 0 0 -130px}
+.game-result{min-height:66px;justify-content:flex-start;margin-top:2px}
+.game-result strong{font-family:var(--font-geist-mono),monospace;font-size:clamp(30px,3.5vw,48px);font-weight:900;letter-spacing:-.06em}
+.game-result .stage-verdict{font-size:clamp(19px,2vw,27px);letter-spacing:.025em}
 .game-stage>p{max-width:390px;line-height:1.5}
 
 @media(max-width:940px){
@@ -354,11 +358,19 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
   .game-stage{justify-self:center}
 }
 @media(max-width:640px){
+  .game-copy h1{font-size:34px}
   .rollout-compact .rollout-head{gap:7px}
   .rollout-compact .rollout-values{grid-template-columns:1fr 1fr}
   .rollout-compact .rollout-values>div{min-height:66px;padding:10px}
   .rollout-compact .rollout-values span{font-size:8px}
   .rollout-compact .rollout-values b{font-size:12px}
-  .game-stage{min-height:420px}
-  .game-chest{scale:.68;transform:none;margin:-31px 0 -42px}
+  .game-stage{min-height:375px;padding-top:46px}
+  .game-chest-frame{width:180px;height:153px}
+  .game-chest{scale:.68;transform:none;margin:0 0 0 -130px}
+  .game-result{min-height:60px}
+  .game-result strong{font-size:31px}
+  .game-result .stage-verdict{font-size:19px}
+  .game-actions{display:grid;grid-template-columns:1fr 1fr}
+  .game-actions button:not(.game-demo-link){grid-column:1/-1;justify-content:center}
+  .game-actions .game-demo-link,.game-actions a{min-width:0;padding-right:10px;padding-left:10px;justify-content:center}
 }
