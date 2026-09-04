@@ -383,7 +383,7 @@ export default function GamePrototype() {
         ) : (
           <div className="game-copy">
             <h1>Rent dropped.<br /><em>Your accounts didn’t notice.</em></h1>
-            <p className="hero-lead">Solana itself lowered the rent-exempt minimum, in a network upgrade called SIMD-0437. Your token accounts were funded at the old floor, and nothing sweeps the difference back to you. <a className="lead-more" href="/solana-rent-reduction">Learn more <span aria-hidden="true">→</span></a></p>
+            <p className="hero-lead">Solana lowered the rent-exempt minimum, in a network upgrade called SIMD-0437. Your token accounts were funded at the old floor, and nothing sweeps the difference back to you. <a className="lead-more" href="/solana-rent-reduction">Learn more <span aria-hidden="true">→</span></a></p>
             <div className="rollout-panel rollout-compact">
               <div className="rollout-head">
                 <span>SIMD-0437 · LIVE RENT UPDATE</span>

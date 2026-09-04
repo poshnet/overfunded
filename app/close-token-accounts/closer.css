@@ -247,62 +247,100 @@
 /* Analyzer. It reads a list of accounts, and what it finds changes what it
    does: idle it drifts, scanning it races, a result turns the rows into
    coins, and an empty wallet says so instead of celebrating. */
-.closer-analyzer{position:relative;width:230px;height:200px;overflow:hidden;border:1px solid #6c4e40;border-radius:10px;background:linear-gradient(#8b513812 1px,transparent 1px) 0 0/100% 25px,linear-gradient(90deg,#8b513812 1px,transparent 1px) 0 0/25px 100%,radial-gradient(circle at 50% 40%,rgba(226,141,105,.09),transparent 72%),#140d0a;box-shadow:inset 0 0 40px rgba(221,143,110,.1)}
-.closer-analyzer:after{content:'';position:absolute;z-index:5;inset:0;pointer-events:none;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(226,141,105,.14),inset 0 -34px 30px -20px rgba(20,13,10,.95),inset 0 34px 30px -20px rgba(20,13,10,.95)}
+
+
 
 /* The list being read. */
-.az-rows{position:absolute;z-index:1;left:18px;right:18px;top:0;display:flex;flex-direction:column;gap:11px;padding-top:14px;animation:az-drift 14s linear infinite}
-.az-row{height:7px;border-radius:2px;background:linear-gradient(90deg,rgba(226,141,105,.5),rgba(226,141,105,.14));opacity:.42;transition:opacity .4s ease}
-.az-row:nth-child(2n){width:78%}
-.az-row:nth-child(3n){width:56%}
-.az-row:nth-child(4n){width:90%}
-@keyframes az-drift{to{transform:translateY(-50%)}}
 
-.scan-line{position:absolute;z-index:3;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#f1b796,transparent);box-shadow:0 0 14px rgba(241,183,150,.65);opacity:.55;animation:az-scan 6s ease-in-out infinite}
-.scan-line:before{content:'';position:absolute;left:0;right:0;top:2px;height:38px;background:linear-gradient(rgba(226,141,105,.14),transparent)}
-@keyframes az-scan{0%,100%{top:6%}50%{top:92%}}
 
-.az-coins{position:absolute;z-index:4;inset:0;pointer-events:none}
-.az-coin{position:absolute;bottom:34px;display:grid;width:20px;height:20px;place-items:center;border:2px solid #3a2117;border-radius:50%;background:#f1b796;color:#2a1811;font-size:10px;font-style:normal;font-weight:900;opacity:0}
-.az-coin:nth-child(1){left:14%}
-.az-coin:nth-child(2){left:28%}
-.az-coin:nth-child(3){left:42%}
-.az-coin:nth-child(4){left:56%}
-.az-coin:nth-child(5){left:70%}
-.az-coin:nth-child(6){left:22%}
-.az-coin:nth-child(7){left:64%}
 
-.az-empty{position:absolute;z-index:4;left:0;right:0;top:50%;margin-top:-7px;color:#a08476;font-size:9px;letter-spacing:.13em;text-align:center;opacity:0;transition:opacity .5s ease}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* Reading the wallet: the list races and the scan line keeps pace. */
-.closer-connecting .az-rows,.closer-scanning .az-rows{animation-duration:2.4s}
+
 .closer-connecting .scan-line,.closer-scanning .scan-line{animation-duration:1.5s;opacity:1}
-.closer-connecting .az-row,.closer-scanning .az-row{opacity:.85}
+
 
 /* Found something: the list settles and pays out. */
-.has-closers.closer-ready .az-rows,.has-closers.closer-won .az-rows,.closer-demo .az-rows{animation-play-state:paused;opacity:.16}
+
 .has-closers.closer-ready .scan-line,.has-closers.closer-won .scan-line,.closer-demo .scan-line{opacity:0}
-.has-closers.closer-ready .az-coin,.closer-demo .az-coin{animation:az-payout 2.6s cubic-bezier(.2,.7,.3,1) infinite}
-.closer-won .az-coin{animation:az-payout 1.7s cubic-bezier(.2,.75,.3,1) infinite}
-.az-coin:nth-child(2){animation-delay:.16s!important}
-.az-coin:nth-child(3){animation-delay:.32s!important}
-.az-coin:nth-child(4){animation-delay:.48s!important}
-.az-coin:nth-child(5){animation-delay:.64s!important}
-.az-coin:nth-child(6){animation-delay:.8s!important}
-.az-coin:nth-child(7){animation-delay:.96s!important}
-@keyframes az-payout{
-  0%{opacity:0;transform:translateY(24px) scale(.5)}
-  14%{opacity:1;transform:translateY(6px) scale(1)}
-  62%{opacity:1;transform:translateY(-58px) scale(1)}
-  100%{opacity:0;transform:translateY(-104px) scale(.72)}
-}
+
+
+
+
+
+
+
+
+
 
 /* Found nothing: it stops and says so. */
-.no-closers.closer-ready .az-rows{animation-play-state:paused;opacity:.1}
+
 .no-closers.closer-ready .scan-line{opacity:0}
-.no-closers.closer-ready .az-empty{opacity:1}
+
 
 @media(prefers-reduced-motion:reduce){
-  .az-rows,.scan-line,.az-coin{animation:none}
-  .has-closers.closer-ready .az-coin,.closer-won .az-coin,.closer-demo .az-coin{opacity:1;transform:translateY(-30px)}
+  
+  
+}
+
+/* A red chest for the closer. Same construction as the reclaim tool's so the
+   two tools feel like one product; the palette and the states differ because
+   what happens here is different — the account is emptied and deleted. */
+.closer-chest{
+  --chest-lid-a:#7c3f28;--chest-lid-b:#a05536;--chest-lid-top:#d78d6e;
+  --chest-body-a:#6b3623;--chest-body-b:#8b4a30;--chest-band:#e8a17f;
+  --chest-ink:#180d09;--chest-lock:#f1b796;
+  --chest-glow:rgba(226,141,105,.34);
+}
+.closer-chest .coin{background:#f1b796;border-color:#2a1811;color:#2a1811}
+.closer-chest .chest-dust{background:radial-gradient(circle,rgba(226,190,165,.5),transparent 70%)}
+
+/* Idle: alive but shut. */
+.closer-idle .closer-chest{animation:chest-breathe 3.6s steps(6) infinite}
+.closer-idle .closer-chest .chest-glow{animation:chest-glow-idle 3.6s steps(6) infinite}
+.closer-idle .closer-chest .chest-body i{animation:lock-glint 5.2s ease-in-out infinite}
+
+/* Reading the wallet: it rattles. */
+.closer-connecting .closer-chest,.closer-scanning .closer-chest{animation:chest-rattle .19s steps(2) infinite}
+.closer-connecting .closer-chest .chest-glow,.closer-scanning .closer-chest .chest-glow{animation:chest-glow-search .5s steps(3) infinite}
+.closer-connecting .closer-chest .chest-lid,.closer-scanning .closer-chest .chest-lid{animation:chest-lid-jitter .24s steps(2) infinite}
+
+/* Empty accounts found: the lid opens and the rent pours out. */
+.has-closers.closer-ready .closer-chest .chest-lid,.closer-demo .closer-chest .chest-lid,.has-closers.closer-closing .closer-chest .chest-lid,.closer-won .closer-chest .chest-lid{animation:chest-lid-open .55s cubic-bezier(.34,1.56,.64,1) both}
+.has-closers.closer-ready .closer-chest .coin,.closer-demo .closer-chest .coin,.has-closers.closer-closing .closer-chest .coin{animation:coin-fly 3.1s cubic-bezier(.22,.68,.36,1) infinite}
+.closer-won .closer-chest .coin{animation:coin-fly 1.9s cubic-bezier(.18,.74,.32,1) infinite}
+.has-closers.closer-ready .closer-chest .chest-glow,.closer-demo .closer-chest .chest-glow{animation:chest-glow-flare .6s ease-out both}
+.closer-won .closer-chest .chest-glow{animation:chest-glow-win 1.1s ease-out both}
+.closer-won .closer-chest{animation:chest-pop .5s steps(4) both}
+
+/* Nothing to clean: it opens a crack on an empty box. */
+.no-closers.closer-ready .closer-chest .chest-lid{animation:chest-lid-crack .9s steps(5) both}
+.no-closers.closer-ready .closer-chest .coin{opacity:0;animation:none}
+.no-closers.closer-ready .closer-chest .chest-glow{animation:chest-glow-dim .9s ease-out both}
+.no-closers.closer-ready .closer-chest .chest-dust{animation:chest-dust .95s steps(6) .25s both}
+
+@media(prefers-reduced-motion:reduce){
+  .closer-chest,.closer-chest .chest-lid,.closer-chest .chest-glow,.closer-chest .chest-dust,
+  .closer-chest .coin,.closer-chest .chest-body i{animation:none!important}
+  .has-closers.closer-ready .closer-chest .chest-lid,.closer-demo .closer-chest .chest-lid,.closer-won .closer-chest .chest-lid{transform:translateY(-30px) rotate(-9deg)}
+  .no-closers.closer-ready .closer-chest .chest-lid{transform:translateY(-9px) rotate(-3deg)}
 }

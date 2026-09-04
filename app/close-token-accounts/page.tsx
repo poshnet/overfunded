@@ -23,6 +23,21 @@ import {
   type ClosableTokenAccount,
 } from '../game/solana-reclaim';
 
+const COIN_ARCS = [
+  { cx: 40, cy: -92, fall: -178, rot: 320, delay: 0 },
+  { cx: 88, cy: -70, fall: -154, rot: -300, delay: 0.36 },
+  { cx: 20, cy: -118, fall: -214, rot: 400, delay: 0.72 },
+  { cx: 122, cy: -84, fall: -146, rot: -360, delay: 1.08 },
+  { cx: 60, cy: -106, fall: -196, rot: 290, delay: 1.44 },
+  { cx: 150, cy: -62, fall: -132, rot: 440, delay: 1.8 },
+  { cx: 8, cy: -80, fall: -168, rot: -320, delay: 2.16 },
+  { cx: 104, cy: -124, fall: -204, rot: 370, delay: 0.18 },
+  { cx: 70, cy: -54, fall: -140, rot: -400, delay: 0.54 },
+  { cx: 172, cy: -96, fall: -162, rot: 330, delay: 0.9 },
+  { cx: 34, cy: -138, fall: -226, rot: -260, delay: 1.26 },
+  { cx: 134, cy: -108, fall: -188, rot: 410, delay: 1.62 },
+];
+
 type CloserState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'closing' | 'won' | 'error' | 'demo';
 
 const DEMO_MINTS = [
@@ -284,15 +299,24 @@ export default function CloseTokenAccountsPage() {
 
         <div className="closer-stage">
           <div className="game-stage-head"><span>TOOL 02 / EMPTY ACCOUNT CLEANUP</span><b>{state === 'won' ? 'COMPLETE' : state === 'error' ? 'CHECK LOG' : busy ? 'ACTIVE' : 'READY'}</b></div>
-          <div className="closer-analyzer" aria-hidden="true">
-            <div className="az-rows">
-              {Array.from({ length: 9 }, (_, index) => <i key={index} className="az-row" />)}
-            </div>
-            <i className="scan-line" />
-            <div className="az-coins">
-              {Array.from({ length: 7 }, (_, index) => <em key={index} className="az-coin">◎</em>)}
-            </div>
-            <span className="az-empty">NO EMPTY ACCOUNTS</span>
+          <div className="game-chest closer-chest" aria-hidden="true">
+            <div className="chest-glow" />
+            <div className="chest-dust" />
+            <div className="chest-lid" />
+            <div className="chest-body"><i /></div>
+            {COIN_ARCS.map((arc, index) => (
+              <span
+                key={index}
+                className="coin"
+                style={{
+                  '--cx': `${arc.cx}px`,
+                  '--cy': `${arc.cy}px`,
+                  '--fall': `${arc.fall}px`,
+                  '--rot': `${arc.rot}deg`,
+                  animationDelay: `${arc.delay}s`,
+                } as React.CSSProperties}
+              >◎</span>
+            ))}
           </div>
           <div className="closer-stage-result"><small>{stageLabel}</small><strong>{busy ? '···' : accounts.length ? `${formatSol(selectedLamports, 5)} SOL` : foundNothing ? 'ALL CLEAN' : '??? SOL'}</strong></div>
           <div className="closer-stage-guard"><span>EMPTY ONLY</span><span>OWNER VERIFIED</span><span>DRY-RUN FIRST</span></div>

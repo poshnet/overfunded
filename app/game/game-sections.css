@@ -519,7 +519,7 @@ a.battle-card:hover{opacity:1}
 
 /* Chest polish: banded metal on the lid, a lock that catches the light, a
    cast shadow so it sits on something, and a warm spill when it is open. */
-.chest-lid{background:repeating-linear-gradient(90deg,#3d6a29 0 25px,#4d8531 25px 50px),linear-gradient(180deg,rgba(255,255,255,.14),transparent 58%);background-blend-mode:overlay,normal;box-shadow:0 -5px 0 #79b940,inset 0 8px 0 rgba(255,255,255,.12),inset 0 -6px 10px rgba(0,0,0,.35)}
+.chest-lid{background:repeating-linear-gradient(90deg,var(--chest-lid-a,#3d6a29) 0 25px,var(--chest-lid-b,#4d8531) 25px 50px),linear-gradient(180deg,rgba(255,255,255,.14),transparent 58%);background-blend-mode:overlay,normal;box-shadow:0 -5px 0 var(--chest-lid-top,#79b940),inset 0 8px 0 rgba(255,255,255,.12),inset 0 -6px 10px rgba(0,0,0,.35)}
 .chest-body{box-shadow:0 7px 0 #040704,inset 0 -10px 16px rgba(0,0,0,.4)}
 .chest-body i{background:linear-gradient(180deg,#fff2a8,var(--g-gold) 42%,#c9a51f);box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 2px 0 rgba(0,0,0,.35)}
 .game-chest:after{content:'';position:absolute;z-index:0;left:50%;bottom:6px;width:196px;height:20px;margin-left:-98px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.55),transparent 70%);pointer-events:none}
