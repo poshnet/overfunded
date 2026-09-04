@@ -569,3 +569,10 @@ a.battle-card:hover{opacity:1}
 .verify-link span{display:inline-block;margin-left:5px;transition:transform .18s ease}
 .verify-link:hover span{transform:translate(2px,-2px)}
 @media(prefers-reduced-motion:reduce){.verify-link span{transition:none}}
+
+/* Emphasis that actually reads: near-white for weight, lime italic for tone.
+   Applied wherever body copy lives so both tools inherit it. */
+.plain-steps strong,.plain-close strong,.reduction-copy strong,.battle-head strong,
+.game-section-title strong,.ledger-title strong,.lc-body strong{color:#e9f2e5;font-weight:700}
+.plain-steps em,.plain-close em,.reduction-copy p em,.battle-head p em,
+.game-section-title p em,.ledger-title p em{color:var(--g-lime);font-style:italic}

@@ -382,3 +382,6 @@
    sequence starts when it scrolls into view rather than on page load. */
 .lifecycle-panel li{animation:lc-appear .62s cubic-bezier(.22,.7,.35,1) both}
 @keyframes lc-appear{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+.closer-section-head strong,.closer-choice strong,.lc-body strong{color:#f2e6df;font-weight:700}
+.closer-section-head p em,.closer-choice p em,.lc-body em{color:#e8b39c;font-style:italic}

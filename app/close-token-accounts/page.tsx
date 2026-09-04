@@ -336,7 +336,7 @@ export default function CloseTokenAccountsPage() {
         <div className="closer-section-head">
           <small>WHERE THE RENT COMES FROM</small>
           <h2>Every token account<br /><em>is holding your SOL.</em></h2>
-          <p>Not a fee, not a charge — a deposit. It goes in when the account opens, sits there for as long as the account exists, and comes back out only when something asks for it. Here is that whole life in three steps.</p>
+          <p><strong>Not a fee, not a charge — a deposit.</strong> It goes in when the account opens, sits there for as long as the account exists, and comes back out <em>only when something asks for it</em>. Here is that whole life in three steps.</p>
         </div>
 
         <ol className="lifecycle-panel">
@@ -368,7 +368,7 @@ export default function CloseTokenAccountsPage() {
       </section>
 
       <section className="closer-choice">
-        <div><small>YES — THIS ONE IS</small><h2>This is<br /><em>an incinerator.</em></h2><p>The rent reclaim tool is careful to tell you it is not one. This is the other tool. It deletes the account, returns the whole deposit, and the address stops working — so reach for it only when the balance is zero and you are finished with that address for good.</p></div>
+        <div><small>YES — THIS ONE IS</small><h2>This is<br /><em>an incinerator.</em></h2><p>The rent reclaim tool is careful to tell you it is <em>not</em> one. This is the other tool. It <strong>deletes the account</strong>, returns the whole deposit, and the address stops working — so reach for it only when the balance is zero and you are <strong>finished with that address for good</strong>.</p></div>
         <ToolCompare current="close" />
       </section>
 

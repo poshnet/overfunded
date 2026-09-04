@@ -453,33 +453,33 @@ export default function GamePrototype() {
       <section className="plain-english" id="plain-english">
         <div className="plain-head">
           <small>IN PLAIN ENGLISH</small>
-          <h2>You paid a deposit.<br /><em>It just got smaller.</em></h2>
+          <h2>Your deposit stayed put.<br /><em>The requirement dropped.</em></h2>
         </div>
         <div className="plain-steps">
           <article>
             <b>01</b>
             <h3>You already paid one</h3>
-            <p>Every token you have ever held opened an account in your wallet, and each one asked for a small refundable deposit to stay alive. Roughly two thousandths of a SOL, paid once, without you really noticing.</p>
+            <p>Every token you have ever held opened an account in your wallet, and each one asked for a <strong>small refundable deposit</strong> to stay alive. Roughly two thousandths of a SOL, paid once, <em>without you really noticing</em>.</p>
           </article>
           <article>
             <b>02</b>
             <h3>Solana is cutting it by 90%</h3>
-            <p>This is Solana’s own change, published as SIMD-0437: the network decided those deposits are far larger than they need to be, so it is lowering the amount it asks for — in five steps, ending at a tenth of the original.</p>
+            <p>This is <strong>Solana’s own change</strong>, published as SIMD-0437. The network decided those deposits are far larger than they need to be, so it is lowering the amount it <em>asks for</em> — in five steps, ending at <strong>a tenth of the original</strong>.</p>
           </article>
           <article>
             <b>03</b>
             <h3>Nobody hands back the difference</h3>
-            <p>Your accounts were funded at the old, bigger amount and nothing adjusts them. The gap between what you paid and what is now required just sits there, still yours, until something moves it.</p>
+            <p>Nothing reaches into your accounts to adjust them. <strong>Accounts you already own still hold the old, bigger amount</strong> — only accounts opened <em>after</em> a step start at the lower one. The gap between the two just sits there, still yours, until something moves it.</p>
           </article>
         </div>
-        <p className="plain-close">That gap is the whole product. Overfunded finds it, moves it back to your wallet, and leaves the account exactly where it was — still open, still holding your tokens.</p>
+        <p className="plain-close">That gap is <strong>the whole product</strong>. Overfunded finds it, moves it back to your wallet, and leaves the account <em>exactly where it was</em> — still open, still holding your tokens.</p>
       </section>
 
       <section className="game-reduction" id="reduction">
         <div className="reduction-copy">
           <small>PATCH NOTES · RENT FLOOR</small>
           <h2 id="rollout">Five gates.<br /><em>One shrinking floor.</em></h2>
-          <p>Rent is <code>(128 + data_len) × lamports_per_byte</code>. Solana’s own SIMD-0437 upgrade steps that rate down in five gated stages, from the legacy 6,960 to 696 — a 90% cut by the end. This is a protocol change shipped by Solana, not something Overfunded does to your wallet. Each stage that activates widens the gap between what your accounts were funded with and what they now need, and nothing sweeps the difference back.</p>
+          <p>Rent is <code>(128 + data_len) × lamports_per_byte</code>. Solana’s own SIMD-0437 upgrade steps that rate down in five gated stages, from the legacy 6,960 to 696 — <strong>a 90% cut by the end</strong>. This is <em>a protocol change shipped by Solana</em>, not something Overfunded does to your wallet. Each stage widens the gap between what your accounts were funded with and what they now need, and <strong>nothing sweeps the difference back</strong>.</p>
           <div className="reduction-facts">
             <article><b>01</b><span>The floor moves down</span><p>The rent-exempt minimum for a 165-byte account is recalculated by the network.</p></article>
             <article><b>02</b><span>The deposit stays put</span><p>Your account keeps the lamports it was funded with. There is no automatic refund.</p></article>
@@ -574,7 +574,7 @@ export default function GamePrototype() {
       </section>
 
       <section className="game-battle" id="safety">
-        <div className="battle-head"><small>KNOW YOUR OPPONENT</small><h2>This is not<br /><em>an incinerator.</em></h2><p>Traditional cleanup tools reclaim rent by closing eligible accounts. Overfunded’s target is different: surplus rent inside accounts you want to keep.</p></div>
+        <div className="battle-head"><small>KNOW YOUR OPPONENT</small><h2>This is not<br /><em>an incinerator.</em></h2><p>Traditional cleanup tools reclaim rent by <em>closing</em> eligible accounts. Overfunded’s target is different: <strong>surplus rent inside accounts you want to keep</strong>.</p></div>
         <ToolCompare current="reclaim" />
         <div className="battle-alert"><b>!</b><span><strong>TOKEN ACCOUNT CLOSING: BLOCKED</strong>Overfunded never adds a CloseAccount instruction. Your token accounts stay open and usable.</span><i>0 CLOSED</i></div>
       </section>
