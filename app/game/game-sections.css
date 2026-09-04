@@ -65,7 +65,7 @@
 /* idle: alive but calm · scanning: rattling · loot: lid pops, coins rise ·
    won: bigger burst + flare · empty: lid cracks open on an empty box.      */
 .game-chest{transform-origin:center bottom}
-.chest-lid{transform-origin:14% 100%}
+.chest-lid{transform-origin:50% 100%}
 .chest-glow{opacity:.55}
 .chest-dust{position:absolute;z-index:4;left:50%;top:96px;width:74px;height:34px;margin-left:-37px;border-radius:50%;opacity:0;background:radial-gradient(circle,rgba(196,214,190,.5),transparent 70%);pointer-events:none}
 
@@ -97,10 +97,10 @@
 @keyframes chest-glint{0%,88%,100%{filter:brightness(1)}92%{filter:brightness(1.9)}}
 @keyframes chest-glow-idle{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:.8;transform:scale(1.07)}}
 @keyframes chest-rattle{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(3px,-2px) rotate(1.6deg)}50%{transform:translate(-3px,1px) rotate(-1.6deg)}75%{transform:translate(2px,-1px) rotate(.9deg)}100%{transform:translate(0,0) rotate(0)}}
-@keyframes chest-lid-jitter{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(-1.4deg)}}
+
 @keyframes chest-glow-search{0%,100%{opacity:.4;transform:scale(.94)}50%{opacity:.95;transform:scale(1.1)}}
 
-@keyframes chest-lid-crack{0%{transform:translateY(0) rotate(0)}35%{transform:translateY(-11px) rotate(-3.5deg)}70%{transform:translateY(-8px) rotate(-2.5deg)}100%{transform:translateY(-9px) rotate(-3deg)}}
+
 @keyframes chest-pop{0%{transform:scale(1)}35%{transform:scale(1.07) translateY(-4px)}100%{transform:scale(1)}}
 @keyframes chest-glow-flare{0%{opacity:.4;transform:scale(.8)}45%{opacity:1;transform:scale(1.4)}100%{opacity:.8;transform:scale(1.14)}}
 @keyframes chest-glow-win{0%{opacity:.4;transform:scale(.75)}30%{opacity:1;transform:scale(1.65)}100%{opacity:.85;transform:scale(1.2)}}
@@ -123,8 +123,8 @@
 @media(prefers-reduced-motion:reduce){
   .game-actions button,.game-demo-link{animation:none!important;transition:none!important}
   .game-chest,.chest-lid,.chest-glow,.chest-dust,.coin,.chest-body i{animation:none!important}
-  .has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.quest-won .chest-lid,.has-loot.quest-reclaiming .chest-lid{transform:translateY(-11px) rotate(-25deg)}
-  .no-loot.quest-ready .chest-lid{transform:translateY(-9px) rotate(-3deg)}
+  .has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.quest-won .chest-lid,.has-loot.quest-reclaiming .chest-lid{transform:rotateX(-78deg)}
+  .no-loot.quest-ready .chest-lid{transform:rotateX(-24deg)}
   .coin{opacity:0!important}
 }
 
@@ -578,13 +578,7 @@ a.battle-card:hover{opacity:1}
   100%{transform:translateY(var(--cy)) rotate(var(--rot))}
 }
 /* A lid on a hinge: it swings back off the rim, overshoots slightly, settles. */
-@keyframes chest-lid-open{
-  0%{transform:translateY(0) rotate(0deg);animation-timing-function:cubic-bezier(.2,.9,.3,1)}
-  46%{transform:translateY(-13px) rotate(-31deg)}
-  68%{transform:translateY(-9px) rotate(-21deg)}
-  84%{transform:translateY(-12px) rotate(-27deg)}
-  100%{transform:translateY(-11px) rotate(-25deg)}
-}
+
 
 /* Stage guarantees. Lives in the global sheet so both tools get it — it was
    defined only in the closer's route CSS, so the reclaim tool rendered the
@@ -597,3 +591,24 @@ a.battle-card:hover{opacity:1}
 .game-actions button:not(.game-demo-link){padding:19px 28px;font-size:13px;box-shadow:6px 6px 0 var(--btn-shadow,#31511e)}
 .game-actions button:not(.game-demo-link):hover{box-shadow:8px 8px 0 var(--btn-shadow,#31511e)}
 .game-actions button:not(.game-demo-link):active{box-shadow:2px 2px 0 var(--btn-shadow,#31511e)}
+
+/* The lid rolls back on its hinge: it swings past open, rebounds off the
+   travel, and settles — rotateX so it tips away from the viewer instead of
+   tilting sideways like a plate. */
+@keyframes chest-lid-open{
+  0%{transform:rotateX(0deg);animation-timing-function:cubic-bezier(.25,.9,.35,1)}
+  48%{transform:rotateX(-92deg)}
+  68%{transform:rotateX(-68deg)}
+  84%{transform:rotateX(-83deg)}
+  93%{transform:rotateX(-75deg)}
+  100%{transform:rotateX(-78deg)}
+}
+/* Empty box: it lifts a crack and stops. */
+@keyframes chest-lid-crack{
+  0%{transform:rotateX(0deg)}
+  38%{transform:rotateX(-29deg)}
+  66%{transform:rotateX(-19deg)}
+  100%{transform:rotateX(-24deg)}
+}
+/* Rattling shut. */
+@keyframes chest-lid-jitter{0%,100%{transform:rotateX(0deg)}50%{transform:rotateX(-9deg)}}
