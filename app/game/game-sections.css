@@ -78,12 +78,12 @@
 .quest-scanning .chest-lid{animation:chest-lid-jitter .24s steps(2) infinite}
 
 .has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.has-loot.quest-reclaiming .chest-lid{animation:chest-lid-open .55s cubic-bezier(.34,1.56,.64,1) both}
-.has-loot.quest-ready .coin,.quest-demo .coin,.has-loot.quest-reclaiming .coin{animation:coin-x 3.1s linear infinite}
+.has-loot.quest-ready .coin,.quest-demo .coin,.has-loot.quest-reclaiming .coin{animation:coin-x 3.1s linear both}
 .has-loot.quest-ready .chest-glow,.quest-demo .chest-glow{animation:chest-glow-flare .6s ease-out both}
 
 .quest-won .chest-lid{animation:chest-lid-open .55s cubic-bezier(.34,1.56,.64,1) both}
 .quest-won .game-chest{animation:chest-pop .5s cubic-bezier(.34,1.5,.64,1) both}
-.quest-won .coin{animation:coin-x 1.9s linear infinite}
+.quest-won .coin{animation:coin-x 1.9s linear both}
 .quest-won .chest-glow{animation:chest-glow-win 1.1s ease-out both}
 
 
@@ -545,7 +545,7 @@ a.battle-card:hover{opacity:1}
    wrapper, gravity on the disc inside it, so they rise, fall, bounce off the
    lip and settle. Two axes because one timing function cannot both decelerate
    upward and accelerate downward. */
-.coin i{animation-name:coin-y;animation-duration:inherit;animation-timing-function:linear;animation-iteration-count:infinite;animation-delay:inherit}
+.coin i{animation-name:coin-y;animation-duration:inherit;animation-timing-function:linear;animation-iteration-count:1;animation-fill-mode:both;animation-delay:inherit}
 
 
 @media(prefers-reduced-motion:reduce){.coin i{animation:none}}

@@ -26,17 +26,17 @@ import {
 
 const COIN_ARCS = [
   { cx: -44, cy: -158, rot: -260, delay: 0.0 },
-  { cx: -14, cy: -186, rot: 300, delay: 0.3 },
-  { cx: 22, cy: -146, rot: -320, delay: 0.6 },
-  { cx: 52, cy: -172, rot: 280, delay: 0.9 },
-  { cx: -64, cy: -132, rot: 340, delay: 1.2 },
-  { cx: 8, cy: -206, rot: -240, delay: 1.5 },
-  { cx: 40, cy: -192, rot: 360, delay: 1.8 },
-  { cx: -30, cy: -166, rot: -300, delay: 2.1 },
-  { cx: 66, cy: -140, rot: 260, delay: 2.4 },
-  { cx: -52, cy: -198, rot: 320, delay: 2.7 },
-  { cx: 30, cy: -124, rot: -280, delay: 3.0 },
-  { cx: -6, cy: -152, rot: 300, delay: 3.3 },
+  { cx: -14, cy: -186, rot: 300, delay: 0.075 },
+  { cx: 22, cy: -146, rot: -320, delay: 0.15 },
+  { cx: 52, cy: -172, rot: 280, delay: 0.225 },
+  { cx: -64, cy: -132, rot: 340, delay: 0.3 },
+  { cx: 8, cy: -206, rot: -240, delay: 0.375 },
+  { cx: 40, cy: -192, rot: 360, delay: 0.45 },
+  { cx: -30, cy: -166, rot: -300, delay: 0.525 },
+  { cx: 66, cy: -140, rot: 260, delay: 0.6 },
+  { cx: -52, cy: -198, rot: 320, delay: 0.675 },
+  { cx: 30, cy: -124, rot: -280, delay: 0.75 },
+  { cx: -6, cy: -152, rot: 300, delay: 0.825 },
 ];
 
 type CloserState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'closing' | 'won' | 'error' | 'demo';

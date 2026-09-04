@@ -42,17 +42,17 @@ type QuestState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'reclaiming' | 
 // server and client markup identical.
 const COIN_ARCS = [
   { cx: -44, cy: -158, rot: -260, delay: 0.0 },
-  { cx: -14, cy: -186, rot: 300, delay: 0.28 },
-  { cx: 22, cy: -146, rot: -320, delay: 0.56 },
-  { cx: 52, cy: -172, rot: 280, delay: 0.84 },
-  { cx: -64, cy: -132, rot: 340, delay: 1.12 },
-  { cx: 8, cy: -206, rot: -240, delay: 1.4 },
-  { cx: 40, cy: -192, rot: 360, delay: 1.68 },
-  { cx: -30, cy: -166, rot: -300, delay: 1.96 },
-  { cx: 66, cy: -140, rot: 260, delay: 2.24 },
-  { cx: -52, cy: -198, rot: 320, delay: 2.52 },
-  { cx: 30, cy: -124, rot: -280, delay: 2.8 },
-  { cx: -6, cy: -152, rot: 300, delay: 3.08 },
+  { cx: -14, cy: -186, rot: 300, delay: 0.07 },
+  { cx: 22, cy: -146, rot: -320, delay: 0.14 },
+  { cx: 52, cy: -172, rot: 280, delay: 0.21 },
+  { cx: -64, cy: -132, rot: 340, delay: 0.28 },
+  { cx: 8, cy: -206, rot: -240, delay: 0.35 },
+  { cx: 40, cy: -192, rot: 360, delay: 0.42 },
+  { cx: -30, cy: -166, rot: -300, delay: 0.49 },
+  { cx: 66, cy: -140, rot: 260, delay: 0.56 },
+  { cx: -52, cy: -198, rot: 320, delay: 0.63 },
+  { cx: 30, cy: -124, rot: -280, delay: 0.7 },
+  { cx: -6, cy: -152, rot: 300, delay: 0.77 },
 ];
 
 const DEMO_MINTS = ['USDC', 'BONK', 'JUP', 'PYTH', 'WIF', 'JTO', 'RAY', 'ORCA'];
