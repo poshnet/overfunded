@@ -78,7 +78,7 @@ export default function RentCutPage() {
       <header className="srr-hero">
         <div className="srr-grid" aria-hidden="true" />
         <div className="srr-kicker"><b>FIELD GUIDE</b><span>SIMD-0437</span></div>
-        <h1>Rent got cheaper.<br /><em>Your accounts didn’t notice.</em></h1>
+        <h1>How the Solana rent cut<br /><em>actually works.</em></h1>
         <p>Every account on Solana holds a deposit that keeps it alive. That deposit just got smaller — but the lamports already sitting in your accounts did not move. Here is exactly what changed, and where the difference went.</p>
         <div className="srr-hero-meta">
           <div><span>READING TIME</span><b>4 minutes</b></div>

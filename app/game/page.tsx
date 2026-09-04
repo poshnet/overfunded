@@ -328,7 +328,7 @@ export default function GamePrototype() {
         ) : (
           <div className="game-copy">
             <div className="game-level"><b>NEW QUEST</b><span>RENT FLOOR REDUCTION</span></div>
-            <h1>Reclaim the Solana rent<br /><em>your wallet already paid.</em></h1>
+            <h1>Rent dropped.<br /><em>Your accounts didn’t notice.</em></h1>
             <p className="hero-lead">Solana lowered the rent-exempt minimum. Your token accounts were funded at the old floor, and nothing sweeps the difference back to you.</p>
             <p className="hero-mech"><code>WithdrawExcessLamports</code><span>The Token Program instruction that moves the surplus out. The account stays open, rent-exempt, and keeps every token.</span></p>
 
@@ -398,7 +398,7 @@ export default function GamePrototype() {
       <section className="game-reduction" id="reduction">
         <div className="reduction-copy">
           <small>PATCH NOTES · RENT FLOOR</small>
-          <h2>Rent dropped.<br /><em>Your accounts didn’t notice.</em></h2>
+          <h2>Five gates.<br /><em>One shrinking floor.</em></h2>
           <p>Rent is <code>(128 + data_len) × lamports_per_byte</code>. SIMD-0437 steps that rate down in five gated stages, from the legacy 6,960 to 696 — a 90% cut by the end. Each stage that activates widens the gap between what your accounts were funded with and what they now need, and nothing sweeps the difference back.</p>
           <div className="reduction-facts">
             <article><b>01</b><span>The floor moves down</span><p>The rent-exempt minimum for a 165-byte account is recalculated by the network.</p></article>
