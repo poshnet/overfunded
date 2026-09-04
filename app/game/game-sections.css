@@ -316,3 +316,5 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
   .stage-unknown em,.stage-value,.stage-verdict,.quest-won .game-result:before{animation:none!important}
   .stage-unknown em{opacity:.75}
 }
+.ledger-screen>a{margin-top:auto;color:var(--g-lime);font-size:9px;letter-spacing:.09em;text-decoration:none;text-underline-offset:3px}
+.ledger-screen>a:hover{text-decoration:underline}

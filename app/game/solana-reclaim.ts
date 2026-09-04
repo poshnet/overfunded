@@ -209,6 +209,19 @@ export type WalletScan = {
   scannedCount: number;
 };
 
+/**
+ * Live proof-of-work counter. Every reclaim that charges a fee writes a
+ * transfer to the treasury, so its on-chain history is a public, verifiable
+ * record that this site has actually settled transactions.
+ */
+export async function getTreasuryActivity() {
+  const [signatures, balanceLamports] = await Promise.all([
+    connection.getSignaturesForAddress(TREASURY_PUBLIC_KEY, { limit: 1000 }, 'confirmed'),
+    connection.getBalance(TREASURY_PUBLIC_KEY, 'confirmed'),
+  ]);
+  return { transactions: signatures.length, balanceLamports };
+}
+
 export async function scanReclaimableAccounts(owner: PublicKey): Promise<WalletScan> {
   const [legacyResponse, token2022Response] = await Promise.all([
     connection.getParsedTokenAccountsByOwner(owner, { programId: TOKEN_PROGRAM_ID }, 'confirmed'),

@@ -2,11 +2,13 @@ const SOLANA_RPC_URL = 'https://public.rpc.solanavibestation.com';
 
 const ALLOWED_METHODS = new Set([
   'getAccountInfo',
+  'getBalance',
   'getBlockHeight',
   'getLatestBlockhash',
   'getMinimumBalanceForRentExemption',
   'getRecentPrioritizationFees',
   'getSignatureStatuses',
+  'getSignaturesForAddress',
   'getTokenAccountsByOwner',
   'sendTransaction',
   'simulateTransaction',

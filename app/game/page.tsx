@@ -7,6 +7,7 @@ import {
   estimatedNetworkFeeLamports,
   formatSol,
   getCurrentRentFloorLamports,
+  getTreasuryActivity,
   activeStageIndex,
   getWalletProvider,
   lamportsPerByteFromFloor,
@@ -49,6 +50,7 @@ export default function GamePrototype() {
   const [liveFloorLamports, setLiveFloorLamports] = useState<number | null>(null);
   const [scannedCount, setScannedCount] = useState(0);
   const [stagesOpen, setStagesOpen] = useState(false);
+  const [treasury, setTreasury] = useState<{ transactions: number; balanceLamports: number } | null>(null);
 
   // Read the cluster's own rent-exempt minimum so the reduction section quotes a
   // number the visitor can verify instead of a marketing figure.
@@ -57,6 +59,16 @@ export default function GamePrototype() {
     getCurrentRentFloorLamports()
       .then(floor => { if (!cancelled) setLiveFloorLamports(floor); })
       .catch(() => { if (!cancelled) setLiveFloorLamports(null); });
+    return () => { cancelled = true; };
+  }, []);
+
+  // The settled-transactions counter is read from the treasury's own history
+  // rather than hardcoded, so it moves the moment a reclaim charges a fee.
+  useEffect(() => {
+    let cancelled = false;
+    getTreasuryActivity()
+      .then(activity => { if (!cancelled) setTreasury(activity); })
+      .catch(() => { if (!cancelled) setTreasury(null); });
     return () => { cancelled = true; };
   }, []);
 
@@ -516,10 +528,20 @@ export default function GamePrototype() {
       </section>
 
       <section className="game-ledger">
-        <div className="ledger-title"><small>WORLD MAP</small><h2>The rent-recovery<br /><em>opportunity.</em></h2><p>Network totals are modeled estimates. Your actual result is calculated from the public state of the accounts in your wallet.</p></div>
-        <div className="ledger-screen primary"><span>ESTIMATED LEFT TO UNLOCK</span><strong>~$310M</strong><p>Directional estimate across the complete reduced-rent rollout.</p><i>MODELLED · NOT A LIVE BALANCE</i></div>
-        <div className="ledger-screen"><span>CLAIMED THROUGH OVERFUNDED</span><strong>$0</strong><p>Pre-launch baseline. Updates only after verified reclaim transactions.</p><i>VERIFIABLE COUNTER</i></div>
-        <div className="ledger-screen"><span>ACCOUNTS CLOSED</span><strong>0</strong><p>The defining score. It never moves.</p><i>NON-DESTRUCTIVE FOREVER</i></div>
+        <div className="ledger-title"><small>WORLD MAP</small><h2>What the cut<br /><em>is actually worth.</em></h2><p>Every figure here is either published by Solana or read live from the chain. Your own result is calculated from the public state of the accounts in your wallet.</p></div>
+        <div className="ledger-screen primary">
+          <span>SAVED PER MILLION TOKEN ACCOUNTS</span>
+          <strong>$143,100</strong>
+          <p>Solana’s own worked example: a business opening a million token accounts pays $159,000 under the legacy rate and $15,900 once all five gates land.</p>
+          <a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">PUBLISHED BY SOLANA ↗</a>
+        </div>
+        <div className="ledger-screen">
+          <span>FEE WALLET TRANSACTIONS</span>
+          <strong>{treasury === null ? '—' : treasury.transactions.toLocaleString('en-US')}</strong>
+          <p>Read live from the treasury’s on-chain history. Every reclaim that charges a fee settles here, so this counter moves on its own.</p>
+          <a href={`https://solscan.io/account/${TREASURY_ADDRESS}`} target="_blank" rel="noreferrer">VERIFY ON SOLSCAN ↗</a>
+        </div>
+        <div className="ledger-screen"><span>ACCOUNTS CLOSED</span><strong>0</strong><p>The defining score. No reclaim transaction this site builds contains a CloseAccount instruction, so it never moves.</p><i>NON-DESTRUCTIVE FOREVER</i></div>
       </section>
 
       <section className="game-finale">
