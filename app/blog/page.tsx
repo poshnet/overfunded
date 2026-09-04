@@ -4,8 +4,8 @@ import { SOURCE_URL } from '../site-config';
 import { BrandMark } from '../brand-mark';
 
 export const metadata: Metadata = {
-  title: 'Solana Rent, Explained — Guides & Analysis',
-  description: 'Guides to Solana account rent: what the deposit on every token account actually is, how the SIMD-0437 reduction works, and how to recover the surplus without closing accounts.',
+  title: 'Solana Rent Claim Guides — How to Reclaim SOL',
+  description: 'Guides to claiming SOL back from Solana token accounts: what the rent deposit on every account is, how much you can reclaim, whether claim tools are safe, and how the SIMD-0437 rent reduction works.',
   alternates: { canonical: '/blog' },
 };
 

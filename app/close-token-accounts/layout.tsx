@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './closer.css';
 
 export const metadata: Metadata = {
-  title: 'Close Empty Solana Token Accounts & Reclaim Rent | Overfunded',
+  title: 'Close Empty Solana Token Accounts & Reclaim Rent',
   description: 'Scan zero-balance SPL Token and Token-2022 accounts, review exactly which token accounts will close, and reclaim their rent deposit to your wallet.',
   keywords: [
     'close Solana token accounts',

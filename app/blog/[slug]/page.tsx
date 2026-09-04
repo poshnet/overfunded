@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { findPost, POSTS, type Block } from '../posts';
-import { SOURCE_URL } from '../../site-config';
+import { SITE_NAME, SITE_URL, SOURCE_URL } from '../../site-config';
 import { BrandMark } from '../../brand-mark';
 
 export function generateStaticParams() {
@@ -103,7 +103,21 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           dateModified: post.published,
           author: { '@type': 'Organization', name: 'Overfunded' },
           publisher: { '@type': 'Organization', name: 'Overfunded' },
-          mainEntityOfPage: { '@type': 'WebPage', '@id': `/blog/${post.slug}` },
+          mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/blog/${post.slug}` },
+          about: { '@type': 'Thing', name: 'Solana account rent' },
+        }) }}
+      />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: `${SITE_NAME} — Solana rent claim`, item: SITE_URL },
+            { '@type': 'ListItem', position: 2, name: 'Solana rent guides', item: `${SITE_URL}/blog` },
+            { '@type': 'ListItem', position: 3, name: post.title },
+          ],
         }) }}
       />
 
