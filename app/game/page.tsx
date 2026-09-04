@@ -443,7 +443,7 @@ export default function GamePrototype() {
             ))}</div>
           </div>
           <div className={foundNothing ? 'game-result is-verdict' : 'game-result'}><small>{stageLabel}</small><StageAmount mode={amountMode} lamports={selectedLamports} verdict="ALL CAUGHT UP" /></div>
-          <div className="closer-stage-guard"><span>NOTHING CLOSED</span><span>OWNER VERIFIED</span><span>DRY-RUN FIRST</span></div>
+          <div className="stage-guard"><span>NOTHING CLOSED</span><span>OWNER VERIFIED</span><span>DRY-RUN FIRST</span></div>
         </div>
         <a className="hero-scroll-cue" href="#reduction">MORE DETAILS <span>↓</span></a>
       </section>

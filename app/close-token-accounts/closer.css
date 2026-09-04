@@ -42,8 +42,8 @@
 .closer-stage-result small{color:#9d6e72;font-size:9px;letter-spacing:.11em}
 .closer-stage-result strong{color:#fff;font-size:clamp(28px,3.2vw,44px);font-weight:950;letter-spacing:-.055em;font-variant-numeric:tabular-nums}
 .closer-won .closer-stage-result strong{color:#e2a085;text-shadow:0 0 24px rgba(221,144,112,.32)}
-.closer-stage-guard{display:flex;gap:5px;margin-top:4px}
-.closer-stage-guard span{padding:6px;border:1px solid #4c282c;color:#85595e;font-size:6px;font-weight:900;letter-spacing:.07em}
+
+
 .closer-stage-fees{position:absolute;right:18px;bottom:14px;left:18px;color:#70494d;font-size:7px;letter-spacing:.09em;text-align:center}
 .closer-connecting .radar-ping,.closer-scanning .radar-ping,.closer-closing .radar-ping{animation-duration:1.1s}.closer-connecting .radar-blip,.closer-scanning .radar-blip,.closer-closing .radar-blip{animation-duration:1.1s}
 
@@ -109,7 +109,7 @@
 @media(prefers-reduced-motion:reduce){}
 @media(max-width:1050px){.closer-hero{grid-template-columns:1fr;padding-top:62px}.closer-copy{max-width:760px}.closer-stage{justify-self:center}.closer-section-head{grid-template-columns:1fr;gap:20px}}
 @media(max-width:760px){.closer-modebar{flex-wrap:wrap;gap:12px 22px}}
-@media(max-width:590px){.closer-hero{min-height:auto;padding:46px 17px 62px}.closer-copy h1{font-size:36px}.closer-copy>p{font-size:13px}.closer-rules{display:grid;grid-template-columns:1fr}.closer-warning{align-items:flex-start}.closer-stage{min-height:375px;padding-top:46px}.closer-stage-result strong{font-size:30px}.closer-stage-guard{flex-wrap:wrap;justify-content:center}.closer-inventory{min-width:0}.closer-shell .live-summary{grid-template-columns:1fr}.closer-shell .live-approval{align-items:stretch;flex-direction:column}.closer-approval>button{width:100%}.closer-section-head h2,.closer-choice h2{font-size:35px}.closer-modebar b:nth-of-type(3){display:none}}
+@media(max-width:590px){.closer-hero{min-height:auto;padding:46px 17px 62px}.closer-copy h1{font-size:36px}.closer-copy>p{font-size:13px}.closer-rules{display:grid;grid-template-columns:1fr}.closer-warning{align-items:flex-start}.closer-stage{min-height:375px;padding-top:46px}.closer-stage-result strong{font-size:30px}.closer-inventory{min-width:0}.closer-shell .live-summary{grid-template-columns:1fr}.closer-shell .live-approval{align-items:stretch;flex-direction:column}.closer-approval>button{width:100%}.closer-section-head h2,.closer-choice h2{font-size:35px}.closer-modebar b:nth-of-type(3){display:none}}
 
 /* Shared game components inherit their accents from these, so the closer
    themes them warm instead of borrowing the reclaim tool's green. */

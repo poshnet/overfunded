@@ -324,7 +324,7 @@ export default function CloseTokenAccountsPage() {
             </div>
           </div>
           <div className="closer-stage-result"><small>{stageLabel}</small><strong>{busy ? '···' : accounts.length ? `${formatSol(selectedLamports, 5)} SOL` : foundNothing ? 'ALL CLEAN' : '??? SOL'}</strong></div>
-          <div className="closer-stage-guard"><span>EMPTY ONLY</span><span>OWNER VERIFIED</span><span>DRY-RUN FIRST</span></div>
+          <div className="stage-guard"><span>EMPTY ONLY</span><span>OWNER VERIFIED</span><span>DRY-RUN FIRST</span></div>
           <small className="closer-stage-fees">SERVICE + NETWORK</small>
         </div>
         <a className="hero-scroll-cue" href="#how-it-works">MORE DETAILS <span>↓</span></a>

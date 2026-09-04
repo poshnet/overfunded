@@ -585,3 +585,15 @@ a.battle-card:hover{opacity:1}
   84%{transform:translateY(-12px) rotate(-27deg)}
   100%{transform:translateY(-11px) rotate(-25deg)}
 }
+
+/* Stage guarantees. Lives in the global sheet so both tools get it — it was
+   defined only in the closer's route CSS, so the reclaim tool rendered the
+   badges as unstyled run-together text. */
+.stage-guard{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:14px}
+.stage-guard span{padding:7px 9px;border:1px solid var(--panel-line,#304332);border-radius:2px;color:var(--panel-ink,#6f8673);font-size:9px;font-weight:900;letter-spacing:.09em;white-space:nowrap}
+@media(max-width:590px){.stage-guard{gap:5px}.stage-guard span{padding:6px 7px;font-size:8px}}
+
+/* Primary action: the loudest control on either tool. */
+.game-actions button:not(.game-demo-link){padding:19px 28px;font-size:13px;box-shadow:6px 6px 0 var(--btn-shadow,#31511e)}
+.game-actions button:not(.game-demo-link):hover{box-shadow:8px 8px 0 var(--btn-shadow,#31511e)}
+.game-actions button:not(.game-demo-link):active{box-shadow:2px 2px 0 var(--btn-shadow,#31511e)}
