@@ -25,7 +25,7 @@ export default function FunPrototype() {
         <span>SOLANA RENT DROPPED&nbsp; ✦ &nbsp;YOUR ACCOUNTS STAY OPEN&nbsp; ✦ &nbsp;CLAIM THE EXTRA&nbsp; ✦ &nbsp;SOLANA RENT DROPPED</span>
       </div>
       <nav className="fun-nav">
-        <a className="fun-brand" href="/fun"><i><BrandMark /></i><b>SOLRENT</b><em>FUN LAB</em></a>
+        <a className="fun-brand" href="/fun"><i><BrandMark /></i><b>OVERFUNDED</b><em>FUN LAB</em></a>
         <div className="fun-nav-links"><a href="#why">Why different</a><a href="#how">How it works</a><a href="/solana-rent-reduction">How the cut works ↗</a></div>
         <a className="fun-nav-cta" href="/">OPEN LIVE APP <span>↗</span></a>
       </nav>
@@ -34,7 +34,7 @@ export default function FunPrototype() {
         <div className="fun-hero-copy">
           <div className="fun-badge"><span>●</span> SOLANA JUST CHANGED THE RENT RULES</div>
           <h1>Your SOL is<br /><em>hiding in plain sight.</em></h1>
-          <p>Old token accounts may be holding more rent than they need. SolRent finds the extra and sends it home—without deleting a thing.</p>
+          <p>Old token accounts may be holding more rent than they need. Overfunded finds the extra and sends it home—without deleting a thing.</p>
           <div className="fun-actions">
             <button className="fun-primary" type="button" onClick={runDemo}>FIND MY SOL <span>→</span></button>
             <a href="#why">WHY THIS IS DIFFERENT</a>
@@ -58,7 +58,7 @@ export default function FunPrototype() {
         <div className="fun-section-heading">
           <p>THE SERIOUS PART</p>
           <h2>Fun on the surface.<br /><em>Strict underneath.</em></h2>
-          <span>SolRent is not an account burner. It uses the Token Program’s excess-lamport withdrawal path to move only what sits above today’s rent floor.</span>
+          <span>Overfunded is not an account burner. It uses the Token Program’s excess-lamport withdrawal path to move only what sits above today’s rent floor.</span>
         </div>
         <div className="fun-proof-grid">
           <article className="fun-proof-hero">
@@ -72,8 +72,8 @@ export default function FunPrototype() {
         </div>
       </section>
 
-      <section className="fun-versus" aria-label="Account closing compared with SolRent reclaim">
-        <div className="fun-versus-title"><span>DELETE BUTTON ENERGY</span><h2>Burner <b>vs.</b> SolRent</h2></div>
+      <section className="fun-versus" aria-label="Account closing compared with Overfunded reclaim">
+        <div className="fun-versus-title"><span>DELETE BUTTON ENERGY</span><h2>Burner <b>vs.</b> Overfunded</h2></div>
         <div className="fun-versus-card bad">
           <div className="fun-card-tag">TRADITIONAL CLOSER</div>
           <strong>ACCOUNT DELETED</strong>
@@ -81,7 +81,7 @@ export default function FunPrototype() {
           <p>Recovers the full rent deposit by permanently closing an eligible empty account.</p>
         </div>
         <div className="fun-versus-card good">
-          <div className="fun-card-tag">SOLRENT RECLAIM</div>
+          <div className="fun-card-tag">OVERFUNDED RECLAIM</div>
           <strong>ONLY EXTRA SOL MOVES</strong>
           <div className="fun-mini-account"><i>◎</i><span>Token account<br /><small>8kP3…xR42</small></span><b>OPEN</b></div>
           <p>Leaves the current rent reserve, account address, and every token exactly where they are.</p>
@@ -100,7 +100,7 @@ export default function FunPrototype() {
       <section className="fun-ledger">
         <div className="fun-ledger-copy"><p>THE BIG NUMBER, LABELED HONESTLY</p><h2>A lot of SOL may be<br /><em>waiting for a ride home.</em></h2><span>Network figures are estimates until a complete public index is running. Your personal result is calculated account by account.</span></div>
         <div className="fun-number-card"><small>MODELED NETWORK OPPORTUNITY</small><strong>~$310M</strong><p>Directional estimate across the complete reduced-rent rollout—not a live wallet balance or audited total.</p><i>ESTIMATE · CHANGES WITH SOL PRICE + NETWORK STATE</i></div>
-        <div className="fun-number-card small"><small>CLAIMED THROUGH SOLRENT</small><strong>$0</strong><p>Pre-launch baseline. This moves only after confirmed reclaim transactions.</p><i>VERIFIABLE PRODUCT COUNTER</i></div>
+        <div className="fun-number-card small"><small>CLAIMED THROUGH OVERFUNDED</small><strong>$0</strong><p>Pre-launch baseline. This moves only after confirmed reclaim transactions.</p><i>VERIFIABLE PRODUCT COUNTER</i></div>
       </section>
 
       <section className="fun-final">
@@ -111,7 +111,7 @@ export default function FunPrototype() {
         <a href="/">Reclaim real SOL on the live app ↗</a>
       </section>
 
-      <footer className="fun-footer"><a className="fun-brand" href="/fun"><i><BrandMark /></i><b>SOLRENT</b><em>FUN LAB</em></a><p>Built for Solana’s reduced-rent era.</p><div><a href="/">Live app</a><a href="/solana-rent-reduction">How the cut works</a><a href="#why">Safety</a></div></footer>
+      <footer className="fun-footer"><a className="fun-brand" href="/fun"><i><BrandMark /></i><b>OVERFUNDED</b><em>FUN LAB</em></a><p>Built for Solana’s reduced-rent era.</p><div><a href="/">Live app</a><a href="/solana-rent-reduction">How the cut works</a><a href="#why">Safety</a></div></footer>
     </main>
   );
 }

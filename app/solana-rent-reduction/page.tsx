@@ -39,7 +39,7 @@ const FAQ = [
   },
   {
     q: 'Does reclaiming rent close my token accounts?',
-    a: 'No. SolRent uses WithdrawExcessLamports, which moves only the balance above the current rent-exempt minimum. The account stays open, stays rent-exempt, keeps its address, and keeps every token. No CloseAccount, Burn, or token transfer instruction is ever added.',
+    a: 'No. Overfunded uses WithdrawExcessLamports, which moves only the balance above the current rent-exempt minimum. The account stays open, stays rent-exempt, keeps its address, and keeps every token. No CloseAccount, Burn, or token transfer instruction is ever added.',
   },
   {
     q: 'Is it safe to connect my wallet?',
@@ -78,7 +78,7 @@ export default function RentCutPage() {
   return (
     <main className="srr-shell">
       <nav className="srr-nav">
-        <a className="srr-brand" href="/"><i><BrandMark /></i><span><b>SOLRENT</b><small>FIELD GUIDE</small></span></a>
+        <a className="srr-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>FIELD GUIDE</small></span></a>
         <a className="srr-nav-cta" href="/">SCAN MY WALLET →</a>
       </nav>
 
@@ -306,7 +306,7 @@ export default function RentCutPage() {
       </section>
 
       <footer className="srr-footer">
-        <a className="srr-brand" href="/"><i><BrandMark /></i><span><b>SOLRENT</b><small>FIELD GUIDE</small></span></a>
+        <a className="srr-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>FIELD GUIDE</small></span></a>
         <p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p>
         <div><a href="/">Scanner</a><a href="/blog">Blog</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a></div>
       </footer>

@@ -13,7 +13,7 @@ export default function BlogIndex() {
   return (
     <main className="blog-shell">
       <nav className="blog-nav">
-        <a className="blog-brand" href="/"><i><BrandMark /></i><span><b>SOLRENT</b><small>SOLANA RENT</small></span></a>
+        <a className="blog-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a>
         <a className="blog-nav-cta" href="/">SCAN MY WALLET →</a>
       </nav>
 
@@ -50,7 +50,7 @@ export default function BlogIndex() {
       </section>
 
       <footer className="blog-footer">
-        <a className="blog-brand" href="/"><i><BrandMark /></i><span><b>SOLRENT</b><small>SOLANA RENT</small></span></a>
+        <a className="blog-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a>
         <div>
           <a href="/">Scanner</a>
           <a href="/solana-rent-reduction">Field guide</a>
