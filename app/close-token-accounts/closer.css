@@ -219,33 +219,90 @@
 
 /* Analyzer: a scan line crosses the panel and target boxes lock on behind it,
    so the panel reads as inspecting accounts rather than spinning for effect. */
-.closer-analyzer{position:relative;width:230px;height:200px;overflow:hidden;border:1px solid #6c4e40;border-radius:10px;background:linear-gradient(#8b513814 1px,transparent 1px) 0 0/100% 25px,linear-gradient(90deg,#8b513814 1px,transparent 1px) 0 0/25px 100%,radial-gradient(circle at 50% 45%,rgba(226,141,105,.1),transparent 70%),#140d0a;box-shadow:inset 0 0 40px rgba(221,143,110,.1)}
-.closer-analyzer:after{content:'';position:absolute;z-index:4;inset:0;pointer-events:none;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(226,141,105,.14)}
-.scan-line{position:absolute;z-index:3;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#f1b796,transparent);box-shadow:0 0 14px rgba(241,183,150,.7);animation:az-scan 3.4s cubic-bezier(.55,0,.45,1) infinite}
-.scan-line:before{content:'';position:absolute;left:0;right:0;top:2px;height:40px;background:linear-gradient(rgba(226,141,105,.16),transparent)}
+
+
+
+
 /* Each target locks on: brackets snap in, the box flashes, then it settles. */
-.target{position:absolute;z-index:2;width:38px;height:26px;border:1px solid rgba(226,141,105,.34);opacity:0;animation:az-lock 3.4s ease-out infinite}
-.target:before,.target:after{content:'';position:absolute;width:8px;height:8px;border:2px solid #f1b796}
-.target:before{left:-2px;top:-2px;border-right:0;border-bottom:0}
-.target:after{right:-2px;bottom:-2px;border-left:0;border-top:0}
-.closer-analyzer i:nth-child(2){left:26px;top:34px;animation-delay:.35s}
-.closer-analyzer i:nth-child(3){left:118px;top:66px;width:52px;animation-delay:1.05s}
-.closer-analyzer i:nth-child(4){left:44px;top:110px;width:46px;animation-delay:1.75s}
-.closer-analyzer i:nth-child(5){left:132px;top:146px;width:34px;animation-delay:2.35s}
-@keyframes az-scan{0%{top:-6%}50%{top:100%}50.01%{top:-6%}100%{top:100%}}
-@keyframes az-lock{
-  0%,6%{opacity:0;transform:scale(1.35)}
-  12%{opacity:1;transform:scale(1);background:rgba(241,183,150,.22)}
-  20%{background:rgba(241,183,150,.06)}
-  74%{opacity:1;background:transparent}
-  92%,100%{opacity:0;transform:scale(.94)}
-}
+
+
+
+
+
+
+
+
+
+
 .closer-connecting .scan-line,.closer-scanning .scan-line,.closer-closing .scan-line{animation-duration:1.2s}
 .closer-connecting .target,.closer-scanning .target,.closer-closing .target{animation-duration:1.2s}
 @media(prefers-reduced-motion:reduce){
-  .scan-line{animation:none;top:50%}
-  .target{animation:none;opacity:1;transform:none}
+  
+  
 }
 
 .closer-choice>div:first-child{max-width:760px;margin-bottom:clamp(34px,4vw,52px)}
 .closer-choice .battle-arena{max-width:1040px}
+
+/* Analyzer. It reads a list of accounts, and what it finds changes what it
+   does: idle it drifts, scanning it races, a result turns the rows into
+   coins, and an empty wallet says so instead of celebrating. */
+.closer-analyzer{position:relative;width:230px;height:200px;overflow:hidden;border:1px solid #6c4e40;border-radius:10px;background:linear-gradient(#8b513812 1px,transparent 1px) 0 0/100% 25px,linear-gradient(90deg,#8b513812 1px,transparent 1px) 0 0/25px 100%,radial-gradient(circle at 50% 40%,rgba(226,141,105,.09),transparent 72%),#140d0a;box-shadow:inset 0 0 40px rgba(221,143,110,.1)}
+.closer-analyzer:after{content:'';position:absolute;z-index:5;inset:0;pointer-events:none;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(226,141,105,.14),inset 0 -34px 30px -20px rgba(20,13,10,.95),inset 0 34px 30px -20px rgba(20,13,10,.95)}
+
+/* The list being read. */
+.az-rows{position:absolute;z-index:1;left:18px;right:18px;top:0;display:flex;flex-direction:column;gap:11px;padding-top:14px;animation:az-drift 14s linear infinite}
+.az-row{height:7px;border-radius:2px;background:linear-gradient(90deg,rgba(226,141,105,.5),rgba(226,141,105,.14));opacity:.42;transition:opacity .4s ease}
+.az-row:nth-child(2n){width:78%}
+.az-row:nth-child(3n){width:56%}
+.az-row:nth-child(4n){width:90%}
+@keyframes az-drift{to{transform:translateY(-50%)}}
+
+.scan-line{position:absolute;z-index:3;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#f1b796,transparent);box-shadow:0 0 14px rgba(241,183,150,.65);opacity:.55;animation:az-scan 6s ease-in-out infinite}
+.scan-line:before{content:'';position:absolute;left:0;right:0;top:2px;height:38px;background:linear-gradient(rgba(226,141,105,.14),transparent)}
+@keyframes az-scan{0%,100%{top:6%}50%{top:92%}}
+
+.az-coins{position:absolute;z-index:4;inset:0;pointer-events:none}
+.az-coin{position:absolute;bottom:34px;display:grid;width:20px;height:20px;place-items:center;border:2px solid #3a2117;border-radius:50%;background:#f1b796;color:#2a1811;font-size:10px;font-style:normal;font-weight:900;opacity:0}
+.az-coin:nth-child(1){left:14%}
+.az-coin:nth-child(2){left:28%}
+.az-coin:nth-child(3){left:42%}
+.az-coin:nth-child(4){left:56%}
+.az-coin:nth-child(5){left:70%}
+.az-coin:nth-child(6){left:22%}
+.az-coin:nth-child(7){left:64%}
+
+.az-empty{position:absolute;z-index:4;left:0;right:0;top:50%;margin-top:-7px;color:#a08476;font-size:9px;letter-spacing:.13em;text-align:center;opacity:0;transition:opacity .5s ease}
+
+/* Reading the wallet: the list races and the scan line keeps pace. */
+.closer-connecting .az-rows,.closer-scanning .az-rows{animation-duration:2.4s}
+.closer-connecting .scan-line,.closer-scanning .scan-line{animation-duration:1.5s;opacity:1}
+.closer-connecting .az-row,.closer-scanning .az-row{opacity:.85}
+
+/* Found something: the list settles and pays out. */
+.has-closers.closer-ready .az-rows,.has-closers.closer-won .az-rows,.closer-demo .az-rows{animation-play-state:paused;opacity:.16}
+.has-closers.closer-ready .scan-line,.has-closers.closer-won .scan-line,.closer-demo .scan-line{opacity:0}
+.has-closers.closer-ready .az-coin,.closer-demo .az-coin{animation:az-payout 2.6s cubic-bezier(.2,.7,.3,1) infinite}
+.closer-won .az-coin{animation:az-payout 1.7s cubic-bezier(.2,.75,.3,1) infinite}
+.az-coin:nth-child(2){animation-delay:.16s!important}
+.az-coin:nth-child(3){animation-delay:.32s!important}
+.az-coin:nth-child(4){animation-delay:.48s!important}
+.az-coin:nth-child(5){animation-delay:.64s!important}
+.az-coin:nth-child(6){animation-delay:.8s!important}
+.az-coin:nth-child(7){animation-delay:.96s!important}
+@keyframes az-payout{
+  0%{opacity:0;transform:translateY(24px) scale(.5)}
+  14%{opacity:1;transform:translateY(6px) scale(1)}
+  62%{opacity:1;transform:translateY(-58px) scale(1)}
+  100%{opacity:0;transform:translateY(-104px) scale(.72)}
+}
+
+/* Found nothing: it stops and says so. */
+.no-closers.closer-ready .az-rows{animation-play-state:paused;opacity:.1}
+.no-closers.closer-ready .scan-line{opacity:0}
+.no-closers.closer-ready .az-empty{opacity:1}
+
+@media(prefers-reduced-motion:reduce){
+  .az-rows,.scan-line,.az-coin{animation:none}
+  .has-closers.closer-ready .az-coin,.closer-won .az-coin,.closer-demo .az-coin{opacity:1;transform:translateY(-30px)}
+}

@@ -284,7 +284,16 @@ export default function CloseTokenAccountsPage() {
 
         <div className="closer-stage">
           <div className="game-stage-head"><span>TOOL 02 / EMPTY ACCOUNT CLEANUP</span><b>{state === 'won' ? 'COMPLETE' : state === 'error' ? 'CHECK LOG' : busy ? 'ACTIVE' : 'READY'}</b></div>
-          <div className="closer-analyzer" aria-hidden="true"><i className="scan-line" /><i className="target" /><i className="target" /><i className="target" /><i className="target" /></div>
+          <div className="closer-analyzer" aria-hidden="true">
+            <div className="az-rows">
+              {Array.from({ length: 9 }, (_, index) => <i key={index} className="az-row" />)}
+            </div>
+            <i className="scan-line" />
+            <div className="az-coins">
+              {Array.from({ length: 7 }, (_, index) => <em key={index} className="az-coin">◎</em>)}
+            </div>
+            <span className="az-empty">NO EMPTY ACCOUNTS</span>
+          </div>
           <div className="closer-stage-result"><small>{stageLabel}</small><strong>{busy ? '···' : accounts.length ? `${formatSol(selectedLamports, 5)} SOL` : foundNothing ? 'ALL CLEAN' : '??? SOL'}</strong></div>
           <div className="closer-stage-guard"><span>EMPTY ONLY</span><span>OWNER VERIFIED</span><span>DRY-RUN FIRST</span></div>
           <small className="closer-stage-fees">SERVICE + NETWORK</small>
