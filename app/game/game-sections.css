@@ -245,3 +245,27 @@ p.hero-mech span{color:#818f85;font-family:Arial,sans-serif;font-size:12px;line-
 .hero-inventory .live-summary{grid-template-columns:repeat(3,1fr)}
 .hero-inventory .live-summary>div{min-height:78px}
 @media(max-width:760px){.hero-inventory .live-summary{grid-template-columns:1fr}}
+
+/* The rent panel reads live data, so it should look alive: a slow CRT scanline
+   crawl, a periodic scanner sweep, a flowing bar, and a breathing figure.
+   Amplitudes stay small — this sits behind real numbers, not a hero graphic. */
+.reduction-panel{animation:panel-float 7.5s ease-in-out infinite}
+.reduction-panel:after{content:'';position:absolute;z-index:2;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 0,rgba(170,255,62,.13) 5%,rgba(170,255,62,.02) 10%,transparent 14%);background-size:100% 300%;animation:panel-sweep 6.5s linear infinite}
+.reduction-scan{animation:scan-crawl 2.4s linear infinite}
+.reduction-figure strong{animation:figure-glow 3.6s ease-in-out infinite}
+.reduction-panel-head b:not(.pending):before{animation:live-blip 2.2s ease-in-out infinite}
+.bar-new{background-size:12px 100%;animation:bar-flow 1.3s linear infinite}
+.reduction-delta strong{animation:figure-glow 3.6s ease-in-out .6s infinite}
+
+@keyframes panel-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes panel-sweep{0%{background-position:0 -110%}70%,100%{background-position:0 210%}}
+@keyframes scan-crawl{to{background-position:0 4px}}
+@keyframes figure-glow{0%,100%{text-shadow:0 0 30px rgba(170,255,62,.18)}50%{text-shadow:0 0 46px rgba(170,255,62,.45)}}
+@keyframes live-blip{0%,100%{opacity:1;box-shadow:0 0 11px var(--g-lime)}50%{opacity:.5;box-shadow:0 0 3px var(--g-lime)}}
+@keyframes bar-flow{to{background-position:12px 0}}
+
+@media(prefers-reduced-motion:reduce){
+  .reduction-panel,.reduction-panel:after,.reduction-scan,.reduction-figure strong,
+  .reduction-panel-head b:before,.bar-new,.reduction-delta strong{animation:none!important}
+  .reduction-panel{transform:none}
+}
