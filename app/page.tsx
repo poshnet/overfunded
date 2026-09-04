@@ -74,7 +74,7 @@ export default function Home() {
 
   const reclaimDemo = () => {
     setDropping(true);
-    setNotice('Demo complete: 0.0842 SOL reclaimed, 0 accounts closed, and no token balances touched.');
+    setNotice('Demo complete: 0.079985 SOL returned after the 5% service fee and estimated network fee. No accounts closed.');
   };
 
   const isResults = scanState === 'results';
@@ -122,7 +122,8 @@ export default function Home() {
             <div><span>With excess rent</span><b>{isResults ? '7' : '—'}</b></div>
             <div><span>Accounts closed</span><b>0</b></div>
           </div>
-          <button className="reclaim-button" type="button" disabled={!isResults} onClick={reclaimDemo}>{isResults ? 'Reclaim 0.0842 SOL' : busy ? 'Scanning accounts…' : 'Connect wallet to continue'}</button>
+          {isResults && <div className="fee-preview"><span>Service fee <b>0.004210 SOL</b></span><span>You receive <strong>0.079985 SOL</strong></span></div>}
+          <button className="reclaim-button" type="button" disabled={!isResults} onClick={reclaimDemo}>{isResults ? 'Reclaim 0.079985 SOL after fee' : busy ? 'Scanning accounts…' : 'Connect wallet to continue'}</button>
           {notice && <p className="inline-notice" role="status">{notice}</p>}
         </div>
       </section>
@@ -144,6 +145,39 @@ export default function Home() {
           <article><span>02</span><b>Your account keeps the old deposit</b><p>Nothing automatically sweeps the surplus back to your wallet.</p></article>
           <article><span>03</span><b>Lamport returns the difference</b><p>Withdraw only the excess and leave the account live and rent-exempt.</p></article>
           <a href="https://solana.com/upgrades/reduced-rent" target="_blank" rel="noreferrer">Follow Solana’s official rollout <span>↗</span></a>
+        </div>
+      </section>
+
+      <section className="network-metrics" aria-label="Solana rent recovery opportunity">
+        <div className="metrics-heading">
+          <p className="section-kicker">THE RECOVERY LEDGER</p>
+          <h2>A network-sized<br /><em>refund window.</em></h2>
+          <p>These figures use different scopes on purpose. Product claims are verified transaction-by-transaction; network opportunity figures are estimates until a complete public index is operating.</p>
+        </div>
+        <div className="metrics-grid">
+          <article className="metric-featured">
+            <span>ESTIMATED LEFT TO UNLOCK</span>
+            <strong>~$310M</strong>
+            <p>Estimated network-wide opportunity across the complete 90% rent-reduction rollout. Changes with SOL price, live state, and future activations.</p>
+            <i>MODELLED ESTIMATE • NOT A LIVE BALANCE</i>
+          </article>
+          <article>
+            <span>CLAIMED THROUGH LAMPORT</span>
+            <strong>$0</strong>
+            <p>Pre-launch baseline. This counter will increase only after confirmed reclaim transactions.</p>
+            <i>VERIFIABLE PRODUCT COUNTER</i>
+          </article>
+          <article>
+            <span>PUBLICLY INDEXED IN SPL MINTS</span>
+            <strong>176,178 <small>SOL</small></strong>
+            <p>A separate public snapshot of excess SOL stranded in 17,049 token mint accounts.</p>
+            <a href="https://lost-lamports.vercel.app/mints" target="_blank" rel="noreferrer">View public mint index ↗</a>
+          </article>
+        </div>
+        <div className="metrics-source">
+          <span>Method note</span>
+          <p>The ~$310M figure is directional, not audited. Before public launch it should be replaced by a reproducible query covering eligible accounts and confirmed withdrawals.</p>
+          <a href="https://solana.com/upgrades/reduced-rent" target="_blank" rel="noreferrer">Solana rent source ↗</a>
         </div>
       </section>
 
@@ -175,6 +209,22 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="pricing-section">
+        <div className="pricing-copy">
+          <p className="section-kicker">SUCCESS-ONLY PRICING</p>
+          <h2>We win only when<br /><em>you recover SOL.</em></h2>
+          <p>The service fee is included in the transaction preview and collected only when the reclaim succeeds. Your wallet shows the destination and exact amounts before you sign.</p>
+        </div>
+        <div className="pricing-card">
+          <div className="pricing-badge">PROPOSED LAUNCH PRICING</div>
+          <div className="price-row"><span>Standard success fee</span><b>5%</b></div>
+          <div className="price-row"><span>Maximum per transaction</span><b>0.05 SOL</b></div>
+          <div className="price-row"><span>If nothing is recovered</span><b>0 SOL</b></div>
+          <div className="price-row member"><span>Eligible $LAMPORT holder rate</span><b>2.5%</b></div>
+          <p>Network fees remain separate and are estimated before signing. The holder threshold will be published before the coin launches.</p>
+        </div>
+      </section>
+
       <section className="community-section" id="community">
         <div className="community-coin" aria-hidden="true">
           <div className="coin-halo" />
@@ -184,12 +234,12 @@ export default function Home() {
         <div className="community-copy">
           <p className="section-kicker light">OPTIONAL COMMUNITY LAYER</p>
           <h2>A coin for the movement.<br /><em>Never a tollbooth.</em></h2>
-          <p className="community-lead">$LAMPORT can turn every successful reclaim into a shareable community moment while the recovery tool remains free and useful on its own.</p>
+          <p className="community-lead">$LAMPORT turns the community into product users: eligible holders receive a lower success fee, while everyone keeps access to the same recovery flow.</p>
           <div className="coin-principles">
-            <div><b>Utility first</b><span>No token required to scan or reclaim.</span></div>
+            <div><b>Fee utility</b><span>Eligible holders receive the proposed 2.5% community rate.</span></div>
             <div><b>Fair launch</b><span>If launched, everyone enters through the same pump.fun market.</span></div>
             <div><b>One official address</b><span>The mint will appear here first—never in replies or DMs.</span></div>
-            <div><b>No promises</b><span>A community coin is speculative, not a claim on product revenue.</span></div>
+            <div><b>Never required</b><span>No token is needed to scan, review, or reclaim SOL.</span></div>
           </div>
           <div className="coin-actions">
             <a className="coin-primary" href="https://pump.fun/create" target="_blank" rel="noreferrer">Open pump.fun launch page <span>↗</span></a>
