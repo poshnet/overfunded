@@ -10,10 +10,33 @@ import { WITHDRAW_EXCESS_LAMPORTS_DISCRIMINATOR as TOKEN_2022_WITHDRAW_DISCRIMIN
 
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
-const RPC_ENDPOINT = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
+const RPC_ENDPOINT = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || (
+  typeof window === 'undefined'
+    ? 'http://localhost:3000/api/solana-rpc'
+    : `${window.location.origin}/api/solana-rpc`
+);
 const ACCOUNTS_PER_TRANSACTION = 6;
 
 export const connection = new Connection(RPC_ENDPOINT, 'confirmed');
+
+const wait = (milliseconds: number) => new Promise(resolve => window.setTimeout(resolve, milliseconds));
+
+async function confirmSignature(signature: string, lastValidBlockHeight: number) {
+  for (let attempt = 0; attempt < 45; attempt += 1) {
+    const [statuses, blockHeight] = await Promise.all([
+      connection.getSignatureStatuses([signature], { searchTransactionHistory: true }),
+      connection.getBlockHeight('confirmed'),
+    ]);
+    const status = statuses.value[0];
+    if (status?.err) throw new Error(`Transaction ${shortenAddress(signature, 7)} failed on-chain.`);
+    if (status?.confirmationStatus === 'confirmed' || status?.confirmationStatus === 'finalized') return;
+    if (blockHeight > lastValidBlockHeight) {
+      throw new Error(`Transaction ${shortenAddress(signature, 7)} expired before confirmation.`);
+    }
+    await wait(1_000);
+  }
+  throw new Error(`Transaction ${shortenAddress(signature, 7)} is still pending. Check it on Solscan.`);
+}
 
 export type WalletProvider = {
   isConnected?: boolean;
@@ -195,8 +218,7 @@ export async function reclaimAccounts(
       throw new Error('This wallet cannot sign Solana transactions from the browser.');
     }
 
-    const confirmation = await connection.confirmTransaction({ signature, ...latestBlockhash }, 'confirmed');
-    if (confirmation.value.err) throw new Error(`Transaction ${shortenAddress(signature, 7)} did not confirm.`);
+    await confirmSignature(signature, latestBlockhash.lastValidBlockHeight);
     signatures.push(signature);
     onProgress?.(batchIndex + 1, batches.length);
   }
