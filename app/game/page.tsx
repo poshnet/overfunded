@@ -24,7 +24,7 @@ import {
   TREASURY_ADDRESS,
   type ReclaimableAccount,
 } from './solana-reclaim';
-import { SOURCE_URL } from '../site-config';
+import { SITE_NAME, SITE_URL, SOURCE_URL } from '../site-config';
 
 type QuestState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'reclaiming' | 'won' | 'error' | 'demo';
 
@@ -514,6 +514,41 @@ export default function GamePrototype() {
         <div className="finale-rays" aria-hidden="true" />
         <small>READY PLAYER WALLET?</small><h2>Find the hidden SOL.<br /><em>Keep every account alive.</em></h2><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN MAINNET ▶</button><a href="/solana-rent-reduction">READ: HOW THE RENT CUT WORKS ↗</a>
       </section>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: SITE_NAME,
+            url: SITE_URL,
+            logo: `${SITE_URL}/og.png`,
+            sameAs: [SOURCE_URL],
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: SITE_NAME,
+            url: SITE_URL,
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: SITE_NAME,
+            applicationCategory: 'FinanceApplication',
+            operatingSystem: 'Web',
+            url: SITE_URL,
+            description: 'Scan Solana SPL token accounts against the live rent-exempt minimum and reclaim the excess with WithdrawExcessLamports, without closing accounts or moving tokens.',
+            offers: {
+              '@type': 'Offer',
+              price: '0',
+              priceCurrency: 'USD',
+              description: `${SERVICE_FEE_PERCENT}% of the recovered surplus, capped at ${formatSol(SERVICE_FEE_CAP_LAMPORTS, 2)} SOL, charged only on success.`,
+            },
+          },
+        ]) }}
+      />
 
       <footer className="game-footer"><a className="game-brand" href="/"><i>O</i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/blog">Blog</a><a href="/solana-rent-reduction">How the cut works</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href="#safety">Safety</a></div></footer>
     </main>

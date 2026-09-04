@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist_Mono } from 'next/font/google';
+import { SITE_NAME, SITE_URL } from './site-config';
 import './globals.css';
 import './game/game.css';
 import './game/game-sections.css';
@@ -10,7 +11,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://lamport-reclaim-sol.hunrtech.chatgpt.site'),
+  metadataBase: new URL(SITE_URL),
   title: 'Reclaim Solana Rent — Recover Excess SOL Without Closing Token Accounts',
   description: 'Solana lowered the rent-exempt minimum under SIMD-0437. Scan your SPL token accounts and reclaim the excess rent with WithdrawExcessLamports — no accounts closed, no tokens touched.',
   icons: { icon: '/favicon.svg' },
@@ -19,11 +20,15 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
   robots: { index: true, follow: true },
   openGraph: {
+    type: 'website',
+    url: '/',
+    siteName: SITE_NAME,
+    locale: 'en_US',
     title: 'Reclaim Solana Rent — Recover Excess SOL Without Closing Token Accounts',
     description: 'Solana lowered the rent-exempt minimum under SIMD-0437. Scan your SPL token accounts and reclaim the excess rent with WithdrawExcessLamports — no accounts closed, no tokens touched.',
     images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Overfunded — reclaim excess Solana rent' }],
   },
-  applicationName: 'Overfunded',
+  applicationName: SITE_NAME,
   twitter: {
     card: 'summary_large_image',
     title: 'Reclaim Solana Rent — Recover Excess SOL Without Closing Token Accounts',

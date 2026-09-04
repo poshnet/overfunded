@@ -75,7 +75,7 @@
 .gap-empty{border-bottom:1px dashed #3d5140;background:repeating-linear-gradient(135deg,#0d130e 0 6px,#0a100b 6px 12px)}
 .gap-floor{display:grid;flex:1;place-items:center;background:repeating-linear-gradient(135deg,#1c3a1f 0 7px,#16301a 7px 14px)}
 .gap-floor span{color:#a9c78c;font-size:9px;letter-spacing:.07em;text-align:center;padding:0 6px}
-.gap-arrow{color:#54655a;font-size:26px}
+.gap-arrow{color:#6d8374;font-size:26px}
 
 .size-table{margin:24px 0 14px;border-top:1px solid #2e3c30;border-left:1px solid #2e3c30;overflow-x:auto}
 .size-row{display:grid;grid-template-columns:1.5fr .55fr 1fr 1fr 1fr 1fr;align-items:center;gap:10px;min-width:660px;padding:14px 12px;border-right:1px solid #2e3c30;border-bottom:1px solid #2e3c30;color:#c3d2c0;font-size:11px}
@@ -89,7 +89,7 @@
 
 .method-pair{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:26px 0}
 .method{padding:20px;border:1px solid #3e4940;background:#111512}
-.method.safe{border-color:#5b8138;background:#0f2014;box-shadow:6px 6px 0 #274519}
+.method.safe{border-color:#61893b;background:#0f2014;box-shadow:6px 6px 0 #274519}
 .method-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:14px;border-bottom:1px solid #2e3c30}
 .method-head span{color:#e6efe2;font-size:13px}
 .method-head b{font-size:9px;letter-spacing:.09em}
@@ -103,7 +103,7 @@
 
 .srr-terminal{margin:24px 0 14px;border:1px solid #3c513f;background:#080d09}
 .term-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #2b3a2e;color:#8b9d8e;font-size:10px;letter-spacing:.1em}
-.term-head i{color:#54655a;font-style:normal;letter-spacing:.14em}
+.term-head i{color:#6d8374;font-style:normal;letter-spacing:.14em}
 .srr-terminal pre{margin:0;padding:16px 14px;overflow-x:auto;color:#c3d2c0;font-family:var(--font-geist-mono),monospace;font-size:12px;line-height:1.7}
 .term-out{padding:13px 14px;border-top:1px solid #2b3a2e;background:rgba(170,255,62,.05)}
 .term-out span{display:block;margin-bottom:8px;color:var(--g-lime);font-size:9px;letter-spacing:.11em}
