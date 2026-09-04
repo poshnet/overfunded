@@ -5,6 +5,7 @@ import {
   SystemProgram,
   Transaction,
   TransactionInstruction,
+  VersionedTransaction,
   type ParsedAccountData,
 } from '@solana/web3.js';
 import { WITHDRAW_EXCESS_LAMPORTS_DISCRIMINATOR as TOKEN_WITHDRAW_DISCRIMINATOR } from '@solana-program/token';
@@ -328,30 +329,48 @@ async function minimumTreasuryTransferLamports() {
   }
 }
 
-// Simulate before the wallet prompt so an unsupported program build or an
-// underfunded fee payer fails without costing the user a signature. A relay or
-// RPC that cannot simulate degrades to the send-time preflight instead.
+/** Turns a raw simulation error into something the person reading it can act on. */
+function explainSimulationError(simulationError: unknown, logs: string[]) {
+  const text = typeof simulationError === 'string' ? simulationError : JSON.stringify(simulationError);
+  if (logs.some(line => /invalid instruction data|InvalidInstructionData|not supported|unknown instruction/i.test(line))) {
+    return 'The Token Program on this cluster does not support WithdrawExcessLamports yet, so nothing was signed.';
+  }
+  if (/AccountNotFound/i.test(text)) {
+    return 'This wallet has no SOL on mainnet, so it cannot pay the network fee for the withdrawal. Send it a small amount of SOL and scan again.';
+  }
+  if (/InsufficientFundsForRent/i.test(text)) {
+    return 'The transaction would leave an account below the rent-exempt minimum, so it was not signed.';
+  }
+  if (/BlockhashNotFound/i.test(text)) {
+    return 'The network moved on before the safety check finished. Nothing was signed — try again.';
+  }
+  return `The network rejected a dry run of this transaction (${text}). Nothing was signed.`;
+}
+
+/**
+ * Simulate before the wallet prompt so an unsupported program build or an
+ * underfunded fee payer fails without costing the user a signature.
+ *
+ * The message is wrapped in a VersionedTransaction rather than passed directly:
+ * simulateTransaction(message) routes through Transaction.populate(), which
+ * leaves zero signatures on a message that requires one, and the runtime cannot
+ * sanitize that. VersionedTransaction fills the placeholder correctly.
+ */
 async function assertBatchSimulates(transaction: Transaction) {
   let logs: string[] = [];
   let simulationError: unknown;
   try {
-    const simulation = await connection.simulateTransaction(transaction.compileMessage());
+    const simulation = await connection.simulateTransaction(
+      new VersionedTransaction(transaction.compileMessage()),
+      { sigVerify: false, replaceRecentBlockhash: true, commitment: 'confirmed' },
+    );
     simulationError = simulation.value.err;
     logs = simulation.value.logs ?? [];
   } catch {
     return;
   }
   if (!simulationError) return;
-
-  const unsupportedInstruction = logs.some(line => (
-    /invalid instruction data|InvalidInstructionData|not supported|unknown instruction/i.test(line)
-  ));
-  if (unsupportedInstruction) {
-    throw new Error(
-      'The Token Program deployed on this cluster does not support WithdrawExcessLamports yet, so nothing was signed.',
-    );
-  }
-  throw new Error(`Simulation failed before signing: ${JSON.stringify(simulationError)}. Nothing was signed.`);
+  throw new Error(explainSimulationError(simulationError, logs));
 }
 
 /**

@@ -143,14 +143,17 @@
 /* Hero lead: the rent change is the pitch, so it carries the mechanism by name
    and a live RPC readout anyone can reproduce against their own node. */
 .game-copy>p.hero-lead{max-width:545px;color:#9db0a2;font-size:17px;line-height:1.62}
-p.hero-mech{display:flex;align-items:center;gap:15px;max-width:620px;margin:19px 0 0;padding:13px 15px;border:1px solid #33452f;border-left:3px solid var(--g-lime);background:linear-gradient(90deg,rgba(170,255,62,.08),rgba(170,255,62,0) 78%)}
-p.hero-mech code{flex:none;color:var(--g-lime);font-family:var(--font-geist-mono),monospace;font-size:12px;letter-spacing:-.01em}
-p.hero-mech span{color:#818f85;font-family:Arial,sans-serif;font-size:12px;line-height:1.55}
+a.hero-mech{display:flex;align-items:center;gap:15px;max-width:620px;margin:19px 0 0;padding:14px 15px;border:1px solid #33452f;border-left:3px solid var(--g-lime);background:linear-gradient(90deg,rgba(170,255,62,.08),rgba(170,255,62,0) 78%);text-decoration:none}
+a.hero-mech:hover{background:linear-gradient(90deg,rgba(170,255,62,.15),rgba(170,255,62,0) 78%)}
+a.hero-mech b{flex:none;display:flex;align-items:center;gap:8px;color:var(--g-lime);font-size:10px;letter-spacing:.1em;white-space:nowrap}
+a.hero-mech b:before{content:'';width:8px;height:8px;border-radius:50%;background:var(--g-lime);box-shadow:0 0 10px var(--g-lime)}
+a.hero-mech span{color:#8b9d8e;font-family:Arial,sans-serif;font-size:12px;line-height:1.55}
+a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
 @media(max-width:640px){
   .game-copy>p.hero-lead{font-size:14px}
   .hero-lead code{font-size:11px;white-space:normal}
 }
-@media(max-width:760px){p.hero-mech{align-items:flex-start;flex-direction:column;gap:9px}}
+@media(max-width:760px){a.hero-mech{align-items:flex-start;flex-direction:column;gap:9px}a.hero-mech i{align-self:flex-end}}
 
 /* SIMD-0437 stage ladder: full-width row under the two reduction columns. */
 .game-reduction{grid-template-rows:auto auto}

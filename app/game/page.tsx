@@ -290,7 +290,7 @@ export default function GamePrototype() {
             <div className="live-summary">
               <div><span>Selected excess</span><b>{formatSol(selectedLamports, 6)} SOL</b></div>
               <div><span>Est. you receive</span><b>~{formatSol(estimatedReceiveLamports, 6)} SOL</b></div>
-              <div><span>Total fees</span><b>~{formatSol(totalFeeLamports, 6)} SOL</b><em>{SERVICE_FEE_PERCENT}% service {formatSol(chargedOrQuotedFee, 6)} + network ~{formatSol(networkFeeLamports, 6)}</em></div>
+              <div><span>Total fees</span><b>~{formatSol(totalFeeLamports, 6)} SOL</b><em>service {formatSol(chargedOrQuotedFee, 6)} + network ~{formatSol(networkFeeLamports, 6)}</em></div>
             </div>
 
             <div className="live-account-list">
@@ -334,7 +334,11 @@ export default function GamePrototype() {
             <div className="game-level"><b>NEW QUEST</b><span>RENT FLOOR REDUCTION</span></div>
             <h1>Rent dropped.<br /><em>Your accounts didn’t notice.</em></h1>
             <p className="hero-lead">Solana lowered the rent-exempt minimum. Your token accounts were funded at the old floor, and nothing sweeps the difference back to you.</p>
-            <p className="hero-mech"><code>WithdrawExcessLamports</code><span>The Token Program instruction that moves the surplus out. The account stays open, rent-exempt, and keeps every token.</span></p>
+            <a className="hero-mech" href={SOURCE_URL} target="_blank" rel="noreferrer">
+              <b>VERIFIED CODE</b>
+              <span>Every instruction this site builds is public. Read the scanner, the transaction builder and the fee maths before you connect.</span>
+              <i aria-hidden="true">↗</i>
+            </a>
 
             <div className="rollout-panel">
               <div className="rollout-head">
