@@ -41,18 +41,18 @@ type QuestState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'reclaiming' | 
 // height, where it falls to, spin and start offset. Fixed values keep the
 // server and client markup identical.
 const COIN_ARCS = [
-  { cx: 46, cy: -96, fall: -188, rot: 340, delay: 0 },
-  { cx: 92, cy: -74, fall: -164, rot: -290, delay: 0.34 },
-  { cx: 28, cy: -122, fall: -226, rot: 420, delay: 0.68 },
-  { cx: 128, cy: -88, fall: -152, rot: -380, delay: 1.02 },
-  { cx: 64, cy: -110, fall: -206, rot: 300, delay: 1.36 },
-  { cx: 156, cy: -66, fall: -138, rot: 460, delay: 1.7 },
-  { cx: 12, cy: -84, fall: -176, rot: -330, delay: 2.04 },
-  { cx: 108, cy: -128, fall: -214, rot: 390, delay: 0.17 },
-  { cx: 74, cy: -58, fall: -148, rot: -420, delay: 0.51 },
-  { cx: 182, cy: -100, fall: -170, rot: 350, delay: 0.85 },
-  { cx: 40, cy: -142, fall: -238, rot: -270, delay: 1.19 },
-  { cx: 140, cy: -112, fall: -196, rot: 430, delay: 1.53 },
+  { cx: 74, cy: -96, rot: 300, delay: 0.0 },
+  { cx: 118, cy: -74, rot: -260, delay: 0.26 },
+  { cx: 46, cy: -124, rot: 380, delay: 0.52 },
+  { cx: 152, cy: -88, rot: -330, delay: 0.78 },
+  { cx: 92, cy: -112, rot: 270, delay: 1.04 },
+  { cx: 178, cy: -68, rot: 420, delay: 1.3 },
+  { cx: 30, cy: -86, rot: -300, delay: 1.56 },
+  { cx: 134, cy: -130, rot: 350, delay: 1.82 },
+  { cx: 100, cy: -60, rot: -380, delay: 2.08 },
+  { cx: 196, cy: -102, rot: 310, delay: 2.34 },
+  { cx: 60, cy: -142, rot: -250, delay: 2.6 },
+  { cx: 160, cy: -116, rot: 400, delay: 2.86 },
 ];
 
 const DEMO_MINTS = ['USDC', 'BONK', 'JUP', 'PYTH', 'WIF', 'JTO', 'RAY', 'ORCA'];
@@ -440,11 +440,10 @@ export default function GamePrototype() {
                 style={{
                   '--cx': `${arc.cx}px`,
                   '--cy': `${arc.cy}px`,
-                  '--fall': `${arc.fall}px`,
                   '--rot': `${arc.rot}deg`,
                   animationDelay: `${arc.delay}s`,
                 } as React.CSSProperties}
-              >◎</span>
+              ><i>◎</i></span>
             ))}</div>
           </div>
           <div className={foundNothing ? 'game-result is-verdict' : 'game-result'}><small>{stageLabel}</small><StageAmount mode={amountMode} lamports={selectedLamports} verdict="ALL CAUGHT UP" /></div>

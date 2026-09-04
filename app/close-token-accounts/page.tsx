@@ -24,18 +24,18 @@ import {
 } from '../game/solana-reclaim';
 
 const COIN_ARCS = [
-  { cx: 40, cy: -92, fall: -178, rot: 320, delay: 0 },
-  { cx: 88, cy: -70, fall: -154, rot: -300, delay: 0.36 },
-  { cx: 20, cy: -118, fall: -214, rot: 400, delay: 0.72 },
-  { cx: 122, cy: -84, fall: -146, rot: -360, delay: 1.08 },
-  { cx: 60, cy: -106, fall: -196, rot: 290, delay: 1.44 },
-  { cx: 150, cy: -62, fall: -132, rot: 440, delay: 1.8 },
-  { cx: 8, cy: -80, fall: -168, rot: -320, delay: 2.16 },
-  { cx: 104, cy: -124, fall: -204, rot: 370, delay: 0.18 },
-  { cx: 70, cy: -54, fall: -140, rot: -400, delay: 0.54 },
-  { cx: 172, cy: -96, fall: -162, rot: 330, delay: 0.9 },
-  { cx: 34, cy: -138, fall: -226, rot: -260, delay: 1.26 },
-  { cx: 134, cy: -108, fall: -188, rot: 410, delay: 1.62 },
+  { cx: 74, cy: -96, rot: 300, delay: 0.0 },
+  { cx: 118, cy: -74, rot: -260, delay: 0.28 },
+  { cx: 46, cy: -124, rot: 380, delay: 0.56 },
+  { cx: 152, cy: -88, rot: -330, delay: 0.84 },
+  { cx: 92, cy: -112, rot: 270, delay: 1.12 },
+  { cx: 178, cy: -68, rot: 420, delay: 1.4 },
+  { cx: 30, cy: -86, rot: -300, delay: 1.68 },
+  { cx: 134, cy: -130, rot: 350, delay: 1.96 },
+  { cx: 100, cy: -60, rot: -380, delay: 2.24 },
+  { cx: 196, cy: -102, rot: 310, delay: 2.52 },
+  { cx: 60, cy: -142, rot: -250, delay: 2.8 },
+  { cx: 160, cy: -116, rot: 400, delay: 3.08 },
 ];
 
 type CloserState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'closing' | 'won' | 'error' | 'demo';
@@ -312,11 +312,10 @@ export default function CloseTokenAccountsPage() {
                   style={{
                     '--cx': `${arc.cx}px`,
                     '--cy': `${arc.cy}px`,
-                    '--fall': `${arc.fall}px`,
-                    '--rot': `${arc.rot}deg`,
+                      '--rot': `${arc.rot}deg`,
                     animationDelay: `${arc.delay}s`,
                   } as React.CSSProperties}
-                >◎</span>
+                ><i>◎</i></span>
               ))}
             </div>
           </div>
