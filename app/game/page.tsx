@@ -533,7 +533,7 @@ export default function GamePrototype() {
           <div className="battle-vs">VS</div>
           <article className="battle-card hero"><div className="battle-name"><span>OVERFUNDED</span><b>SAFE MOVE</b></div><i className="battle-icon"><BrandMark /></i><strong>WITHDRAW EXCESS</strong><ul><li>Account stays open</li><li>Address stays usable</li><li>Tokens stay untouched</li></ul><em>USE ON LIVE ACCOUNTS</em></article>
         </div>
-        <div className="battle-alert"><b>!</b><span><strong>ACCOUNT DELETION: BLOCKED</strong>Overfunded never adds a CloseAccount instruction. Your token accounts stay open and usable.</span><i>0 CLOSED</i></div>
+        <div className="battle-alert"><b>!</b><span><strong>TOKEN ACCOUNT CLOSING: BLOCKED</strong>Overfunded never adds a CloseAccount instruction. Your token accounts stay open and usable.</span><i>0 CLOSED</i></div>
         <div className="battle-source"><div><b>DON’T TAKE OUR WORD FOR IT</b><span>Every instruction this site builds is in the open. Read the transaction builder, check the fee maths, and verify the rent floor against your own node.</span></div><a href={SOURCE_URL} target="_blank" rel="noreferrer">READ THE SOURCE ON GITHUB ↗</a></div>
       </section>
 
