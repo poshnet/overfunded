@@ -351,7 +351,7 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
 .game-result{min-height:66px;justify-content:flex-start;margin-top:2px}
 .game-result strong{font-family:var(--font-geist-mono),monospace;font-size:clamp(30px,3.5vw,48px);font-weight:900;letter-spacing:-.06em}
 .game-result .stage-verdict{font-size:clamp(19px,2vw,27px);letter-spacing:.025em}
-.game-stage>p{max-width:390px;line-height:1.5}
+.stage-fees{position:absolute;right:22px;bottom:20px;left:22px;color:#5f7463;font-size:8px;letter-spacing:.08em;text-align:center;white-space:nowrap}
 
 @media(max-width:940px){
   .game-hero{grid-template-columns:1fr;padding-top:58px}
@@ -370,6 +370,7 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
   .game-result{min-height:60px}
   .game-result strong{font-size:31px}
   .game-result .stage-verdict{font-size:19px}
+  .stage-fees{right:12px;bottom:16px;left:12px;font-size:7px}
   .game-actions{display:grid;grid-template-columns:1fr 1fr}
   .game-actions button:not(.game-demo-link){grid-column:1/-1;justify-content:center}
   .game-actions .game-demo-link,.game-actions a{min-width:0;padding-right:10px;padding-left:10px;justify-content:center}

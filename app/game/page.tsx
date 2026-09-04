@@ -50,12 +50,20 @@ const COIN_ARCS = [
   { cx: 54, cy: -128, fall: 54, rot: -410, delay: 0.11 },
 ];
 
-const demoAccounts: ReclaimableAccount[] = [
-  { address: '8kP3demoAccountxR42', dataLength: 165, excessLamports: 22_180_000, mint: 'USDCdemoMint', program: 'token', rentFloorLamports: 1_400_000, selected: true },
-  { address: '3Dw9demoAccountkN18', dataLength: 165, excessLamports: 18_620_000, mint: 'BONKdemoMint', program: 'token', rentFloorLamports: 1_400_000, selected: true },
-  { address: 'H7q1demoAccountmV05', dataLength: 170, excessLamports: 14_970_000, mint: 'Token2022demoMint', program: 'token-2022', rentFloorLamports: 1_430_000, selected: true },
-  { address: 'P5w2demoAccountjA77', dataLength: 165, excessLamports: 28_430_000, mint: 'JUPdemoMint', program: 'token', rentFloorLamports: 1_400_000, selected: true },
-];
+const DEMO_MINTS = ['USDC', 'BONK', 'JUP', 'PYTH', 'WIF', 'JTO', 'RAY', 'ORCA'];
+
+function buildDemoAccounts(rentFloorLamports: number): ReclaimableAccount[] {
+  const excessLamports = Math.max(0, LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS - rentFloorLamports);
+  return Array.from({ length: 20 }, (_, index) => ({
+    address: `DemoTokenAccount${String(index + 1).padStart(2, '0')}xRent`,
+    dataLength: TOKEN_ACCOUNT_SPACE,
+    excessLamports,
+    mint: `${DEMO_MINTS[index % DEMO_MINTS.length]}demoMint${index + 1}`,
+    program: index % 5 === 4 ? 'token-2022' as const : 'token' as const,
+    rentFloorLamports,
+    selected: true,
+  }));
+}
 
 export default function GamePrototype() {
   const [quest, setQuest] = useState<QuestState>('idle');
@@ -172,10 +180,12 @@ export default function GamePrototype() {
     setProgress('');
     setChargedFeeLamports(0);
     window.setTimeout(() => {
+      const demoFloor = liveFloorLamports ?? rentFloorFor(TOKEN_ACCOUNT_SPACE, RENT_STAGES[0].lamportsPerByte);
+      const demoAccounts = buildDemoAccounts(demoFloor);
       setAccounts(demoAccounts);
       setScannedCount(demoAccounts.length);
       setQuest('demo');
-      setNotice('Demo result only. Connect a wallet to scan and reclaim live mainnet SOL.');
+      setNotice('Demo result: 20 standard token accounts funded at the legacy rent floor. Connect a wallet to scan live mainnet SOL.');
     }, 900);
   }
 
@@ -408,7 +418,11 @@ export default function GamePrototype() {
             ))}</div>
           </div>
           <div className={foundNothing ? 'game-result is-verdict' : 'game-result'}><small>{stageLabel}</small><StageAmount mode={amountMode} lamports={selectedLamports} verdict="ALL CAUGHT UP" /></div>
-          <p>LIVE MAINNET · {SERVICE_FEE_PERCENT}% SUCCESS FEE · NOTHING RECOVERED, NOTHING CHARGED · YOU APPROVE EVERY TRANSACTION</p>
+          <small className="stage-fees">
+            {amountMode === 'value'
+              ? <>SERVICE {formatSol(chargedOrQuotedFee, 6)} + NETWORK ~{formatSol(networkFeeLamports, 6)}</>
+              : <>SERVICE + NETWORK</>}
+          </small>
         </div>
       </section>
 
