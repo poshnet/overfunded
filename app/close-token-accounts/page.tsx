@@ -297,8 +297,8 @@ export default function CloseTokenAccountsPage() {
       <section className="rent-lifecycle" id="how-it-works">
         <div className="closer-section-head">
           <small>WHERE THE RENT COMES FROM</small>
-          <h2>Locked on the way in.<br /><em>Released on the way out.</em></h2>
-          <p>Nobody chose to pay it and nothing ever spends it. Rent is created the moment a token account opens and stays there until something takes it back out.</p>
+          <h2>Every token account<br /><em>is holding your SOL.</em></h2>
+          <p>Not a fee, not a charge — a deposit. It goes in when the account opens, sits there for as long as the account exists, and comes back out only when something asks for it. Here is that whole life in three steps.</p>
         </div>
 
         <div className="lifecycle-panel">
@@ -308,7 +308,6 @@ export default function CloseTokenAccountsPage() {
             <div className="lc-node lc-vault"><i /><b>TOKEN ACCOUNT</b><small>holds the deposit</small></div>
             <div className="lc-rail"><span /></div>
             <div className="lc-node"><i /><b>YOUR WALLET</b><small>gets it back</small></div>
-            <em className="lc-coin">◎</em>
           </div>
 
           <ol className="lifecycle-steps">
