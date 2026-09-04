@@ -134,7 +134,7 @@ export const POSTS: Post[] = [
     blocks: [
       { kind: 'p', text: 'If you have traded on Solana, you are holding SOL you did not know about. Not a lot per account — but every token you have ever touched opened an account, and every one of those accounts is sitting on a deposit. Here is how to claim it back, and how to tell a legitimate claim tool from something you should close the tab on.' },
       { kind: 'h', text: 'What you are actually claiming' },
-      { kind: 'p', text: 'Solana requires each account to hold a refundable deposit so validators are paid for keeping it in memory. For a standard SPL token account that deposit is 0.00203928 SOL, charged once when the account is created. It is not a fee. It has always been yours.' },
+      { kind: 'p', text: 'Solana requires each account to hold a refundable deposit so validators are paid for keeping it in memory. For a standard SPL token account that deposit is 0.00203928 SOL, charged once when the account is created. It is **not a fee**. It has always been yours.' },
       { kind: 'p', text: 'Two separate things now make that deposit claimable:' },
       { kind: 'list', items: [
         'Accounts you have finished with can be closed, returning the entire deposit.',
@@ -149,7 +149,7 @@ export const POSTS: Post[] = [
       { kind: 'p', text: 'Most wallets hold a mix. Accounts from tokens you sold out of years ago are candidates for closing; accounts holding positions you still care about are candidates for a surplus withdrawal. They are different instructions and they are not interchangeable.' },
       { kind: 'h', text: 'The steps' },
       { kind: 'list', items: [
-        'Scan. Any honest tool reads your token accounts from public RPC data and compares each balance against the current rent-exempt minimum. Scanning is a read — it needs no signature and costs nothing.',
+        'Scan. Any honest tool reads your token accounts from public RPC data and compares each balance against the current rent-exempt minimum. Scanning is a read — it needs *no signature* and costs nothing.',
         'Review. You should see each account, its address, the amount claimable, the service fee, the estimated network fee, and where the fee is going, before anything is signed.',
         'Approve. Your wallet shows the actual instructions. This is the last checkpoint and the only one that matters.',
       ] },
@@ -176,7 +176,7 @@ export const POSTS: Post[] = [
     blocks: [
       { kind: 'p', text: 'Searching for a way to claim Solana rent puts you in front of a lot of sites asking you to connect a wallet and sign something. That is also, precisely, what a wallet drainer asks for. The mechanics of claiming rent are perfectly safe; the risk is entirely in which site you hand the signature to.' },
       { kind: 'h', text: 'Connecting is safe. Signing is the decision.' },
-      { kind: 'p', text: 'Connecting a wallet grants a site your public address and nothing else. It cannot move funds, and it cannot sign on your behalf. Every real action requires a transaction you approve in your wallet, and that approval screen — not the website around it — is what actually authorises anything.' },
+      { kind: 'p', text: 'Connecting a wallet grants a site your **public address and nothing else**. It cannot move funds, and it cannot sign on your behalf. Every real action requires a transaction you approve in your wallet, and that approval screen — not the website around it — is what actually authorises anything.' },
       { kind: 'p', text: 'So the useful question is never "does this site look trustworthy." It is "what exactly is in the transaction it is asking me to sign."' },
       { kind: 'h', text: 'What a legitimate rent claim contains' },
       { kind: 'table', head: ['Instruction', 'Should it be there?'], rows: [
@@ -212,7 +212,7 @@ export const POSTS: Post[] = [
     published: '2026-09-04',
     minutes: 6,
     blocks: [
-      { kind: 'p', text: 'SIMD-0437 is the proposal that makes Solana accounts dramatically cheaper to open. It does not change how rent is calculated — it changes one number in the formula, and it does so in five separately gated steps rather than all at once. That staging is the detail most summaries leave out, and it is the one that matters if you are holding accounts funded under the old rate.' },
+      { kind: 'p', text: 'SIMD-0437 is the proposal that makes Solana accounts dramatically cheaper to open. It does not change *how* rent is calculated — it changes **one number** in the formula, and it does so in five separately gated steps rather than all at once. That staging is the detail most summaries leave out, and it is the one that matters if you are holding accounts funded under the old rate.' },
       { kind: 'h', text: 'The formula stays the same' },
       { kind: 'code', text: 'rent = (128 + data_len) × lamports_per_byte' },
       { kind: 'p', text: 'The 128 is fixed per-account overhead. data_len is the size of what the account stores — 82 bytes for a mint, 165 for a token account, 355 for a multisig. SIMD-0437 only touches lamports_per_byte, which has been 6,960 since the beginning and ends at 696.' },
@@ -253,7 +253,7 @@ export const POSTS: Post[] = [
     published: '2026-09-04',
     minutes: 4,
     blocks: [
-      { kind: 'p', text: 'Solana charges you in two completely different ways, and they are constantly conflated. One is spent forever. The other is a deposit you still own. Most people never reclaim the second because they assume it works like the first.' },
+      { kind: 'p', text: 'Solana charges you in two completely different ways, and they are constantly conflated. One is **spent forever**. The other is **a deposit you still own**. Most people never reclaim the second because they assume it works like the first.' },
       { kind: 'table', head: ['', 'Transaction fee', 'Rent'], rows: [
         ['What it is', 'Payment for execution', 'Refundable deposit'],
         ['Typical size', '~0.000005 SOL', '~0.00204 SOL per token account'],
@@ -280,7 +280,7 @@ export const POSTS: Post[] = [
     published: '2026-09-04',
     minutes: 5,
     blocks: [
-      { kind: 'p', text: 'Closing a token account is the fastest way to reclaim rent — it returns the entire 0.00203928 SOL deposit rather than a slice of it. It is also the only rent operation you cannot undo. Here is exactly what the instruction does.' },
+      { kind: 'p', text: 'Closing a token account is the fastest way to reclaim rent — it returns the entire 0.00203928 SOL deposit rather than a slice of it. It is also the **only rent operation you cannot undo**. Here is exactly what the instruction does.' },
       { kind: 'h', text: 'The mechanics' },
       { kind: 'p', text: 'CloseAccount takes the account, a destination for its lamports, and the owner’s signature. It transfers the entire balance to the destination and removes the account from the ledger. Afterwards the address holds nothing and is no longer an initialised token account.' },
       { kind: 'list', items: [
@@ -289,7 +289,7 @@ export const POSTS: Post[] = [
         'The token balance must already be zero — the instruction fails otherwise.',
         'It costs a normal transaction fee, so the net gain is the deposit minus roughly 0.000005 SOL.',
       ] },
-      { kind: 'callout', label: 'THE ZERO-BALANCE RULE IS A SAFETY FEATURE', text: 'The Token Program refuses to close an account still holding tokens. That guard is the reason closing empty accounts is safe: the protocol itself will not let you delete a position by accident.' },
+      { kind: 'callout', label: 'THE ZERO-BALANCE RULE IS A SAFETY FEATURE', text: 'The Token Program refuses to close an account still holding tokens. That guard is *the* reason closing empty accounts is safe: the protocol itself will not let you delete a position by accident.' },
       { kind: 'h', text: 'What you lose' },
       { kind: 'p', text: 'The address stops working as a token account. If someone later sends you that token, the transfer needs an account to arrive in — so either the sender creates one for you, or it fails. Reopening it yourself costs a fresh deposit at whatever the rate is then.' },
       { kind: 'p', text: 'That last point cuts both ways at the moment. Because SIMD-0437 is lowering the rent rate in stages, reopening an account later will get cheaper — currently 0.00185557 SOL and heading toward 0.00020393. Closing an account today and reopening it after the full reduction actually nets you the difference.' },

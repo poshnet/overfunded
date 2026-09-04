@@ -47,10 +47,7 @@ function TokenPortrait({ mint }: { mint: string }) {
   return (
     <span
       className="token-portrait"
-      style={{
-        '--token-hue': hash,
-        backgroundImage: `url(https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/${mint}/logo.png)`,
-      } as React.CSSProperties}
+      style={{ '--token-hue': hash } as React.CSSProperties}
       aria-label={`Token mint ${shortenAddress(mint, 4)}`}
     >
       <b aria-hidden="true">{mint.slice(0, 2).toUpperCase()}</b>
@@ -291,8 +288,8 @@ export default function CloseTokenAccountsPage() {
 
         <div className="closer-stage">
           <div className="game-stage-head"><span>TOOL 02 / EMPTY ACCOUNT CLEANUP</span><b>{state === 'won' ? 'COMPLETE' : state === 'error' ? 'CHECK LOG' : busy ? 'ACTIVE' : 'READY'}</b></div>
-          <div className="closer-radar" aria-hidden="true"><i /><i /><i /><span>×</span></div>
-          <div className="closer-stage-result"><small>{stageLabel}</small><strong>{busy ? '···' : accounts.length ? `${formatSol(selectedLamports, 5)} SOL` : foundNothing ? 'ALL CLEAN' : '?.???? SOL'}</strong></div>
+          <div className="closer-radar" aria-hidden="true"><i /><i /><i /><i /></div>
+          <div className="closer-stage-result"><small>{stageLabel}</small><strong>{busy ? '···' : accounts.length ? `${formatSol(selectedLamports, 5)} SOL` : foundNothing ? 'ALL CLEAN' : '??? SOL'}</strong></div>
           <div className="closer-stage-guard"><span>EMPTY ONLY</span><span>OWNER VERIFIED</span><span>DRY-RUN FIRST</span></div>
           <small className="closer-stage-fees">SERVICE + NETWORK</small>
         </div>

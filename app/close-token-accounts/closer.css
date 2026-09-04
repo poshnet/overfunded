@@ -35,7 +35,7 @@
 .closer-radar i{position:absolute;left:50%;bottom:50%;width:50%;height:1px;transform-origin:left center;background:linear-gradient(90deg,#dd9070,transparent);animation:radar-sweep 3.4s linear infinite}
 .closer-radar i:nth-child(2){width:6px;height:6px;left:31%;bottom:65%;border-radius:50%;background:#e8b39c;box-shadow:0 0 13px #dd9070;animation:radar-blip 2.2s ease-in-out infinite}
 .closer-radar i:nth-child(3){width:5px;height:5px;left:70%;bottom:34%;border-radius:50%;background:#e8b39c;box-shadow:0 0 13px #dd9070;animation:radar-blip 2.2s .8s ease-in-out infinite}
-.closer-radar span{position:relative;z-index:2;display:grid;width:70px;height:70px;place-items:center;border:2px solid #d99274;background:#2e211c;color:#e09a7c;box-shadow:0 0 30px rgba(221,143,110,.18);font:900 47px/1 Arial,sans-serif}
+
 @keyframes radar-sweep{to{transform:rotate(360deg)}}
 @keyframes radar-blip{0%,100%{opacity:.3;scale:.7}50%{opacity:1;scale:1.35}}
 .closer-stage-result{display:flex;min-height:78px;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin-top:13px;text-align:center}
@@ -52,7 +52,7 @@
 .closer-shell .live-account-list label.selected{border-color:#6f3038;background:rgba(221,144,112,.065)}
 .closer-shell .live-account-list label>i{border-color:#73333a;color:#210608;background:#18090b}
 .closer-shell .live-account-list label.selected>i{background:var(--closer-red)}
-.token-portrait{position:relative;display:grid;width:39px;height:39px;flex:none;overflow:hidden;place-items:center;border:1px solid hsl(var(--token-hue) 74% 58%);border-radius:50%;background-color:hsl(var(--token-hue) 63% 22%);background-position:center;background-size:cover;box-shadow:inset 0 0 0 3px rgba(0,0,0,.22),0 0 13px hsl(var(--token-hue) 70% 42%/.16)}
+.token-portrait{position:relative;display:grid;width:30px;height:30px;flex:none;overflow:hidden;place-items:center;border:1px solid hsl(var(--token-hue) 74% 58%);border-radius:50%;background-color:hsl(var(--token-hue) 63% 22%);background-position:center;background-size:cover;box-shadow:inset 0 0 0 3px rgba(0,0,0,.22),0 0 13px hsl(var(--token-hue) 70% 42%/.16)}
 .token-portrait>b{color:#fff!important;font-size:9px;letter-spacing:.04em;text-shadow:0 1px 4px #000,0 0 5px #000}
 .closer-shell .live-approval{border-color:#57282d;background:rgba(31,10,13,.92)}
 .closer-approval>button{flex:none;padding:14px 17px;border-style:solid;font-size:9px;font-weight:950;letter-spacing:.07em}
@@ -137,3 +137,20 @@
   --ghost-hover:rgba(226,141,105,.09);
   --btn-glow:rgba(226,141,105,.45);
 }
+
+/* The closer's row carries a token chip, so it needs a column for it —
+   without this the amount wraps onto a second line and doubles the row. */
+.closer-shell .live-account-list>label{grid-template-columns:24px 30px minmax(0,1fr) auto}
+.closer-shell .live-account-list label>span{min-width:0}
+.closer-shell .live-account-list label>span small{overflow-wrap:anywhere}
+.closer-shell .live-account-list label>strong{white-space:nowrap}
+@media(max-width:640px){
+  .closer-shell .live-account-list>label{grid-template-columns:24px 30px minmax(0,1fr)}
+  .closer-shell .live-account-list label>strong{grid-column:3}
+}
+
+/* Radar polish: the sweep leaves a soft wedge behind it and the blips breathe. */
+.closer-radar{box-shadow:inset 0 0 46px rgba(221,143,110,.09)}
+.closer-radar i:first-child{height:2px;background:linear-gradient(90deg,rgba(232,179,156,.95),rgba(221,143,110,.35) 45%,transparent)}
+.closer-radar i:first-child:after{content:'';position:absolute;left:0;bottom:-30px;width:100%;height:60px;transform-origin:left center;background:conic-gradient(from -14deg at 0 50%,rgba(221,143,110,.16),transparent 14deg);pointer-events:none}
+@keyframes radar-blip{0%,100%{opacity:.25;transform:scale(.72)}45%{opacity:1;transform:scale(1.18)}}

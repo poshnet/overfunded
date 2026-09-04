@@ -40,18 +40,18 @@ type QuestState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'reclaiming' | 
 // height, where it falls to, spin and start offset. Fixed values keep the
 // server and client markup identical.
 const COIN_ARCS = [
-  { cx: -96, cy: -74, fall: 78, rot: -430, delay: 0 },
-  { cx: -62, cy: -104, fall: 66, rot: 380, delay: 0.04 },
-  { cx: -34, cy: -66, fall: 88, rot: -300, delay: 0.08 },
-  { cx: -12, cy: -118, fall: 58, rot: 470, delay: 0.12 },
-  { cx: 14, cy: -82, fall: 82, rot: -360, delay: 0.02 },
-  { cx: 40, cy: -110, fall: 62, rot: 420, delay: 0.06 },
-  { cx: 68, cy: -70, fall: 90, rot: -480, delay: 0.1 },
-  { cx: 98, cy: -92, fall: 70, rot: 340, delay: 0.14 },
-  { cx: -78, cy: -50, fall: 96, rot: 260, delay: 0.18 },
-  { cx: 82, cy: -46, fall: 94, rot: -270, delay: 0.05 },
-  { cx: -4, cy: -50, fall: 100, rot: 520, delay: 0.2 },
-  { cx: 54, cy: -128, fall: 54, rot: -410, delay: 0.11 },
+  { cx: 46, cy: -96, fall: -188, rot: 340, delay: 0 },
+  { cx: 92, cy: -74, fall: -164, rot: -290, delay: 0.34 },
+  { cx: 28, cy: -122, fall: -226, rot: 420, delay: 0.68 },
+  { cx: 128, cy: -88, fall: -152, rot: -380, delay: 1.02 },
+  { cx: 64, cy: -110, fall: -206, rot: 300, delay: 1.36 },
+  { cx: 156, cy: -66, fall: -138, rot: 460, delay: 1.7 },
+  { cx: 12, cy: -84, fall: -176, rot: -330, delay: 2.04 },
+  { cx: 108, cy: -128, fall: -214, rot: 390, delay: 0.17 },
+  { cx: 74, cy: -58, fall: -148, rot: -420, delay: 0.51 },
+  { cx: 182, cy: -100, fall: -170, rot: 350, delay: 0.85 },
+  { cx: 40, cy: -142, fall: -238, rot: -270, delay: 1.19 },
+  { cx: 140, cy: -112, fall: -196, rot: 430, delay: 1.53 },
 ];
 
 const DEMO_MINTS = ['USDC', 'BONK', 'JUP', 'PYTH', 'WIF', 'JTO', 'RAY', 'ORCA'];
@@ -382,7 +382,7 @@ export default function GamePrototype() {
         ) : (
           <div className="game-copy">
             <h1>Rent dropped.<br /><em>Your accounts didn’t notice.</em></h1>
-            <p className="hero-lead">Solana’s rent floor reduction lowered the rent-exempt minimum. Your token accounts were funded at the old floor, and nothing sweeps the difference back to you.</p>
+            <p className="hero-lead">Solana itself lowered the rent-exempt minimum, in a network upgrade called SIMD-0437. Your token accounts were funded at the old floor, and nothing sweeps the difference back to you. <a className="lead-more" href="/solana-rent-reduction">Learn more <span aria-hidden="true">→</span></a></p>
             <div className="rollout-panel rollout-compact">
               <div className="rollout-head">
                 <span>SIMD-0437 · LIVE RENT UPDATE</span>
@@ -457,7 +457,7 @@ export default function GamePrototype() {
           <article>
             <b>02</b>
             <h3>Solana is cutting it by 90%</h3>
-            <p>The network decided those deposits are far larger than they need to be, so it is lowering the amount it asks for — in five steps, ending at a tenth of the original.</p>
+            <p>This is Solana’s own change, published as SIMD-0437: the network decided those deposits are far larger than they need to be, so it is lowering the amount it asks for — in five steps, ending at a tenth of the original.</p>
           </article>
           <article>
             <b>03</b>
@@ -472,7 +472,7 @@ export default function GamePrototype() {
         <div className="reduction-copy">
           <small>PATCH NOTES · RENT FLOOR</small>
           <h2 id="rollout">Five gates.<br /><em>One shrinking floor.</em></h2>
-          <p>Rent is <code>(128 + data_len) × lamports_per_byte</code>. SIMD-0437 steps that rate down in five gated stages, from the legacy 6,960 to 696 — a 90% cut by the end. Each stage that activates widens the gap between what your accounts were funded with and what they now need, and nothing sweeps the difference back.</p>
+          <p>Rent is <code>(128 + data_len) × lamports_per_byte</code>. Solana’s own SIMD-0437 upgrade steps that rate down in five gated stages, from the legacy 6,960 to 696 — a 90% cut by the end. This is a protocol change shipped by Solana, not something Overfunded does to your wallet. Each stage that activates widens the gap between what your accounts were funded with and what they now need, and nothing sweeps the difference back.</p>
           <div className="reduction-facts">
             <article><b>01</b><span>The floor moves down</span><p>The rent-exempt minimum for a 165-byte account is recalculated by the network.</p></article>
             <article><b>02</b><span>The deposit stays put</span><p>Your account keeps the lamports it was funded with. There is no automatic refund.</p></article>

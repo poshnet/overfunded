@@ -27,14 +27,27 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
+/**
+ * Lightweight inline emphasis so posts can stress a term without the content
+ * file carrying markup: **bold**, *italic* and `code`.
+ */
+function inline(text: string) {
+  return text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g).map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) return <b key={index}>{part.slice(2, -2)}</b>;
+    if (part.startsWith('`') && part.endsWith('`')) return <code key={index}>{part.slice(1, -1)}</code>;
+    if (part.startsWith('*') && part.endsWith('*') && part.length > 2) return <em key={index}>{part.slice(1, -1)}</em>;
+    return part;
+  });
+}
+
 function renderBlock(block: Block, key: number) {
   switch (block.kind) {
     case 'h': return <h2 key={key}>{block.text}</h2>;
-    case 'p': return <p key={key}>{block.text}</p>;
+    case 'p': return <p key={key}>{inline(block.text)}</p>;
     case 'code': return <pre key={key}><code>{block.text}</code></pre>;
-    case 'list': return <ul key={key}>{block.items.map(item => <li key={item}>{item}</li>)}</ul>;
+    case 'list': return <ul key={key}>{block.items.map(item => <li key={item}>{inline(item)}</li>)}</ul>;
     case 'callout': return (
-      <aside key={key} className="post-callout"><b>{block.label}</b><span>{block.text}</span></aside>
+      <aside key={key} className="post-callout"><b>{block.label}</b><span>{inline(block.text)}</span></aside>
     );
     case 'table': return (
       <div key={key} className="post-table">

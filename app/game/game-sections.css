@@ -317,10 +317,11 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
 
 /* Coins spill from the chest mouth, arc outward and fall away like confetti. */
 @keyframes coin-fly{
-  0%{opacity:0;transform:translate(0,0) scale(.4) rotate(0)}
-  10%{opacity:1;transform:translate(calc(var(--cx)*.18),calc(var(--cy)*.42)) scale(1) rotate(calc(var(--rot)*.18))}
-  45%{opacity:1;transform:translate(calc(var(--cx)*.72),var(--cy)) scale(1) rotate(calc(var(--rot)*.55))}
-  100%{opacity:0;transform:translate(var(--cx),var(--fall)) scale(.72) rotate(var(--rot))}
+  0%{opacity:0;transform:translate(0,0) scale(.35) rotate(0)}
+  9%{opacity:1;transform:translate(calc(var(--cx)*.14),calc(var(--cy)*.34)) scale(1.04) rotate(calc(var(--rot)*.14))}
+  40%{opacity:1;transform:translate(calc(var(--cx)*.55),var(--cy)) scale(1) rotate(calc(var(--rot)*.5))}
+  78%{opacity:.85;transform:translate(calc(var(--cx)*.86),calc((var(--cy) + var(--fall))*.62)) scale(.92) rotate(calc(var(--rot)*.82))}
+  100%{opacity:0;transform:translate(var(--cx),var(--fall)) scale(.6) rotate(var(--rot))}
 }
 /* The scan indicator is the one thing that should read as working. */
 .stage-scanning{display:inline-flex;gap:.16em}
@@ -433,8 +434,8 @@ a.battle-card.hero:hover{border-color:var(--tool-keep);box-shadow:8px 15px 0 var
 a.battle-card.enemy:hover{border-color:var(--tool-close);box-shadow:8px 15px 0 var(--tool-close-shadow)}
 a.battle-card>em{color:var(--tool-close)}
 a.battle-card.hero>em{color:var(--tool-keep)}
-.battle-card.is-here{opacity:.72}
-.battle-card.is-here>em{color:#8fa293;letter-spacing:.12em}
+
+
 @media(prefers-reduced-motion:reduce){a.battle-card{transition:none}a.battle-card:hover{transform:none}}
 
 /* Plain-English primer. Sits before the technical ladder so a visitor who
@@ -480,3 +481,23 @@ a.battle-card.hero>em{color:var(--tool-keep)}
   .tool-toggle-reclaim:has(>a:last-child:hover):before{transform:none}
   .tool-toggle-close:has(>a:first-child:hover):before{transform:translateX(100%)}
 }
+
+/* The card you are standing on is the confident one; the way across is the
+   quieter one that wakes up on hover. */
+.battle-card.is-here{position:relative;opacity:1}
+.battle-card.is-here:after{content:'';position:absolute;inset:-1px;border:2px solid var(--tool-close);border-radius:2px;pointer-events:none}
+.battle-card.hero.is-here:after{border-color:var(--tool-keep)}
+.battle-card.is-here>em{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;background:var(--tool-close);color:#1d1512;font-weight:900;letter-spacing:.1em}
+.battle-card.hero.is-here>em{background:var(--tool-keep);color:#071008}
+.battle-card.is-here>em:before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor}
+a.battle-card{opacity:.78}
+a.battle-card:hover{opacity:1}
+
+/* Radar: a slower sweep with a fading tail, and blips that pulse under it. */
+.closer-radar i:first-child{animation-duration:4.2s!important;animation-timing-function:cubic-bezier(.4,0,.6,1)!important}
+@keyframes chest-lid-open{0%{transform:translateY(0) rotate(0)}52%{transform:translateY(-38px) rotate(-13deg)}74%{transform:translateY(-24px) rotate(-6deg)}88%{transform:translateY(-32px) rotate(-10deg)}100%{transform:translateY(-30px) rotate(-9deg)}}
+.lead-more{color:var(--g-lime);font-weight:700;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px;white-space:nowrap}
+.lead-more:hover{text-decoration-thickness:2px}
+.lead-more span{display:inline-block;margin-left:3px;transition:transform .18s ease}
+.lead-more:hover span{transform:translateX(3px)}
+@media(prefers-reduced-motion:reduce){.lead-more span{transition:none}}
