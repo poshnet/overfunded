@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer';
 import {
   Connection,
   PublicKey,
@@ -153,7 +152,7 @@ async function getFreshInstruction(account: ReclaimableAccount, authority: Publi
       { pubkey: authority, isSigner: false, isWritable: true },
       { pubkey: authority, isSigner: true, isWritable: false },
     ],
-    data: Buffer.from([discriminator]),
+    data: new Uint8Array([discriminator]) as unknown as Buffer,
   });
 }
 
