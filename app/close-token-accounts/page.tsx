@@ -289,13 +289,13 @@ export default function CloseTokenAccountsPage() {
         ) : (
           <div className="closer-copy">
             <h1>Dead accounts.<br /><em>Live SOL.</em></h1>
-            <p>Close zero-balance Solana token accounts you no longer need and return their full rent deposits to your wallet.</p>
+            <p className="hero-lead">Close zero-balance Solana token accounts you no longer need and return their <strong>full rent deposits</strong> to your wallet. <a className="lead-more" href="#how-it-works">Learn more <span aria-hidden="true">→</span></a></p>
             <div className="closer-rules">
               <span><b>0</b> TOKEN BALANCE REQUIRED</span>
               <span><b>✓</b> YOU REVIEW EVERY ADDRESS</span>
               <span><b>5%</b> SUCCESS FEE</span>
             </div>
-            <div className="game-actions"><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + FIND EMPTY ACCOUNTS ▶</button><button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button><a className="game-text-link verify-link" href={SOURCE_URL} target="_blank" rel="noreferrer">VERIFY THE CODE <span aria-hidden="true">↗</span></a><a className="game-text-link" href="#how-it-works">HOW IT WORKS ↓</a></div>
+            <div className="game-actions"><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + FIND EMPTY ACCOUNTS ▶</button><button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button><a className="game-text-link verify-link" href={SOURCE_URL} target="_blank" rel="noreferrer">VERIFY THE CODE <span aria-hidden="true">↗</span></a></div>
             {state === 'error' && <p className="live-notice error">{notice}</p>}
             <div className="closer-warning"><i>!</i><div><b>DESTRUCTIVE: THIS MODE CLOSES EMPTY TOKEN ACCOUNTS</b><span>Selected empty token-account addresses are permanently deleted. Tokens are never burned, and your wallet is never closed.</span></div></div>
           </div>
