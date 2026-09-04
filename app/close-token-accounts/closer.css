@@ -388,3 +388,6 @@
 
 .closer-stage-result .stage-unknown b,.closer-stage-result .stage-value b{color:#a9787c}
 .closer-stage-result.is-verdict .stage-verdict{font-size:clamp(19px,2vw,27px);letter-spacing:.025em}
+
+.closer-copy{margin-top:calc(-1 * clamp(18px,3.4vw,58px))}
+@media(max-width:1050px){.closer-copy{margin-top:0}}

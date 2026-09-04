@@ -628,3 +628,8 @@ a.battle-card:hover{opacity:1}
 .stage-unknown,.stage-value,.stage-scanning,.stage-verdict{display:inline-flex;align-items:baseline;gap:.24em;font-family:var(--font-geist-mono),monospace;font-variant-numeric:tabular-nums}
 .stage-unknown,.stage-value,.stage-scanning{font-size:clamp(30px,3.5vw,48px);font-weight:900;letter-spacing:-.06em}
 @media(max-width:590px){.stage-unknown,.stage-value,.stage-scanning{font-size:31px}}
+
+/* The copy column sat dead-centre against a much taller stage panel, which
+   left it low on the screen. Nudge it up without disturbing the panel. */
+.game-copy{margin-top:calc(-1 * clamp(18px,3.4vw,58px))}
+@media(max-width:940px){.game-copy{margin-top:0}}
