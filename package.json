@@ -10,8 +10,8 @@
     "build": "vinext build",
     "start": "vinext start",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "deploy": "vinext build && wrangler deploy",
-    "deploy:dry": "vinext build && wrangler deploy --dry-run"
+    "deploy": "vinext build && node scripts/patch-worker-config.mjs && wrangler deploy --config dist/server/wrangler.json",
+    "deploy:dry": "vinext build && node scripts/patch-worker-config.mjs && wrangler deploy --config dist/server/wrangler.json --dry-run"
   },
   "dependencies": {
     "@solana-program/token": "^0.16.1",
