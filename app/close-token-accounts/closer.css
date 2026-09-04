@@ -52,6 +52,8 @@
 .closer-shell .live-account-list label.selected{border-color:#6f3038;background:rgba(255,78,85,.065)}
 .closer-shell .live-account-list label>i{border-color:#73333a;color:#210608;background:#18090b}
 .closer-shell .live-account-list label.selected>i{background:var(--closer-red)}
+.token-portrait{position:relative;display:grid;width:39px;height:39px;flex:none;overflow:hidden;place-items:center;border:1px solid hsl(var(--token-hue) 74% 58%);border-radius:50%;background-color:hsl(var(--token-hue) 63% 22%);background-position:center;background-size:cover;box-shadow:inset 0 0 0 3px rgba(0,0,0,.22),0 0 13px hsl(var(--token-hue) 70% 42%/.16)}
+.token-portrait>b{color:#fff!important;font-size:9px;letter-spacing:.04em;text-shadow:0 1px 4px #000,0 0 5px #000}
 .closer-shell .live-approval{border-color:#57282d;background:rgba(31,10,13,.92)}
 .closer-approval>button{flex:none;padding:14px 17px;border-style:solid;font-size:9px;font-weight:950;letter-spacing:.07em}
 .closer-approval>button:disabled{opacity:.45;animation:none}

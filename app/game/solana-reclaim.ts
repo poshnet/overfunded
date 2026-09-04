@@ -40,6 +40,7 @@ const RPC_ENDPOINT = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || (
     : `${window.location.origin}/api/solana-rpc`
 );
 const ACCOUNTS_PER_TRANSACTION = 6;
+const WALLET_SESSION_KEY = 'overfunded.connectedWallet';
 
 // Rent-floor reference. Token accounts are 165 bytes and were funded to
 // 2_039_280 lamports under the original rent schedule; the live floor is read
@@ -205,6 +206,17 @@ export function getWalletProvider(): WalletProvider | null {
   if (typeof window === 'undefined') return null;
   const walletWindow = window as WalletWindow;
   return walletWindow.phantom?.solana || walletWindow.solana || walletWindow.solflare || null;
+}
+
+export function rememberWalletAddress(address: string) {
+  if (typeof window === 'undefined') return;
+  window.sessionStorage.setItem(WALLET_SESSION_KEY, address);
+}
+
+export function getRememberedWalletAddress() {
+  if (typeof window === 'undefined') return '';
+  const providerAddress = getWalletProvider()?.publicKey?.toString();
+  return providerAddress || window.sessionStorage.getItem(WALLET_SESSION_KEY) || '';
 }
 
 export function shortenAddress(value: string, size = 4) {

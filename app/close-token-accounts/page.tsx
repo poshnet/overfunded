@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import { BrandMark } from '../brand-mark';
 import { SITE_NAME, SITE_URL, SOURCE_URL } from '../site-config';
@@ -11,6 +11,8 @@ import {
   estimatedNetworkFeeLamports,
   formatSol,
   getWalletProvider,
+  getRememberedWalletAddress,
+  rememberWalletAddress,
   scanClosableTokenAccounts,
   SERVICE_FEE_PERCENT,
   shortenAddress,
@@ -19,6 +21,23 @@ import {
 } from '../game/solana-reclaim';
 
 type CloserState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'closing' | 'won' | 'error';
+
+function TokenPortrait({ mint }: { mint: string }) {
+  let hash = 0;
+  for (const character of mint) hash = (hash * 31 + character.charCodeAt(0)) % 360;
+  return (
+    <span
+      className="token-portrait"
+      style={{
+        '--token-hue': hash,
+        backgroundImage: `url(https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/${mint}/logo.png)`,
+      } as React.CSSProperties}
+      aria-label={`Token mint ${shortenAddress(mint, 4)}`}
+    >
+      <b aria-hidden="true">{mint.slice(0, 2).toUpperCase()}</b>
+    </span>
+  );
+}
 
 export default function CloseTokenAccountsPage() {
   const [state, setState] = useState<CloserState>('idle');
@@ -29,6 +48,14 @@ export default function CloseTokenAccountsPage() {
   const [signatures, setSignatures] = useState<string[]>([]);
   const [progress, setProgress] = useState('');
   const [chargedFeeLamports, setChargedFeeLamports] = useState(0);
+
+  useEffect(() => {
+    const syncWallet = window.setTimeout(() => {
+      const remembered = getRememberedWalletAddress();
+      if (remembered) setWallet(remembered);
+    }, 0);
+    return () => window.clearTimeout(syncWallet);
+  }, []);
 
   const selectedAccounts = useMemo(() => accounts.filter(account => account.selected), [accounts]);
   const selectedLamports = useMemo(
@@ -66,6 +93,7 @@ export default function CloseTokenAccountsPage() {
       const response = await provider.connect();
       const owner = new PublicKey(response.publicKey.toString());
       setWallet(owner.toBase58());
+      rememberWalletAddress(owner.toBase58());
       setState('scanning');
       setNotice('Checking empty SPL Token and Token-2022 accounts on mainnet…');
       const scan = await scanClosableTokenAccounts(owner);
@@ -184,7 +212,8 @@ export default function CloseTokenAccountsPage() {
                     <label key={account.address} className={account.selected ? 'selected' : ''}>
                       <input type="checkbox" checked={account.selected} onChange={() => toggleAccount(account.address)} disabled={busy || state === 'won'} />
                       <i>{account.selected ? '✓' : ''}</i>
-                      <span><b>{account.program === 'token-2022' ? 'Empty Token-2022 account' : 'Empty token account'}</b><small>{shortenAddress(account.address, 6)} · mint {shortenAddress(account.mint, 4)}</small></span>
+                      <TokenPortrait mint={account.mint} />
+                      <span><b>{account.program === 'token-2022' ? 'Empty Token-2022 account' : 'Empty token account'}</b><small>{shortenAddress(account.address, 6)} · token mint {shortenAddress(account.mint, 4)} is not deleted</small></span>
                       <strong>+{formatSol(account.recoverableLamports, 6)} SOL</strong>
                     </label>
                   )) : (

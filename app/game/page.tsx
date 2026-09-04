@@ -7,6 +7,7 @@ import {
   estimatedNetworkFeeLamports,
   formatSol,
   getCurrentRentFloorLamports,
+  getRememberedWalletAddress,
   getTreasuryActivity,
   activeStageIndex,
   getWalletProvider,
@@ -19,6 +20,7 @@ import {
   stageState,
   stageReductionPercent,
   reclaimAccounts,
+  rememberWalletAddress,
   scanReclaimableAccounts,
   SERVICE_FEE_PERCENT,
   shortenAddress,
@@ -77,6 +79,16 @@ export default function GamePrototype() {
   const [liveFloorLamports, setLiveFloorLamports] = useState<number | null>(null);
   const [scannedCount, setScannedCount] = useState(0);
   const [treasury, setTreasury] = useState<{ reclaimedLamports: number; feesCollectedLamports: number } | null>(null);
+
+  // The root layout survives the client-side tool switch, and sessionStorage
+  // keeps the public wallet identity visible if either page remounts.
+  useEffect(() => {
+    const syncWallet = window.setTimeout(() => {
+      const remembered = getRememberedWalletAddress();
+      if (remembered) setWallet(remembered);
+    }, 0);
+    return () => window.clearTimeout(syncWallet);
+  }, []);
 
   // Read the cluster's own rent-exempt minimum so the reduction section quotes a
   // number the visitor can verify instead of a marketing figure.
@@ -158,6 +170,7 @@ export default function GamePrototype() {
       const response = await provider.connect();
       const owner = new PublicKey(response.publicKey.toString());
       setWallet(owner.toBase58());
+      rememberWalletAddress(owner.toBase58());
       setQuest('scanning');
       setNotice('Reading Token Program and Token-2022 accounts from mainnet…');
       const scan = await scanReclaimableAccounts(owner);

@@ -404,3 +404,9 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
   .tool-toggle>a b{font-size:9px}
   .tool-toggle>a small{font-size:6px}
 }
+
+/* Disclaimer markers give one small, periodic nudge without making the page
+   feel restless. */
+.game-warning>i,.battle-alert>b,.closer-warning>i{animation:disclaimer-nudge 3.8s ease-in-out infinite;transform-origin:center}
+@keyframes disclaimer-nudge{0%,76%,100%{transform:translateY(0) rotate(0)}82%{transform:translateY(-3px) rotate(-6deg)}88%{transform:translateY(1px) rotate(5deg)}94%{transform:translateY(-1px) rotate(-2deg)}}
+@media(prefers-reduced-motion:reduce){.game-warning>i,.battle-alert>b,.closer-warning>i{animation:none}}
