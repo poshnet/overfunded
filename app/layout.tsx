@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://lamport-reclaim-sol.hunrtech.chatgpt.site'),
   title: 'Lamport — Solana lowered rent. Claim the difference.',
   description: 'The rent floor changed. Scan token accounts and recover excess SOL without closing them.',
+  icons: { icon: '/favicon.svg' },
   openGraph: {
     title: 'Solana lowered rent. Claim the difference.',
     description: 'Scan token accounts and recover excess SOL without closing them.',

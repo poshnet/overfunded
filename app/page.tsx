@@ -89,7 +89,7 @@ export default function Home() {
       </div>
 
       <nav className="nav">
-        <a className="brand" href="#top" aria-label="Lamport home"><span className="brand-mark">L</span><span>LAMPORT</span></a>
+        <a className="brand" href="#top" aria-label="Lamport home"><span className="brand-mark" aria-hidden="true">L</span><span>LAMPORT</span></a>
         <div className="nav-links"><a href="#difference">Why different</a><a href="#how">How it works</a><a href="#community">Community coin</a></div>
         <button className="wallet-button" type="button" onClick={connectWallet} disabled={busy}>
           {wallet ? shortAddress(wallet) : busy ? 'Checking wallet…' : 'Connect wallet'} <span aria-hidden="true">↗</span>
@@ -111,19 +111,23 @@ export default function Home() {
           <div className="card-head">
             <div>
               <p>AVAILABLE TO RECLAIM</p>
-              <strong>{isResults ? '0.0842' : busy ? 'Scanning' : '—.——'} {!busy && <small>SOL</small>}</strong>
-              <span>{isResults ? 'Across 7 token accounts' : busy ? 'Reading account rent floors…' : 'Connect to scan your accounts'}</span>
+              <strong className={!isResults ? 'word-value' : ''}>{isResults ? '0.0842' : busy ? 'SCANNING' : 'READY'} {isResults && <small>SOL</small>}</strong>
+              <span>{isResults ? 'Across 7 token accounts' : busy ? 'Reading account rent floors…' : 'Your wallet may already be overfunded'}</span>
             </div>
             <div className="status-pill"><i /> {demo && isResults ? 'DEMO SCAN' : wallet ? 'WALLET CONNECTED' : 'READY TO SCAN'}</div>
           </div>
           <div className="meter"><span style={{ width: busy ? '42%' : isResults ? '68%' : '0%' }} /></div>
           <div className="card-stats">
-            <div><span>Accounts scanned</span><b>{isResults ? '24' : '—'}</b></div>
-            <div><span>With excess rent</span><b>{isResults ? '7' : '—'}</b></div>
-            <div><span>Accounts closed</span><b>0</b></div>
+            <div><span>Accounts scanned</span><b className={!isResults ? 'stat-word' : ''}>{isResults ? '24' : busy ? 'CHECKING' : 'READY'}</b></div>
+            <div><span>With excess rent</span><b className={!isResults ? 'stat-word' : ''}>{isResults ? '7' : busy ? 'SEARCHING' : 'FIND OUT'}</b></div>
+            <div><span>Accounts closed</span><b className="stat-word never">NEVER</b></div>
+          </div>
+          <div className="never-close-alert" role="note">
+            <strong>NO TOKEN ACCOUNTS ARE EVER CLOSED</strong>
+            <span>Lamport withdraws only excess rent. Your accounts and token balances stay intact.</span>
           </div>
           {isResults && <div className="fee-preview"><span>Service fee <b>0.004210 SOL</b></span><span>You receive <strong>0.079985 SOL</strong></span></div>}
-          <button className="reclaim-button" type="button" disabled={!isResults} onClick={reclaimDemo}>{isResults ? 'Reclaim 0.079985 SOL after fee' : busy ? 'Scanning accounts…' : 'Connect wallet to continue'}</button>
+          <button className="reclaim-button" type="button" disabled={!isResults} onClick={reclaimDemo}>{isResults ? 'Reclaim 0.079985 SOL after fee' : busy ? 'Scanning accounts…' : 'Scan first — no accounts will close'}</button>
           {notice && <p className="inline-notice" role="status">{notice}</p>}
         </div>
       </section>
@@ -312,7 +316,7 @@ export default function Home() {
       </section>
 
       <footer>
-        <a className="brand footer-brand" href="#top"><span className="brand-mark">L</span><span>LAMPORT</span></a>
+        <a className="brand footer-brand" href="#top"><span className="brand-mark" aria-hidden="true">L</span><span>LAMPORT</span></a>
         <p>Built for Solana’s reduced-rent era.</p>
         <div><a href="https://solana.com/upgrades/reduced-rent" target="_blank" rel="noreferrer">Rent rollout</a><a href="#community">Community coin</a><a href="#safety">Safety</a></div>
       </footer>
