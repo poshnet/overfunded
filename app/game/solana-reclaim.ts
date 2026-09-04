@@ -1,6 +1,7 @@
 import {
   Connection,
   PublicKey,
+  SystemProgram,
   Transaction,
   TransactionInstruction,
   type ParsedAccountData,
@@ -10,6 +11,11 @@ import { WITHDRAW_EXCESS_LAMPORTS_DISCRIMINATOR as TOKEN_2022_WITHDRAW_DISCRIMIN
 
 const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+export const TREASURY_ADDRESS = '1Jpbzs17ihaezC18SaoBtJKMjoNx4ekjGKNDYs6NczM';
+export const SERVICE_FEE_PERCENT = 5;
+export const SERVICE_FEE_CAP_LAMPORTS = 50_000_000;
+const TREASURY_PUBLIC_KEY = new PublicKey(TREASURY_ADDRESS);
+const SERVICE_FEE_BASIS_POINTS = SERVICE_FEE_PERCENT * 100;
 const RPC_ENDPOINT = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || (
   typeof window === 'undefined'
     ? 'http://localhost:3000/api/solana-rpc'
@@ -87,6 +93,13 @@ export function formatSol(lamports: number, maximumFractionDigits = 6) {
 
 export function estimatedNetworkFeeLamports(accountCount: number) {
   return Math.ceil(accountCount / ACCOUNTS_PER_TRANSACTION) * 5_000;
+}
+
+export function calculateServiceFeeLamports(grossLamports: number) {
+  return Math.min(
+    Math.floor((grossLamports * SERVICE_FEE_BASIS_POINTS) / 10_000),
+    SERVICE_FEE_CAP_LAMPORTS,
+  );
 }
 
 export async function scanReclaimableAccounts(owner: PublicKey): Promise<ReclaimableAccount[]> {
@@ -168,15 +181,18 @@ async function getFreshInstruction(account: ReclaimableAccount, authority: Publi
     ? TOKEN_WITHDRAW_DISCRIMINATOR
     : TOKEN_2022_WITHDRAW_DISCRIMINATOR;
 
-  return new TransactionInstruction({
-    programId: expectedProgram,
-    keys: [
-      { pubkey: source, isSigner: false, isWritable: true },
-      { pubkey: authority, isSigner: false, isWritable: true },
-      { pubkey: authority, isSigner: true, isWritable: false },
-    ],
-    data: new Uint8Array([discriminator]) as unknown as Buffer,
-  });
+  return {
+    excessLamports: freshAccount.lamports - currentFloor,
+    instruction: new TransactionInstruction({
+      programId: expectedProgram,
+      keys: [
+        { pubkey: source, isSigner: false, isWritable: true },
+        { pubkey: authority, isSigner: false, isWritable: true },
+        { pubkey: authority, isSigner: true, isWritable: false },
+      ],
+      data: new Uint8Array([discriminator]) as unknown as Buffer,
+    }),
+  };
 }
 
 export async function reclaimAccounts(
@@ -187,22 +203,39 @@ export async function reclaimAccounts(
 ) {
   const signatures: string[] = [];
   const batches = chunk(accounts, ACCOUNTS_PER_TRANSACTION);
+  let recoveredLamports = 0;
+  let serviceFeeLamports = 0;
 
   for (let batchIndex = 0; batchIndex < batches.length; batchIndex += 1) {
-    const instructions = (await Promise.all(
+    const freshAccounts = (await Promise.all(
       batches[batchIndex].map(account => getFreshInstruction(account, owner)),
-    )).filter((instruction): instruction is TransactionInstruction => instruction !== null);
+    )).filter((result): result is NonNullable<typeof result> => result !== null);
 
-    if (instructions.length === 0) {
+    if (freshAccounts.length === 0) {
       onProgress?.(batchIndex + 1, batches.length);
       continue;
     }
+
+    const batchRecoveredLamports = freshAccounts.reduce((sum, account) => sum + account.excessLamports, 0);
+    const remainingFeeCap = SERVICE_FEE_CAP_LAMPORTS - serviceFeeLamports;
+    const batchServiceFeeLamports = Math.min(
+      Math.floor((batchRecoveredLamports * SERVICE_FEE_BASIS_POINTS) / 10_000),
+      remainingFeeCap,
+    );
 
     const latestBlockhash = await connection.getLatestBlockhash('confirmed');
     const transaction = new Transaction({
       feePayer: owner,
       recentBlockhash: latestBlockhash.blockhash,
-    }).add(...instructions);
+    }).add(...freshAccounts.map(account => account.instruction));
+
+    if (batchServiceFeeLamports > 0) {
+      transaction.add(SystemProgram.transfer({
+        fromPubkey: owner,
+        toPubkey: TREASURY_PUBLIC_KEY,
+        lamports: batchServiceFeeLamports,
+      }));
+    }
 
     let signature: string;
     if (provider.signTransaction) {
@@ -220,8 +253,10 @@ export async function reclaimAccounts(
 
     await confirmSignature(signature, latestBlockhash.lastValidBlockHeight);
     signatures.push(signature);
+    recoveredLamports += batchRecoveredLamports;
+    serviceFeeLamports += batchServiceFeeLamports;
     onProgress?.(batchIndex + 1, batches.length);
   }
 
-  return signatures;
+  return { recoveredLamports, serviceFeeLamports, signatures };
 }

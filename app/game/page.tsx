@@ -3,12 +3,16 @@
 import { useMemo, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import {
+  calculateServiceFeeLamports,
   estimatedNetworkFeeLamports,
   formatSol,
   getWalletProvider,
   reclaimAccounts,
   scanReclaimableAccounts,
+  SERVICE_FEE_CAP_LAMPORTS,
+  SERVICE_FEE_PERCENT,
   shortenAddress,
+  TREASURY_ADDRESS,
   type ReclaimableAccount,
 } from './solana-reclaim';
 
@@ -28,10 +32,13 @@ export default function GamePrototype() {
   const [notice, setNotice] = useState('Connect a wallet to scan live Solana mainnet data.');
   const [signatures, setSignatures] = useState<string[]>([]);
   const [progress, setProgress] = useState('');
+  const [chargedFeeLamports, setChargedFeeLamports] = useState(0);
 
   const selectedAccounts = useMemo(() => accounts.filter(account => account.selected), [accounts]);
   const selectedLamports = useMemo(() => selectedAccounts.reduce((sum, account) => sum + account.excessLamports, 0), [selectedAccounts]);
   const networkFeeLamports = estimatedNetworkFeeLamports(selectedAccounts.length);
+  const serviceFeeLamports = calculateServiceFeeLamports(selectedLamports);
+  const estimatedReceiveLamports = Math.max(0, selectedLamports - serviceFeeLamports - networkFeeLamports);
   const busy = quest === 'connecting' || quest === 'scanning' || quest === 'reclaiming';
   const isLiveResult = quest === 'ready' || quest === 'reclaiming' || quest === 'won';
 
@@ -47,6 +54,7 @@ export default function GamePrototype() {
       setQuest('connecting');
       setNotice('Waiting for wallet permission…');
       setSignatures([]);
+      setChargedFeeLamports(0);
       const response = await provider.connect();
       const owner = new PublicKey(response.publicKey.toString());
       setWallet(owner.toBase58());
@@ -68,6 +76,7 @@ export default function GamePrototype() {
     setQuest('scanning');
     setNotice('Running a sample scan—no wallet or network request is being used.');
     setSignatures([]);
+    setChargedFeeLamports(0);
     window.setTimeout(() => {
       setAccounts(demoAccounts);
       setQuest('demo');
@@ -84,24 +93,25 @@ export default function GamePrototype() {
   async function reclaimSelected() {
     const provider = getWalletProvider();
     if (!provider || !wallet || selectedAccounts.length === 0) return;
-    if (selectedLamports <= networkFeeLamports) {
-      setNotice('The selected recovery is smaller than the estimated network fee. Select more accounts or wait for more excess.');
+    if (estimatedReceiveLamports <= 0) {
+      setNotice('The selected recovery is smaller than the disclosed service fee and estimated network fee. Select more accounts or wait for more excess.');
       return;
     }
 
     try {
       setQuest('reclaiming');
       setProgress('Preparing transaction 1…');
-      setNotice('Your wallet will ask you to approve each transaction. Verify that every instruction is WithdrawExcessLamports.');
+      setNotice(`Your wallet will ask you to approve each transaction. Verify the WithdrawExcessLamports instructions and the disclosed fee transfer to ${TREASURY_ADDRESS}.`);
       const owner = new PublicKey(wallet);
-      const confirmed = await reclaimAccounts(provider, owner, selectedAccounts, (completed, total) => {
+      const result = await reclaimAccounts(provider, owner, selectedAccounts, (completed, total) => {
         setProgress(`Confirmed ${completed} of ${total} transaction${total === 1 ? '' : 's'}`);
       });
-      setSignatures(confirmed);
+      setSignatures(result.signatures);
+      setChargedFeeLamports(result.serviceFeeLamports);
       setQuest('won');
       setProgress('Quest complete');
-      setNotice(confirmed.length
-        ? `Recovered approximately ${formatSol(selectedLamports)} SOL before network fees. No token accounts were closed.`
+      setNotice(result.signatures.length
+        ? `Recovered ${formatSol(result.recoveredLamports - result.serviceFeeLamports)} SOL before network fees. The disclosed ${formatSol(result.serviceFeeLamports)} SOL service fee went to the treasury. No token accounts were closed.`
         : 'The accounts were already at the current rent floor. Nothing was changed.');
     } catch (error) {
       setQuest('error');
@@ -141,7 +151,7 @@ export default function GamePrototype() {
           <div className="game-level"><b>NEW QUEST</b><span>RENT FLOOR REDUCTION</span></div>
           <h1>Unlock the SOL<br /><em>your wallet already owns.</em></h1>
           <p>Solana lowered account rent. Your token accounts may now hold bonus lamports above the new minimum.</p>
-          <div className="game-actions"><button type="button" onClick={primaryAction} disabled={busy || (quest === 'ready' && (selectedAccounts.length === 0 || selectedLamports <= networkFeeLamports))}>{primaryLabel}</button><button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button><a href="/classic">EXIT TO CLASSIC</a></div>
+          <div className="game-actions"><button type="button" onClick={primaryAction} disabled={busy || (quest === 'ready' && (selectedAccounts.length === 0 || estimatedReceiveLamports <= 0))}>{primaryLabel}</button><button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button><a href="/classic">EXIT TO CLASSIC</a></div>
           <div className="game-warning"><i>!</i><div><b>NO TOKEN ACCOUNTS ARE EVER CLOSED</b><span>Only excess rent moves. Tokens and account addresses stay intact.</span></div></div>
         </div>
 
@@ -150,8 +160,8 @@ export default function GamePrototype() {
           <div className="game-stars" aria-hidden="true"><i /><i /><i /><i /><i /></div>
           <div className="game-chest" aria-hidden="true"><div className="chest-glow" /><div className="chest-lid" /><div className="chest-body"><i /></div><span className="coin coin-one">◎</span><span className="coin coin-two">◎</span><span className="coin coin-three">◎</span></div>
           <div className="game-result"><small>{stageLabel}</small><strong>{stageAmount}</strong></div>
-          <button type="button" onClick={primaryAction} disabled={busy || (quest === 'ready' && (selectedAccounts.length === 0 || selectedLamports <= networkFeeLamports))}>{primaryLabel}</button>
-          <p>LIVE MAINNET · BETA SERVICE FEE 0% · YOU APPROVE EVERY TRANSACTION</p>
+          <button type="button" onClick={primaryAction} disabled={busy || (quest === 'ready' && (selectedAccounts.length === 0 || estimatedReceiveLamports <= 0))}>{primaryLabel}</button>
+          <p>LIVE MAINNET · 5% SUCCESS FEE · 0.05 SOL MAX · YOU APPROVE EVERY TRANSACTION</p>
         </div>
       </section>
 
@@ -162,8 +172,8 @@ export default function GamePrototype() {
           <div className="live-results-head"><div><small>{quest === 'demo' ? 'DEMO INVENTORY' : 'LIVE WALLET INVENTORY'}</small><h2>{wallet ? shortenAddress(wallet, 6) : 'Sample wallet'}</h2></div><span className={quest === 'demo' ? 'demo' : ''}>{quest === 'demo' ? 'DEMO DATA' : 'SOLANA MAINNET'}</span></div>
           <div className="live-summary">
             <div><span>Selected excess</span><b>{formatSol(selectedLamports, 6)} SOL</b></div>
-            <div><span>Eligible accounts</span><b>{accounts.length}</b></div>
-            <div><span>Beta service fee</span><b>0 SOL</b></div>
+            <div><span>Est. you receive</span><b>~{formatSol(estimatedReceiveLamports, 6)} SOL</b></div>
+            <div><span>Service fee ({SERVICE_FEE_PERCENT}%)</span><b>{formatSol(quest === 'won' ? chargedFeeLamports : serviceFeeLamports, 6)} SOL</b></div>
             <div><span>Est. network fee</span><b>~{formatSol(networkFeeLamports, 6)} SOL</b></div>
           </div>
           <div className="live-account-list">
@@ -176,7 +186,7 @@ export default function GamePrototype() {
               </label>
             )) : <div className="live-empty"><b>NO RECLAIMABLE EXCESS FOUND</b><span>This wallet’s supported token accounts are already at the current rent floor.</span></div>}
           </div>
-          <div className="live-approval"><div><b>TRANSACTION RULE</b><span>Only selected accounts are included. No CloseAccount, Burn, token transfer, or fee-transfer instruction is added.</span></div><button type="button" onClick={quest === 'demo' ? connectAndScan : reclaimSelected} disabled={busy || quest === 'won' || (!accounts.length || selectedAccounts.length === 0) || (quest !== 'demo' && selectedLamports <= networkFeeLamports)}>{quest === 'demo' ? 'CONNECT A REAL WALLET →' : quest === 'won' ? 'RECOVERY COMPLETE ✓' : `APPROVE ${selectedAccounts.length} ACCOUNT${selectedAccounts.length === 1 ? '' : 'S'} →`}</button></div>
+          <div className="live-approval"><div><b>TRANSACTION RULE</b><span>Selected WithdrawExcessLamports instructions plus one disclosed System Program fee transfer. No CloseAccount, Burn, or token transfer instruction is added.</span><a href={`https://solscan.io/account/${TREASURY_ADDRESS}`} target="_blank" rel="noreferrer">FEE WALLET: {shortenAddress(TREASURY_ADDRESS, 8)} ↗</a></div><button type="button" onClick={quest === 'demo' ? connectAndScan : reclaimSelected} disabled={busy || quest === 'won' || (!accounts.length || selectedAccounts.length === 0) || (quest !== 'demo' && estimatedReceiveLamports <= 0)}>{quest === 'demo' ? 'CONNECT A REAL WALLET →' : quest === 'won' ? 'RECOVERY COMPLETE ✓' : `APPROVE ${selectedAccounts.length} ACCOUNT${selectedAccounts.length === 1 ? '' : 'S'} →`}</button></div>
           <p className={quest === 'error' ? 'live-notice error' : 'live-notice'}>{notice}</p>
           {signatures.length > 0 && <div className="live-signatures">{signatures.map((signature, index) => <a key={signature} href={`https://solscan.io/tx/${signature}`} target="_blank" rel="noreferrer">Transaction {index + 1}: {shortenAddress(signature, 7)} ↗</a>)}</div>}
         </section>
@@ -214,7 +224,7 @@ export default function GamePrototype() {
           <div className="reward-pixels" aria-hidden="true"><i /><i /><i /><i /></div>
           <div className="reward-label">BONUS LEVEL · NOT LIVE</div>
         </div>
-        <div className="reward-copy"><small>OPTIONAL COMMUNITY QUEST</small><h2>Utility coin.<br /><em>No paywall.</em></h2><p>The live beta charges no service fee. If $LAMPORT launches on pump.fun later, holders could qualify for a lower future success fee. Nobody needs the coin to scan, review, or reclaim their own SOL.</p><div className="reward-stats"><div><span>LIVE BETA FEE</span><b>0%</b></div><div><span>FUTURE STANDARD</span><b>5%</b></div><div><span>PROPOSED HOLDER RATE</span><b>2.5%</b></div><div><span>FAILED QUEST</span><b>0 SOL</b></div></div><a href="https://pump.fun/create" target="_blank" rel="noreferrer">OPEN LAUNCH WORKSPACE ↗</a><i>CONCEPT ONLY · MEMECOINS ARE HIGH RISK · OFFICIAL MINT WILL APPEAR HERE FIRST</i></div>
+        <div className="reward-copy"><small>OPTIONAL COMMUNITY QUEST</small><h2>Utility coin.<br /><em>No paywall.</em></h2><p>The live success fee is {SERVICE_FEE_PERCENT}%, capped at {formatSol(SERVICE_FEE_CAP_LAMPORTS, 2)} SOL. If $LAMPORT launches on pump.fun later, holders could qualify for a lower rate. Nobody needs the coin to scan, review, or reclaim their own SOL.</p><div className="reward-stats"><div><span>LIVE SUCCESS FEE</span><b>5%</b></div><div><span>MAXIMUM FEE</span><b>0.05 SOL</b></div><div><span>PROPOSED HOLDER RATE</span><b>2.5%</b></div><div><span>FAILED TRANSACTION</span><b>0 SOL</b></div></div><a href="https://pump.fun/create" target="_blank" rel="noreferrer">OPEN LAUNCH WORKSPACE ↗</a><i>CONCEPT ONLY · MEMECOINS ARE HIGH RISK · OFFICIAL MINT WILL APPEAR HERE FIRST</i></div>
       </section>
 
       <section className="game-finale">
