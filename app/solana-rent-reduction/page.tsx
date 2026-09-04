@@ -15,6 +15,35 @@ import {
 } from '../game/solana-reclaim';
 import { SOURCE_URL } from '../site-config';
 
+// Answers to the questions people actually type. Emitted as FAQPage JSON-LD as
+// well as rendered, so they are eligible for rich results.
+const FAQ = [
+  {
+    q: 'What is the Solana rent reduction?',
+    a: 'Solana charges every account a refundable deposit to stay resident in validator memory, calculated as (128 + data_len) × lamports_per_byte. SIMD-0437 lowers that per-byte rate from 6,960 to 696 across five independently gated stages — a 90% reduction once all five activate.',
+  },
+  {
+    q: 'How much SOL can I reclaim?',
+    a: 'It depends on how many accounts you hold and which stages are live. At the first stage a 165-byte SPL token account strands about 0.00018 SOL; at full rollout that rises to roughly 0.00184 SOL per account. Larger accounts such as mints and multisigs strand proportionally more, and accounts overfunded beyond the rent floor can hold far more than the schedule implies.',
+  },
+  {
+    q: 'Why has the SOL not come back automatically?',
+    a: 'Lowering the rent-exempt minimum does not move lamports. Your account was funded once at whatever the floor was that day, and the runtime has no mechanism that sweeps the difference back to you. It stays in the account until something withdraws it.',
+  },
+  {
+    q: 'Does reclaiming rent close my token accounts?',
+    a: 'No. Overfunded uses WithdrawExcessLamports, which moves only the balance above the current rent-exempt minimum. The account stays open, stays rent-exempt, keeps its address, and keeps every token. No CloseAccount, Burn, or token transfer instruction is ever added.',
+  },
+  {
+    q: 'Is it safe to connect my wallet?',
+    a: 'Scanning only reads public account data. Nothing moves without a transaction you approve, every batch is simulated before your wallet is prompted, and the exact instructions and fee destination are shown beforehand. The source is public so the transaction builder can be read line by line.',
+  },
+  {
+    q: 'What does it cost?',
+    a: 'A 5% fee on the gross surplus, capped at 0.05 SOL, charged only on a successful reclaim and included in the same transaction you approve. Network fees are separate and estimated before signing. Nothing is charged if nothing is recovered.',
+  },
+];
+
 const ACCOUNT_KINDS = [
   { bytes: 82, label: 'Mint account', note: 'SPL token mint' },
   { bytes: 165, label: 'Token account', note: 'the one your wallet holds' },
@@ -40,31 +69,31 @@ export default function RentCutPage() {
   const legacyTokenRent = chargeableBytes * LEGACY_LAMPORTS_PER_BYTE;
 
   return (
-    <main className="cut-shell">
-      <nav className="cut-nav">
-        <a className="cut-brand" href="/"><i>L</i><span><b>LAMPORT</b><small>FIELD GUIDE</small></span></a>
-        <a className="cut-nav-cta" href="/">SCAN MY WALLET →</a>
+    <main className="srr-shell">
+      <nav className="srr-nav">
+        <a className="srr-brand" href="/"><i>O</i><span><b>OVERFUNDED</b><small>FIELD GUIDE</small></span></a>
+        <a className="srr-nav-cta" href="/">SCAN MY WALLET →</a>
       </nav>
 
-      <header className="cut-hero">
-        <div className="cut-grid" aria-hidden="true" />
-        <div className="cut-kicker"><b>FIELD GUIDE</b><span>SIMD-0437</span></div>
+      <header className="srr-hero">
+        <div className="srr-grid" aria-hidden="true" />
+        <div className="srr-kicker"><b>FIELD GUIDE</b><span>SIMD-0437</span></div>
         <h1>Rent got cheaper.<br /><em>Your accounts didn’t notice.</em></h1>
         <p>Every account on Solana holds a deposit that keeps it alive. That deposit just got smaller — but the lamports already sitting in your accounts did not move. Here is exactly what changed, and where the difference went.</p>
-        <div className="cut-hero-meta">
+        <div className="srr-hero-meta">
           <div><span>READING TIME</span><b>4 minutes</b></div>
           <div><span>ROLLOUT</span><b>{floorLamports === null ? '—' : `Stage ${stagesLive} of ${RENT_STAGES.length}`}</b></div>
           <div><span>LIVE RATE</span><b>{liveRate === null ? '—' : `${liveRate.toLocaleString('en-US')} /byte`}</b></div>
         </div>
       </header>
 
-      <section className="cut-section">
-        <div className="cut-num"><span>01</span></div>
-        <div className="cut-body">
+      <section className="srr-section">
+        <div className="srr-num"><span>01</span></div>
+        <div className="srr-body">
           <h2>What rent actually is</h2>
           <p>Solana charges every account a one-off deposit to stay resident in validator memory. It is not a fee — you keep it, and you get it back if the account is ever closed. The size of that deposit is pure arithmetic:</p>
 
-          <div className="cut-formula">
+          <div className="srr-formula">
             <code><b>rent</b> = ( <em>128</em> + <em>data_len</em> ) × <em>lamports_per_byte</em></code>
           </div>
 
@@ -76,7 +105,7 @@ export default function RentCutPage() {
           </div>
           <p className="byte-total">= <b>{chargeableBytes} chargeable bytes</b> for every token account you own</p>
 
-          <div className="cut-callout">
+          <div className="srr-callout">
             <span>UNDER THE LEGACY RATE</span>
             <code>{chargeableBytes} × {LEGACY_LAMPORTS_PER_BYTE.toLocaleString('en-US')} = {legacyTokenRent.toLocaleString('en-US')} lamports = {formatSol(legacyTokenRent, 8)} SOL</code>
             <small>If you have ever opened a token account, this is what you paid. It is the same number for everyone.</small>
@@ -84,9 +113,9 @@ export default function RentCutPage() {
         </div>
       </section>
 
-      <section className="cut-section">
-        <div className="cut-num"><span>02</span></div>
-        <div className="cut-body">
+      <section className="srr-section">
+        <div className="srr-num"><span>02</span></div>
+        <div className="srr-body">
           <h2>What SIMD-0437 changes</h2>
           <p>The proposal leaves the formula alone and lowers one variable: <code>lamports_per_byte</code>. It drops from {LEGACY_LAMPORTS_PER_BYTE.toLocaleString('en-US')} to {finalRate} across five independently gated stages — a {stageReductionPercent(finalRate)}% cut once all five activate. Each gate is a separate switch, so the rate steps down over time rather than all at once.</p>
 
@@ -109,9 +138,9 @@ export default function RentCutPage() {
         </div>
       </section>
 
-      <section className="cut-section">
-        <div className="cut-num"><span>03</span></div>
-        <div className="cut-body">
+      <section className="srr-section">
+        <div className="srr-num"><span>03</span></div>
+        <div className="srr-body">
           <h2>Why the difference is still yours</h2>
           <p>Here is the part people miss. Lowering the minimum does <em>not</em> claw anything back, and it does not push anything out. Your account was funded once, at whatever the floor was that day, and those lamports simply stay where they are. The runtime has no mechanism that sweeps the difference home for you.</p>
 
@@ -140,9 +169,9 @@ export default function RentCutPage() {
         </div>
       </section>
 
-      <section className="cut-section">
-        <div className="cut-num"><span>04</span></div>
-        <div className="cut-body">
+      <section className="srr-section">
+        <div className="srr-num"><span>04</span></div>
+        <div className="srr-body">
           <h2>What it is worth, per account</h2>
           <p>Because rent scales with account size, bigger accounts strand more. These are the three sizes you are most likely to own:</p>
           <div className="size-table">
@@ -167,9 +196,9 @@ export default function RentCutPage() {
         </div>
       </section>
 
-      <section className="cut-section">
-        <div className="cut-num"><span>05</span></div>
-        <div className="cut-body">
+      <section className="srr-section">
+        <div className="srr-num"><span>05</span></div>
+        <div className="srr-body">
           <h2>How it comes back out</h2>
           <p>There are two ways to get rent out of an account, and they are not equivalent. The older tools use the destructive one because, before this change, it was the only one worth using.</p>
           <div className="method-pair">
@@ -198,12 +227,12 @@ export default function RentCutPage() {
         </div>
       </section>
 
-      <section className="cut-section">
-        <div className="cut-num"><span>06</span></div>
-        <div className="cut-body">
+      <section className="srr-section">
+        <div className="srr-num"><span>06</span></div>
+        <div className="srr-body">
           <h2>Check it yourself</h2>
           <p>None of this requires trusting us. The rent floor is a public RPC call, and every number on this page is derived from it. Run this against any mainnet node:</p>
-          <div className="cut-terminal">
+          <div className="srr-terminal">
             <div className="term-head"><span>curl</span><i>● ● ●</i></div>
             <pre>{`curl -s https://api.mainnet-beta.solana.com \\
   -X POST -H 'content-type: application/json' \\
@@ -215,21 +244,49 @@ export default function RentCutPage() {
               <code>{floorLamports === null ? '{"jsonrpc":"2.0","result": …, "id":1}' : `{"jsonrpc":"2.0","result":${floorLamports},"id":1}`}</code>
             </div>
           </div>
-          <div className="cut-callout"><span>AND THE CODE ITSELF</span><code>{SOURCE_URL.replace('https://', '')}</code><small>The scanner, the transaction builder, and the fee maths are all public. <a href={SOURCE_URL} target="_blank" rel="noreferrer">Read the source ↗</a></small></div>
+          <div className="srr-callout"><span>AND THE CODE ITSELF</span><code>{SOURCE_URL.replace('https://', '')}</code><small>The scanner, the transaction builder, and the fee maths are all public. <a href={SOURCE_URL} target="_blank" rel="noreferrer">Read the source ↗</a></small></div>
           <p className="chart-note">Divide that result by {chargeableBytes} and you get the live <code>lamports_per_byte</code>. Match it against the ladder above and you know which gates are active — which is precisely how this page decides what to label ACTIVE.</p>
         </div>
       </section>
 
-      <section className="cut-cta">
-        <div className="cut-grid" aria-hidden="true" />
+      <section className="srr-section faq-section" id="faq">
+        <div className="srr-num"><span>07</span></div>
+        <div className="srr-body">
+          <h2>Common questions</h2>
+          <div className="faq-list">
+            {FAQ.map(item => (
+              <details key={item.q}>
+                <summary><span>{item.q}</span><i aria-hidden="true" /></summary>
+                <p>{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: FAQ.map(item => ({
+            '@type': 'Question',
+            name: item.q,
+            acceptedAnswer: { '@type': 'Answer', text: item.a },
+          })),
+        }) }}
+      />
+
+      <section className="srr-cta">
+        <div className="srr-grid" aria-hidden="true" />
         <small>NOW THE USEFUL PART</small>
         <h2>See what your own<br /><em>wallet is holding.</em></h2>
         <p>The scanner reads your token accounts, compares each one against the live floor, and shows the surplus before you approve anything. No accounts are closed.</p>
         <a href="/">CONNECT + SCAN MAINNET ▶</a>
       </section>
 
-      <footer className="cut-footer">
-        <a className="cut-brand" href="/"><i>L</i><span><b>LAMPORT</b><small>FIELD GUIDE</small></span></a>
+      <footer className="srr-footer">
+        <a className="srr-brand" href="/"><i>O</i><span><b>OVERFUNDED</b><small>FIELD GUIDE</small></span></a>
         <p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p>
         <div><a href="/">Scanner</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a></div>
       </footer>

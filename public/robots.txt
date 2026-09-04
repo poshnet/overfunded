@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /classic
+Disallow: /fun
+
+Sitemap: https://lamport-reclaim-sol.hunrtech.chatgpt.site/sitemap.xml

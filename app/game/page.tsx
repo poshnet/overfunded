@@ -242,7 +242,7 @@ export default function GamePrototype() {
   return (
     <main className={`game-shell quest-${quest} ${accounts.length ? 'has-loot' : 'no-loot'}`}>
       <nav className="game-nav">
-        <a className="game-brand" href="/"><i>L</i><span><b>LAMPORT</b><small>RENT QUEST</small></span></a>
+        <a className="game-brand" href="/"><i>O</i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a>
         <div className="game-nav-stats"><span>MODE <b>SAFE</b></span><span>ACCOUNTS CLOSED <b>0</b></span><span>NETWORK <b>MAINNET</b></span></div>
         <button type="button" onClick={connectAndScan} disabled={busy}>{wallet ? shortenAddress(wallet) : busy ? 'SCANNING…' : 'CONNECT WALLET'} <span>+</span></button>
       </nav>
@@ -328,7 +328,7 @@ export default function GamePrototype() {
         ) : (
           <div className="game-copy">
             <div className="game-level"><b>NEW QUEST</b><span>RENT FLOOR REDUCTION</span></div>
-            <h1>Unlock the SOL<br /><em>your wallet already owns.</em></h1>
+            <h1>Reclaim the Solana rent<br /><em>your wallet already paid.</em></h1>
             <p className="hero-lead">Solana lowered the rent-exempt minimum. Your token accounts were funded at the old floor, and nothing sweeps the difference back to you.</p>
             <p className="hero-mech"><code>WithdrawExcessLamports</code><span>The Token Program instruction that moves the surplus out. The account stays open, rent-exempt, and keeps every token.</span></p>
 
@@ -377,7 +377,7 @@ export default function GamePrototype() {
             <div className="game-actions">
               <button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN ▶</button>
               <button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button>
-              <a href="/rent-cut">HOW THE CUT WORKS →</a>
+              <a href="/solana-rent-reduction">HOW THE CUT WORKS →</a>
             </div>
             {quest === 'error' && <p className="live-notice error">{notice}</p>}
             <div className="game-warning"><i>!</i><div><b>NO TOKEN ACCOUNTS ARE EVER CLOSED</b><span>Only excess rent moves. Tokens and account addresses stay intact.</span></div></div>
@@ -393,7 +393,7 @@ export default function GamePrototype() {
         </div>
       </section>
 
-      <div className="game-modebar"><span><i /> SAFE MODE ACTIVE</span><b>WITHDRAW EXCESS</b><b>KEEP ACCOUNTS</b><b>TOUCH ZERO TOKENS</b><a href={SOURCE_URL} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a><a href="/rent-cut">HOW THE CUT WORKS ↗</a></div>
+      <div className="game-modebar"><span><i /> SAFE MODE ACTIVE</span><b>WITHDRAW EXCESS</b><b>KEEP ACCOUNTS</b><b>TOUCH ZERO TOKENS</b><a href={SOURCE_URL} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a><a href="/solana-rent-reduction">HOW THE CUT WORKS ↗</a></div>
 
       <section className="game-reduction" id="reduction">
         <div className="reduction-copy">
@@ -492,29 +492,29 @@ export default function GamePrototype() {
       </section>
 
       <section className="game-battle" id="safety">
-        <div className="battle-head"><small>KNOW YOUR OPPONENT</small><h2>This is not<br /><em>an incinerator.</em></h2><p>Traditional cleanup tools reclaim rent by closing eligible accounts. Lamport’s target is different: surplus rent inside accounts you want to keep.</p></div>
+        <div className="battle-head"><small>KNOW YOUR OPPONENT</small><h2>This is not<br /><em>an incinerator.</em></h2><p>Traditional cleanup tools reclaim rent by closing eligible accounts. Overfunded’s target is different: surplus rent inside accounts you want to keep.</p></div>
         <div className="battle-arena">
           <article className="battle-card enemy"><div className="battle-name"><span>ACCOUNT CLOSER</span><b>DESTRUCTIVE MOVE</b></div><i className="battle-icon">×</i><strong>CLOSE ACCOUNT</strong><ul><li>Account is deleted</li><li>Address stops working</li><li>Empty balance required</li></ul><em>USE ON DEAD ACCOUNTS</em></article>
           <div className="battle-vs">VS</div>
-          <article className="battle-card hero"><div className="battle-name"><span>LAMPORT</span><b>SAFE MOVE</b></div><i className="battle-icon">L</i><strong>WITHDRAW EXCESS</strong><ul><li>Account stays open</li><li>Address stays usable</li><li>Tokens stay untouched</li></ul><em>USE ON LIVE ACCOUNTS</em></article>
+          <article className="battle-card hero"><div className="battle-name"><span>OVERFUNDED</span><b>SAFE MOVE</b></div><i className="battle-icon">L</i><strong>WITHDRAW EXCESS</strong><ul><li>Account stays open</li><li>Address stays usable</li><li>Tokens stay untouched</li></ul><em>USE ON LIVE ACCOUNTS</em></article>
         </div>
-        <div className="battle-alert"><b>!</b><span><strong>PERMADEATH DISABLED</strong>No account-closing instruction appears in a Lamport reclaim transaction.</span><i>0 CLOSED</i></div>
+        <div className="battle-alert"><b>!</b><span><strong>PERMADEATH DISABLED</strong>No account-closing instruction appears in a Overfunded reclaim transaction.</span><i>0 CLOSED</i></div>
         <div className="battle-source"><div><b>DON’T TAKE OUR WORD FOR IT</b><span>Every instruction this site builds is in the open. Read the transaction builder, check the fee maths, and verify the rent floor against your own node.</span></div><a href={SOURCE_URL} target="_blank" rel="noreferrer">READ THE SOURCE ON GITHUB ↗</a></div>
       </section>
 
       <section className="game-ledger">
         <div className="ledger-title"><small>WORLD MAP</small><h2>The rent-recovery<br /><em>opportunity.</em></h2><p>Network totals are modeled estimates. Your actual result is calculated from the public state of the accounts in your wallet.</p></div>
         <div className="ledger-screen primary"><span>ESTIMATED LEFT TO UNLOCK</span><strong>~$310M</strong><p>Directional estimate across the complete reduced-rent rollout.</p><i>MODELLED · NOT A LIVE BALANCE</i></div>
-        <div className="ledger-screen"><span>CLAIMED THROUGH LAMPORT</span><strong>$0</strong><p>Pre-launch baseline. Updates only after verified reclaim transactions.</p><i>VERIFIABLE COUNTER</i></div>
+        <div className="ledger-screen"><span>CLAIMED THROUGH OVERFUNDED</span><strong>$0</strong><p>Pre-launch baseline. Updates only after verified reclaim transactions.</p><i>VERIFIABLE COUNTER</i></div>
         <div className="ledger-screen"><span>ACCOUNTS CLOSED</span><strong>0</strong><p>The defining score. It never moves.</p><i>NON-DESTRUCTIVE FOREVER</i></div>
       </section>
 
       <section className="game-finale">
         <div className="finale-rays" aria-hidden="true" />
-        <small>READY PLAYER WALLET?</small><h2>Find the hidden SOL.<br /><em>Keep every account alive.</em></h2><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN MAINNET ▶</button><a href="/rent-cut">READ: HOW THE RENT CUT WORKS ↗</a>
+        <small>READY PLAYER WALLET?</small><h2>Find the hidden SOL.<br /><em>Keep every account alive.</em></h2><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN MAINNET ▶</button><a href="/solana-rent-reduction">READ: HOW THE RENT CUT WORKS ↗</a>
       </section>
 
-      <footer className="game-footer"><a className="game-brand" href="/"><i>L</i><span><b>LAMPORT</b><small>RENT QUEST</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href="/rent-cut">How the cut works</a><a href="#safety">Safety</a></div></footer>
+      <footer className="game-footer"><a className="game-brand" href="/"><i>O</i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href="/solana-rent-reduction">How the cut works</a><a href="#safety">Safety</a></div></footer>
     </main>
   );
 }

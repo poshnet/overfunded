@@ -11,18 +11,23 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://lamport-reclaim-sol.hunrtech.chatgpt.site'),
-  title: 'Lamport Rent Quest — Unlock your excess SOL',
-  description: 'Scan Solana token accounts and recover excess rent without closing accounts or touching tokens.',
+  title: 'Reclaim Solana Rent — Recover Excess SOL Without Closing Token Accounts',
+  description: 'Solana lowered the rent-exempt minimum under SIMD-0437. Scan your SPL token accounts and reclaim the excess rent with WithdrawExcessLamports — no accounts closed, no tokens touched.',
   icons: { icon: '/favicon.svg' },
+  keywords: ['solana rent', 'reclaim solana rent', 'solana rent refund', 'SIMD-0437',
+    'WithdrawExcessLamports', 'solana rent exempt minimum', 'recover SOL', 'excess lamports'],
+  alternates: { canonical: '/' },
+  robots: { index: true, follow: true },
   openGraph: {
-    title: 'Lamport Rent Quest — Unlock your excess SOL',
-    description: 'Scan Solana token accounts and recover excess rent without closing accounts or touching tokens.',
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Lamport — reclaim excess Solana rent' }],
+    title: 'Reclaim Solana Rent — Recover Excess SOL Without Closing Token Accounts',
+    description: 'Solana lowered the rent-exempt minimum under SIMD-0437. Scan your SPL token accounts and reclaim the excess rent with WithdrawExcessLamports — no accounts closed, no tokens touched.',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Overfunded — reclaim excess Solana rent' }],
   },
+  applicationName: 'Overfunded',
   twitter: {
     card: 'summary_large_image',
-    title: 'Lamport Rent Quest — Unlock your excess SOL',
-    description: 'Scan Solana token accounts and recover excess rent without closing accounts or touching tokens.',
+    title: 'Reclaim Solana Rent — Recover Excess SOL Without Closing Token Accounts',
+    description: 'Solana lowered the rent-exempt minimum under SIMD-0437. Scan your SPL token accounts and reclaim the excess rent with WithdrawExcessLamports — no accounts closed, no tokens touched.',
     images: ['/og.png'],
   },
 };

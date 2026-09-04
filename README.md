@@ -1,11 +1,11 @@
-# Lamport — Rent Quest
+# Overfunded — Rent Quest
 
 Recover the excess rent sitting in your Solana token accounts, **without closing them**.
 
 Solana's rent-exempt minimum is being lowered in five gated stages under
 **SIMD-0437** (`lamports_per_byte` steps down from 6,960 to 696 — a 90% cut once
 all five activate). Accounts funded under an older, higher floor keep the
-original deposit; nothing sweeps the difference back. Lamport finds that surplus
+original deposit; nothing sweeps the difference back. Overfunded finds that surplus
 and withdraws it with the Token Program's `WithdrawExcessLamports` instruction,
 leaving the account open, rent-exempt, and holding every token.
 
