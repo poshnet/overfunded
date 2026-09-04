@@ -288,7 +288,7 @@ export default function RentCutPage() {
       <footer className="srr-footer">
         <a className="srr-brand" href="/"><i>O</i><span><b>OVERFUNDED</b><small>FIELD GUIDE</small></span></a>
         <p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p>
-        <div><a href="/">Scanner</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a></div>
+        <div><a href="/">Scanner</a><a href="/blog">Blog</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a></div>
       </footer>
     </main>
   );

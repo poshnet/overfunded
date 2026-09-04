@@ -514,7 +514,7 @@ export default function GamePrototype() {
         <small>READY PLAYER WALLET?</small><h2>Find the hidden SOL.<br /><em>Keep every account alive.</em></h2><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN MAINNET ▶</button><a href="/solana-rent-reduction">READ: HOW THE RENT CUT WORKS ↗</a>
       </section>
 
-      <footer className="game-footer"><a className="game-brand" href="/"><i>O</i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href="/solana-rent-reduction">How the cut works</a><a href="#safety">Safety</a></div></footer>
+      <footer className="game-footer"><a className="game-brand" href="/"><i>O</i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/blog">Blog</a><a href="/solana-rent-reduction">How the cut works</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href="#safety">Safety</a></div></footer>
     </main>
   );
 }
