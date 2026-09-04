@@ -6,6 +6,7 @@ import { BrandMark } from '../brand-mark';
 import { SITE_NAME, SITE_URL, SOURCE_URL } from '../site-config';
 import { ToolToggle } from '../game/tool-toggle';
 import { ToolCompare } from '../tool-compare';
+import { StageAmount, type AmountMode } from '../game/stage-amount';
 import { TokenPortrait } from '../token-portrait';
 import {
   calculateServiceFeeLamports,
@@ -216,6 +217,11 @@ export default function CloseTokenAccountsPage() {
             disabled: selectedAccounts.length === 0 || estimatedReceiveLamports <= 0,
           };
 
+  const amountMode: AmountMode = busy ? 'scanning'
+    : foundNothing ? 'verdict'
+      : accounts.length ? 'value'
+        : 'unknown';
+
   const stageLabel = state === 'connecting' ? 'CONNECTING WALLET…'
     : state === 'scanning' ? 'SEARCHING FOR EMPTY TOKEN ACCOUNTS…'
       : state === 'closing' ? (progress || 'WAITING FOR APPROVAL…')
@@ -323,7 +329,7 @@ export default function CloseTokenAccountsPage() {
               ))}
             </div>
           </div>
-          <div className="closer-stage-result"><small>{stageLabel}</small><strong>{busy ? '···' : accounts.length ? `${formatSol(selectedLamports, 5)} SOL` : foundNothing ? 'ALL CLEAN' : '??? SOL'}</strong></div>
+          <div className={foundNothing ? 'closer-stage-result is-verdict' : 'closer-stage-result'}><small>{stageLabel}</small><StageAmount mode={amountMode} lamports={selectedLamports} verdict="ALL CLEAN" /></div>
           <div className="stage-guard"><span>EMPTY ONLY</span><span>OWNER VERIFIED</span><span>DRY-RUN FIRST</span></div>
           <small className="closer-stage-fees">SERVICE + NETWORK</small>
         </div>

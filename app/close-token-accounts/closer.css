@@ -385,3 +385,6 @@
 
 .closer-section-head strong,.closer-choice strong,.lc-body strong{color:#f2e6df;font-weight:700}
 .closer-section-head p em,.closer-choice p em,.lc-body em{color:#e8b39c;font-style:italic}
+
+.closer-stage-result .stage-unknown b,.closer-stage-result .stage-value b{color:#a9787c}
+.closer-stage-result.is-verdict .stage-verdict{font-size:clamp(19px,2vw,27px);letter-spacing:.025em}

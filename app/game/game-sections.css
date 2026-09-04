@@ -117,7 +117,7 @@
 
 .empty-hint{max-width:430px;color:#6f8476!important;font-size:10px!important}
 .empty-actions{display:flex;align-items:center;gap:18px;margin-top:4px}
-.empty-actions>button:first-child{padding:13px 16px;border:1px solid var(--btn-edge,#dfffaf);background:var(--g-lime);color:#071008;font-size:10px;font-weight:950;letter-spacing:.08em;box-shadow:4px 4px 0 var(--btn-shadow,#31511e)}
+.empty-actions>button:first-child{padding:15px 19px;border:1px solid var(--btn-edge,#dfffaf);border-radius:3px;background:var(--g-lime);color:#071008;font-size:11px;font-weight:950;letter-spacing:.08em;box-shadow:4px 4px 0 var(--btn-shadow,#31511e)}
 .empty-actions>button:first-child:disabled{opacity:.5}
 
 @media(prefers-reduced-motion:reduce){
@@ -279,7 +279,7 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
 /* The reveal. Unknown glyphs breathe, a scan spins the digits, a result
    counts up and locks. Digits are tabular so nothing jitters mid-count. */
 .game-result strong{display:inline-flex;align-items:baseline;gap:.24em;font-variant-numeric:tabular-nums}
-.game-result strong b{color:#8aa08d;font-size:.34em;font-weight:900;letter-spacing:.1em}
+.stage-unknown b,.stage-value b{color:#8aa08d;font-size:.34em;font-weight:900;letter-spacing:.1em}
 
 .stage-unknown{color:#7f9384}
 
@@ -612,3 +612,8 @@ a.battle-card:hover{opacity:1}
 }
 /* Rattling shut. */
 @keyframes chest-lid-jitter{0%,100%{transform:rotateX(0deg)}50%{transform:rotateX(-9deg)}}
+
+/* Both empty-state controls sit at the same size — the back button inherits
+   the demo-link styling, which was two pixels taller and a point larger. */
+.empty-actions .game-demo-link{padding:15px 19px!important;font-size:11px}
+.empty-actions{gap:12px}
