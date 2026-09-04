@@ -76,7 +76,7 @@
 
 
 
-.closer-choice{display:block;background:linear-gradient(135deg,#0d0708,#16080b)}
+
 .closer-choice h2{font-size:clamp(34px,3.7vw,54px)}
 
 
@@ -99,7 +99,7 @@
 
 
 .closer-modebar span,.closer-modebar a{color:#dc9b80}.closer-modebar span i{background:#d88b6b;box-shadow:0 0 7px #a9684d}.closer-modebar b{color:#ad9386}
-.closer-choice{background:linear-gradient(135deg,#0c0b0a,#15110f)}
+
 .closer-shell .game-footer{border-color:#3c302b;background:#090807}
 .closer-shell .game-actions .game-demo-link{border-color:#6d5145;background:#171210;color:#d7a68e;box-shadow:none}
 .closer-shell .game-actions .game-demo-link:hover{border-color:#c68a70;background:#211915;color:#e8b49e}
@@ -241,8 +241,8 @@
   
 }
 
-.closer-choice>div:first-child{max-width:760px;margin-bottom:clamp(34px,4vw,52px)}
-.closer-choice .battle-arena{max-width:1040px}
+
+
 
 /* Analyzer. It reads a list of accounts, and what it finds changes what it
    does: idle it drifts, scanning it races, a result turns the rows into
@@ -351,22 +351,34 @@
 .lifecycle-panel li{position:relative;display:grid;grid-template-columns:46px minmax(0,1fr);gap:20px;padding:0 0 clamp(28px,3vw,40px)}
 .lifecycle-panel li:last-child{padding-bottom:0}
 .lc-mark{position:relative;display:grid;place-items:start center}
-.lc-mark i{position:relative;z-index:1;display:block;width:18px;height:18px;margin-top:5px;border:2px solid #8b5138;border-radius:50%;background:#20130e;animation:lc-step 6s ease-in-out infinite}
+.lc-mark i{position:relative;z-index:1;display:block;width:18px;height:18px;margin-top:5px;border:2px solid #a9684d;border-radius:50%;background:#3a2117}
 .lc-hold i{border-radius:4px}
 /* The rail runs behind the markers and stops at the last one. */
 .lifecycle-panel li:not(:last-child) .lc-mark:after{content:'';position:absolute;z-index:0;left:50%;top:22px;bottom:-4px;width:2px;margin-left:-1px;background:repeating-linear-gradient(180deg,#5c4338 0 6px,transparent 6px 12px)}
-.lifecycle-panel li:nth-child(2) .lc-mark i{animation-delay:2s}
-.lifecycle-panel li:nth-child(3) .lc-mark i{animation-delay:4s}
-@keyframes lc-step{0%,100%{border-color:#8b5138;background:#20130e;box-shadow:0 0 0 0 rgba(226,141,105,0)}12%{border-color:#f1b796;background:#e8b39c;box-shadow:0 0 0 7px rgba(226,141,105,.14)}30%{border-color:#a9684d;background:#3a2117;box-shadow:0 0 0 0 rgba(226,141,105,0)}}
+.lifecycle-panel li:nth-child(2){animation-delay:.22s}
+.lifecycle-panel li:nth-child(3){animation-delay:.44s}
+
 .lc-body b{display:block;margin-bottom:9px;color:#a9684d;font-size:9px;letter-spacing:.11em}
 .lc-body h3{margin:0 0 11px;color:#f2e6df;font-family:Arial,sans-serif;font-size:20px;letter-spacing:-.015em}
 .lc-body p{max-width:62ch;margin:0;color:#b8a094;font-family:Arial,sans-serif;font-size:14px;line-height:1.75}
 .lc-body strong{color:#e8b39c;font-weight:700}
 @media(max-width:640px){.lifecycle-panel li{grid-template-columns:34px minmax(0,1fr);gap:14px}.lc-body h3{font-size:18px}}
-@media(prefers-reduced-motion:reduce){.lc-mark i{animation:none}}
+@media(prefers-reduced-motion:reduce){.lifecycle-panel li{animation:none;opacity:1;transform:none}}
 /* The closer's primary action carries the weight of a destructive step, so it
    should be the loudest thing in the panel rather than a peer of the others. */
 .closer-shell .game-actions button:not(.game-demo-link){padding:19px 28px;font-size:13px;box-shadow:6px 6px 0 var(--btn-shadow,#512d1e)}
 .closer-shell .game-actions button:not(.game-demo-link):hover{box-shadow:8px 8px 0 var(--btn-shadow,#512d1e)}
 .closer-shell .game-actions button:not(.game-demo-link):active{box-shadow:2px 2px 0 var(--btn-shadow,#512d1e)}
 .closer-shell .game-actions{gap:14px}
+
+/* Same shape as the reclaim tool's comparison: head on the left, arena on the
+   right, identical columns, gap and padding. The padding rule went missing in
+   an earlier cleanup, which is why this ran flush to the page edge. */
+.closer-choice{display:grid;grid-template-columns:.7fr 1.3fr;gap:clamp(65px,10vw,150px);align-items:center;padding:130px clamp(22px,7vw,110px);border-bottom:1px solid #3d2023;background:linear-gradient(135deg,#0c0b0a,#15110f)}
+@media(max-width:1050px){.closer-choice{grid-template-columns:1fr;gap:44px}.closer-choice>div:first-child{max-width:760px}}
+@media(max-width:640px){.closer-choice{padding:78px 18px}}
+
+/* One, then two, then three. The section carries content-visibility, so the
+   sequence starts when it scrolls into view rather than on page load. */
+.lifecycle-panel li{animation:lc-appear .62s cubic-bezier(.22,.7,.35,1) both}
+@keyframes lc-appear{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
