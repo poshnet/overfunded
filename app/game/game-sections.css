@@ -278,7 +278,7 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
 
 /* The reveal. Unknown glyphs breathe, a scan spins the digits, a result
    counts up and locks. Digits are tabular so nothing jitters mid-count. */
-.game-result strong{display:inline-flex;align-items:baseline;gap:.24em;font-variant-numeric:tabular-nums}
+
 .stage-unknown b,.stage-value b{color:#8aa08d;font-size:.34em;font-weight:900;letter-spacing:.1em}
 
 .stage-unknown{color:#7f9384}
@@ -622,3 +622,9 @@ a.battle-card:hover{opacity:1}
 
 /* The panel signs itself instead of listing guarantees the page already makes. */
 .stage-mark{margin-top:16px;color:var(--panel-ink,#6f8673);font-size:9px;font-weight:900;letter-spacing:.2em;text-align:center;text-transform:uppercase}
+
+/* The amount readout looks the same wherever the component is used: mono,
+   tabular, with the unit set apart by a consistent gap. */
+.stage-unknown,.stage-value,.stage-scanning,.stage-verdict{display:inline-flex;align-items:baseline;gap:.24em;font-family:var(--font-geist-mono),monospace;font-variant-numeric:tabular-nums}
+.stage-unknown,.stage-value,.stage-scanning{font-size:clamp(30px,3.5vw,48px);font-weight:900;letter-spacing:-.06em}
+@media(max-width:590px){.stage-unknown,.stage-value,.stage-scanning{font-size:31px}}

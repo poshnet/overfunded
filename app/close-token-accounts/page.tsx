@@ -228,7 +228,7 @@ export default function CloseTokenAccountsPage() {
         : state === 'won' ? 'RENT RECOVERED'
           : state === 'demo' ? 'SAMPLE CLEANUP REWARD'
           : foundNothing ? 'NO EMPTY TOKEN ACCOUNTS FOUND'
-            : accounts.length ? 'READY TO CLOSE' : 'CLEANUP REWARD';
+            : accounts.length ? 'READY TO CLOSE' : 'UNCLAIMED SOL';
 
   return (
     <main className={`game-shell closer-shell closer-${state} ${accounts.length ? 'has-closers' : 'no-closers'}`}>
