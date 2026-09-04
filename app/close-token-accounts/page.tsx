@@ -294,12 +294,40 @@ export default function CloseTokenAccountsPage() {
 
       <div className="closer-modebar"><span><i /> DESTRUCTIVE CLOSER MODE</span><b>ZERO-BALANCE ONLY</b><b>TOKEN ACCOUNT DELETED</b><b>TOKENS NEVER BURNED</b><a href={SOURCE_URL} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a></div>
 
-      <section className="closer-steps" id="how-it-works">
-        <div className="closer-section-head"><small>THE CLEANUP RUN</small><h2>Three checks.<br /><em>Then the exit.</em></h2><p>The red tool is intentionally separate from the green reclaim tool. It is for token accounts you are finished with—not active ones you want to keep.</p></div>
-        <div className="closer-step-grid">
-          <article><b>01</b><span>FIND EMPTY</span><h3>Scan public state</h3><p>We list only supported token accounts with a raw token balance of zero.</p></article>
-          <article><b>02</b><span>CHECK CONTROL</span><h3>Verify authority</h3><p>Wrapped SOL and token accounts controlled by another close authority are excluded.</p></article>
-          <article><b>03</b><span>CLOSE + RETURN</span><h3>Recover the rent</h3><p>Your wallet approves CloseAccount. The rent lands back in the same wallet.</p></article>
+      <section className="rent-lifecycle" id="how-it-works">
+        <div className="closer-section-head">
+          <small>WHERE THE RENT COMES FROM</small>
+          <h2>Locked on the way in.<br /><em>Released on the way out.</em></h2>
+          <p>Nobody chose to pay it and nothing ever spends it. Rent is created the moment a token account opens and stays there until something takes it back out.</p>
+        </div>
+
+        <div className="lifecycle-panel">
+          <div className="lifecycle-track" aria-hidden="true">
+            <div className="lc-node"><i /><b>YOUR WALLET</b><small>funds the account</small></div>
+            <div className="lc-rail"><span /></div>
+            <div className="lc-node lc-vault"><i /><b>TOKEN ACCOUNT</b><small>holds the deposit</small></div>
+            <div className="lc-rail"><span /></div>
+            <div className="lc-node"><i /><b>YOUR WALLET</b><small>gets it back</small></div>
+            <em className="lc-coin">◎</em>
+          </div>
+
+          <ol className="lifecycle-steps">
+            <li>
+              <b>01</b>
+              <h3>It is created</h3>
+              <p>The first time you hold a token, a token account is opened for it and your wallet funds that account with the rent-exempt minimum — <strong>0.00203928 SOL</strong> under the legacy rate. You paid it without a prompt.</p>
+            </li>
+            <li>
+              <b>02</b>
+              <h3>It sits there</h3>
+              <p>The deposit never leaves the account and is never spent. It exists so validators are paid for keeping the account in memory — and it stays yours the entire time.</p>
+            </li>
+            <li>
+              <b>03</b>
+              <h3>It is released</h3>
+              <p>Two instructions can move it. <strong>CloseAccount</strong> returns the whole deposit and deletes the account. <strong>WithdrawExcessLamports</strong> returns only what sits above today’s lowered floor and leaves the account alive.</p>
+            </li>
+          </ol>
         </div>
       </section>
 

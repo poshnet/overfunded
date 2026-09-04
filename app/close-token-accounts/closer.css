@@ -6,7 +6,7 @@
 .closer-hero{position:relative;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);align-items:center;gap:clamp(22px,3vw,48px);min-height:max(680px,calc(100svh - 82px));padding:58px clamp(22px,7vw,110px) 78px;background:radial-gradient(circle at 78% 39%,rgba(219,136,101,.09),transparent 31%),linear-gradient(180deg,#0a0908,#12100e)}
 .closer-hero .game-grid{opacity:.15;background-image:linear-gradient(#483a33 1px,transparent 1px),linear-gradient(90deg,#483a33 1px,transparent 1px)}
 .closer-copy,.closer-stage{position:relative;z-index:1}
-.closer-copy{max-width:700px}
+.closer-copy{max-width:760px}
 .closer-kicker{display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid #74503f;background:#231a16;color:#e2a085;font-size:9px;font-weight:900;letter-spacing:.13em}
 .closer-kicker:before{content:'×';display:grid;width:17px;height:17px;place-items:center;background:var(--closer-red);color:#210608;font-size:13px}
 .closer-copy h1{margin:30px 0 23px;font-family:Arial,sans-serif;font-size:clamp(40px,4.4vw,68px);font-weight:900;line-height:.95;letter-spacing:-.035em;text-transform:uppercase}
@@ -64,18 +64,18 @@
 
 .closer-modebar{display:flex;align-items:center;justify-content:center;gap:clamp(16px,3vw,50px);min-height:56px;padding:11px 20px;border-top:1px solid #44352e;border-bottom:1px solid #44352e;background:#171310;color:#927a6e;font-size:8px;letter-spacing:.09em}
 .closer-modebar span{color:#e4a78e}.closer-modebar span i{display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:#dd9070;box-shadow:0 0 8px #dd9070}.closer-modebar b{color:#bd9381}.closer-modebar a{color:#e5a88e;text-decoration:none}
-.closer-steps,.closer-choice{padding:92px clamp(22px,7vw,110px);border-bottom:1px solid #3d2023;background:#090506}
-.closer-section-head{display:grid;grid-template-columns:1fr 1.2fr;column-gap:60px;max-width:1040px}
+
+.closer-section-head{max-width:760px}
 .closer-section-head>small,.closer-choice>div:first-child>small{grid-column:1/-1;margin-bottom:16px;color:#e19b7d;font-size:9px;font-weight:900;letter-spacing:.14em}
 .closer-section-head h2,.closer-choice h2{margin:0;font-family:Arial,sans-serif;font-size:clamp(36px,4.4vw,62px);font-weight:950;line-height:.95;letter-spacing:-.04em;text-transform:uppercase}
 .closer-section-head h2 em,.closer-choice h2 em{color:#e09a7c;font-family:Georgia,serif;font-weight:500;text-transform:none}
 .closer-section-head>p,.closer-choice>div:first-child>p{margin:4px 0 0;color:#987176;font-family:Arial,sans-serif;font-size:14px;line-height:1.7}
-.closer-step-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;max-width:1180px;margin-top:53px;border:1px solid #482329;background:#482329}
-.closer-step-grid article{position:relative;min-height:240px;padding:28px;background:#100708}
-.closer-step-grid article>b{position:absolute;right:20px;top:15px;color:#402126;font-size:42px}
-.closer-step-grid span{color:#e09879;font-size:8px;font-weight:900;letter-spacing:.12em}
-.closer-step-grid h3{margin:49px 0 12px;color:#f4e9e8;font-family:Arial,sans-serif;font-size:21px;text-transform:uppercase}
-.closer-step-grid p{margin:0;color:#91696e;font-family:Arial,sans-serif;font-size:13px;line-height:1.6}
+
+
+
+
+
+
 .closer-choice{display:grid;grid-template-columns:.8fr 1.2fr;gap:70px;align-items:center;background:linear-gradient(135deg,#0d0708,#16080b)}
 .closer-choice h2{font-size:clamp(34px,3.7vw,54px)}
 .closer-choice-grid{display:grid;gap:10px}
@@ -99,7 +99,7 @@
 
 
 .closer-modebar span,.closer-modebar a{color:#dc9b80}.closer-modebar span i{background:#d88b6b;box-shadow:0 0 7px #a9684d}.closer-modebar b{color:#ad9386}
-.closer-steps,.closer-choice{border-color:#3c302b;background:#0a0908}.closer-choice{background:linear-gradient(135deg,#0c0b0a,#15110f)}
+.closer-choice{background:linear-gradient(135deg,#0c0b0a,#15110f)}
 .closer-shell .game-footer{border-color:#3c302b;background:#090807}
 .closer-shell .game-actions .game-demo-link{border-color:#6d5145;background:#171210;color:#d7a68e;box-shadow:none}
 .closer-shell .game-actions .game-demo-link:hover{border-color:#c68a70;background:#211915;color:#e8b49e}
@@ -108,8 +108,8 @@
 
 @media(prefers-reduced-motion:reduce){}
 @media(max-width:1050px){.closer-hero{grid-template-columns:1fr;padding-top:62px}.closer-copy{max-width:760px}.closer-stage{justify-self:center}.closer-choice{grid-template-columns:1fr;gap:38px}.closer-section-head{grid-template-columns:1fr;gap:20px}}
-@media(max-width:760px){.closer-modebar{flex-wrap:wrap;gap:12px 22px}.closer-step-grid{grid-template-columns:1fr}.closer-step-grid article{min-height:190px}.closer-choice-grid>a{grid-template-columns:44px 1fr}.closer-choice-grid>a>i{width:42px;height:42px}.closer-choice-grid>a>em{display:none}}
-@media(max-width:590px){.closer-hero{min-height:auto;padding:46px 17px 62px}.closer-copy h1{font-size:36px}.closer-copy>p{font-size:13px}.closer-rules{display:grid;grid-template-columns:1fr}.closer-warning{align-items:flex-start}.closer-stage{min-height:400px;padding-right:16px;padding-left:16px}.closer-stage-result strong{font-size:30px}.closer-stage-guard{flex-wrap:wrap;justify-content:center}.closer-inventory{min-width:0}.closer-shell .live-summary{grid-template-columns:1fr}.closer-shell .live-approval{align-items:stretch;flex-direction:column}.closer-approval>button{width:100%}.closer-steps,.closer-choice{padding:68px 17px}.closer-section-head h2,.closer-choice h2{font-size:35px}.closer-modebar b:nth-of-type(3){display:none}}
+@media(max-width:760px){.closer-modebar{flex-wrap:wrap;gap:12px 22px}.closer-choice-grid>a{grid-template-columns:44px 1fr}.closer-choice-grid>a>i{width:42px;height:42px}.closer-choice-grid>a>em{display:none}}
+@media(max-width:590px){.closer-hero{min-height:auto;padding:46px 17px 62px}.closer-copy h1{font-size:36px}.closer-copy>p{font-size:13px}.closer-rules{display:grid;grid-template-columns:1fr}.closer-warning{align-items:flex-start}.closer-stage{min-height:400px;padding-right:16px;padding-left:16px}.closer-stage-result strong{font-size:30px}.closer-stage-guard{flex-wrap:wrap;justify-content:center}.closer-inventory{min-width:0}.closer-shell .live-summary{grid-template-columns:1fr}.closer-shell .live-approval{align-items:stretch;flex-direction:column}.closer-approval>button{width:100%}.closer-section-head h2,.closer-choice h2{font-size:35px}.closer-modebar b:nth-of-type(3){display:none}}
 
 /* Shared game components inherit their accents from these, so the closer
    themes them warm instead of borrowing the reclaim tool's green. */
@@ -175,3 +175,47 @@
   .radar-ping{opacity:.2;transform:scale(3)}
   .radar-blip{opacity:.9}
 }
+
+/* Rent lifecycle. One coin travels wallet -> account -> wallet on a loop:
+   it is funded in, held while the vault pulses, then released back out.
+   Pure CSS transforms so the section costs nothing to run. */
+.rent-lifecycle{padding:clamp(78px,8vw,112px) clamp(22px,7vw,110px);border-bottom:1px solid #3c302b;background:#0a0908;content-visibility:auto;contain-intrinsic-size:auto 700px}
+.lifecycle-panel{margin-top:clamp(38px,4vw,54px);padding:clamp(26px,3vw,40px);border:1px solid #4a3a33;background:linear-gradient(180deg,rgba(46,33,28,.55),rgba(12,9,8,.9))}
+.lifecycle-track{position:relative;display:grid;grid-template-columns:auto 1fr auto 1fr auto;align-items:start;gap:clamp(10px,2vw,22px)}
+.lc-node{display:flex;width:clamp(96px,13vw,150px);flex-direction:column;align-items:center;gap:9px;text-align:center}
+.lc-node i{display:block;width:44px;height:44px;border:2px solid #8b5138;border-radius:10px;background:#20130e}
+.lc-node b{color:#e8b39c;font-size:9px;letter-spacing:.1em}
+.lc-node small{color:#a08476;font-family:Arial,sans-serif;font-size:11px;line-height:1.4}
+.lc-vault i{border-color:#e28d69;border-radius:50%;background:radial-gradient(circle,rgba(226,141,105,.3),#20130e 68%);animation:lc-vault 3.6s ease-in-out infinite}
+.lc-rail{position:relative;height:44px;display:grid;place-items:center}
+.lc-rail span{display:block;width:100%;height:2px;background:repeating-linear-gradient(90deg,#5c4338 0 7px,transparent 7px 14px)}
+.lc-coin{position:absolute;z-index:2;left:0;top:10px;display:grid;width:26px;height:26px;place-items:center;border:2px solid #3a2117;border-radius:50%;background:#e8b39c;color:#2a1811;font-size:13px;font-style:normal;font-weight:900;opacity:0;animation:lc-travel 3.6s cubic-bezier(.5,0,.5,1) infinite}
+@keyframes lc-vault{0%,100%{box-shadow:0 0 0 0 rgba(226,141,105,0)}45%{box-shadow:0 0 0 9px rgba(226,141,105,.12)}}
+@keyframes lc-travel{
+  0%{opacity:0;left:0;transform:scale(.68)}
+  8%{opacity:1;left:4%;transform:scale(1)}
+  32%{opacity:1;left:calc(50% - 13px);transform:scale(1)}
+  40%{transform:scale(1.14)}
+  58%{opacity:1;left:calc(50% - 13px);transform:scale(.88)}
+  86%{opacity:1;left:calc(100% - 26px);transform:scale(1)}
+  100%{opacity:0;left:calc(100% - 26px);transform:scale(.68)}
+}
+.lifecycle-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:clamp(30px,3vw,44px) 0 0;padding:0;list-style:none}
+.lifecycle-steps li{padding:20px;border:1px solid #40342e;background:#100c0a}
+.lifecycle-steps b{display:grid;width:34px;height:34px;place-items:center;margin-bottom:15px;border:1px solid #6b4a3a;background:#1d1512;color:#e8b39c;font-size:10px}
+.lifecycle-steps h3{margin:0 0 10px;color:#f2e6df;font-family:Arial,sans-serif;font-size:18px;letter-spacing:-.01em}
+.lifecycle-steps p{margin:0;color:#b8a094;font-family:Arial,sans-serif;font-size:13px;line-height:1.7}
+.lifecycle-steps strong{color:#e8b39c;font-weight:700}
+@media(max-width:820px){
+  .lifecycle-track{grid-template-columns:1fr;justify-items:center;gap:6px}
+  .lc-rail{width:2px;height:34px}
+  .lc-rail span{width:2px;height:100%;background:repeating-linear-gradient(180deg,#5c4338 0 7px,transparent 7px 14px)}
+  .lc-coin{display:none}
+  .lifecycle-steps{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){.lc-coin,.lc-vault i{animation:none}.lc-coin{opacity:1}}
+
+/* One measure for every intro block, so heads line up down the page. */
+.closer-section-head>small{display:block;margin-bottom:18px}
+.closer-section-head>p{max-width:62ch;margin:22px 0 0}
+.closer-copy>p{max-width:62ch}
