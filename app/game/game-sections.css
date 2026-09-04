@@ -65,7 +65,7 @@
 /* idle: alive but calm · scanning: rattling · loot: lid pops, coins rise ·
    won: bigger burst + flare · empty: lid cracks open on an empty box.      */
 .game-chest{transform-origin:center bottom}
-.chest-lid{transform-origin:left bottom}
+.chest-lid{transform-origin:14% 100%}
 .chest-glow{opacity:.55}
 .chest-dust{position:absolute;z-index:4;left:50%;top:96px;width:74px;height:34px;margin-left:-37px;border-radius:50%;opacity:0;background:radial-gradient(circle,rgba(196,214,190,.5),transparent 70%);pointer-events:none}
 
@@ -99,7 +99,7 @@
 @keyframes chest-rattle{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(3px,-2px) rotate(1.6deg)}50%{transform:translate(-3px,1px) rotate(-1.6deg)}75%{transform:translate(2px,-1px) rotate(.9deg)}100%{transform:translate(0,0) rotate(0)}}
 @keyframes chest-lid-jitter{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(-1.4deg)}}
 @keyframes chest-glow-search{0%,100%{opacity:.4;transform:scale(.94)}50%{opacity:.95;transform:scale(1.1)}}
-@keyframes chest-lid-open{0%{transform:translateY(0) rotate(0)}60%{transform:translateY(-36px) rotate(-12deg)}80%{transform:translateY(-25px) rotate(-6.5deg)}100%{transform:translateY(-30px) rotate(-9deg)}}
+
 @keyframes chest-lid-crack{0%{transform:translateY(0) rotate(0)}35%{transform:translateY(-11px) rotate(-3.5deg)}70%{transform:translateY(-8px) rotate(-2.5deg)}100%{transform:translateY(-9px) rotate(-3deg)}}
 @keyframes chest-pop{0%{transform:scale(1)}35%{transform:scale(1.07) translateY(-4px)}100%{transform:scale(1)}}
 @keyframes chest-glow-flare{0%{opacity:.4;transform:scale(.8)}45%{opacity:1;transform:scale(1.4)}100%{opacity:.8;transform:scale(1.14)}}
@@ -123,7 +123,7 @@
 @media(prefers-reduced-motion:reduce){
   .game-actions button,.game-demo-link{animation:none!important;transition:none!important}
   .game-chest,.chest-lid,.chest-glow,.chest-dust,.coin,.chest-body i{animation:none!important}
-  .has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.quest-won .chest-lid,.has-loot.quest-reclaiming .chest-lid{transform:translateY(-30px) rotate(-9deg)}
+  .has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.quest-won .chest-lid,.has-loot.quest-reclaiming .chest-lid{transform:translateY(-11px) rotate(-25deg)}
   .no-loot.quest-ready .chest-lid{transform:translateY(-9px) rotate(-3deg)}
   .coin{opacity:0!important}
 }
@@ -489,7 +489,7 @@ a.battle-card:hover{opacity:1}
 
 /* Radar: a slower sweep with a fading tail, and blips that pulse under it. */
 
-@keyframes chest-lid-open{0%{transform:translateY(0) rotate(0)}52%{transform:translateY(-38px) rotate(-13deg)}74%{transform:translateY(-24px) rotate(-6deg)}88%{transform:translateY(-32px) rotate(-10deg)}100%{transform:translateY(-30px) rotate(-9deg)}}
+
 .lead-more{color:var(--g-lime);font-weight:700;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px;white-space:nowrap}
 .lead-more:hover{text-decoration-thickness:2px}
 .lead-more span{display:inline-block;margin-left:3px;transition:transform .18s ease}
@@ -546,21 +546,8 @@ a.battle-card:hover{opacity:1}
    lip and settle. Two axes because one timing function cannot both decelerate
    upward and accelerate downward. */
 .coin i{animation-name:coin-y;animation-duration:inherit;animation-timing-function:linear;animation-iteration-count:infinite;animation-delay:inherit}
-@keyframes coin-x{
-  0%{opacity:0;transform:translateX(0) scale(.55)}
-  7%{opacity:1;transform:translateX(calc(var(--cx) * .07)) scale(1)}
-  88%{opacity:1}
-  100%{opacity:0;transform:translateX(var(--cx)) scale(.9)}
-}
-@keyframes coin-y{
-  0%{transform:translateY(0) rotate(0deg);animation-timing-function:cubic-bezier(.12,.62,.3,1)}
-  36%{transform:translateY(var(--cy)) rotate(calc(var(--rot) * .38));animation-timing-function:cubic-bezier(.58,0,.86,.42)}
-  60%{transform:translateY(0) rotate(calc(var(--rot) * .66));animation-timing-function:cubic-bezier(.12,.62,.3,1)}
-  74%{transform:translateY(calc(var(--cy) * .3)) rotate(calc(var(--rot) * .82));animation-timing-function:cubic-bezier(.58,0,.86,.42)}
-  86%{transform:translateY(0) rotate(calc(var(--rot) * .93));animation-timing-function:cubic-bezier(.12,.62,.3,1)}
-  93%{transform:translateY(calc(var(--cy) * .1)) rotate(var(--rot));animation-timing-function:cubic-bezier(.58,0,.86,.42)}
-  100%{transform:translateY(0) rotate(var(--rot))}
-}
+
+
 @media(prefers-reduced-motion:reduce){.coin i{animation:none}}
 
 /* Verify link sits beside TRY DEMO: underlined, arrowed, obviously clickable. */
@@ -576,3 +563,25 @@ a.battle-card:hover{opacity:1}
 .game-section-title strong,.ledger-title strong,.lc-body strong{color:#e9f2e5;font-weight:700}
 .plain-steps em,.plain-close em,.reduction-copy p em,.battle-head p em,
 .game-section-title p em,.ledger-title p em{color:var(--g-lime);font-style:italic}
+
+/* Coins are spat out of the mouth, then drift upward and fade. No corner to
+   aim at — they spread both ways and disappear before they reach anything. */
+@keyframes coin-x{
+  0%{opacity:0;transform:translateX(0) scale(.45)}
+  11%{opacity:1;transform:translateX(calc(var(--cx) * .3)) scale(1)}
+  58%{opacity:1;transform:translateX(calc(var(--cx) * .74)) scale(1)}
+  100%{opacity:0;transform:translateX(var(--cx)) scale(.82)}
+}
+@keyframes coin-y{
+  0%{transform:translateY(6px) rotate(0deg);animation-timing-function:cubic-bezier(.08,.8,.28,1)}
+  20%{transform:translateY(calc(var(--cy) * .44)) rotate(calc(var(--rot) * .26));animation-timing-function:cubic-bezier(.36,.1,.66,1)}
+  100%{transform:translateY(var(--cy)) rotate(var(--rot))}
+}
+/* A lid on a hinge: it swings back off the rim, overshoots slightly, settles. */
+@keyframes chest-lid-open{
+  0%{transform:translateY(0) rotate(0deg);animation-timing-function:cubic-bezier(.2,.9,.3,1)}
+  46%{transform:translateY(-13px) rotate(-31deg)}
+  68%{transform:translateY(-9px) rotate(-21deg)}
+  84%{transform:translateY(-12px) rotate(-27deg)}
+  100%{transform:translateY(-11px) rotate(-25deg)}
+}

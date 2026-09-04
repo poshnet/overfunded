@@ -341,7 +341,7 @@
 @media(prefers-reduced-motion:reduce){
   .closer-chest,.closer-chest .chest-lid,.closer-chest .chest-glow,.closer-chest .chest-dust,
   .closer-chest .coin,.closer-chest .chest-body i{animation:none!important}
-  .has-closers.closer-ready .closer-chest .chest-lid,.closer-demo .closer-chest .chest-lid,.closer-won .closer-chest .chest-lid{transform:translateY(-30px) rotate(-9deg)}
+  .has-closers.closer-ready .closer-chest .chest-lid,.closer-demo .closer-chest .chest-lid,.closer-won .closer-chest .chest-lid{transform:translateY(-11px) rotate(-25deg)}
   .no-closers.closer-ready .closer-chest .chest-lid{transform:translateY(-9px) rotate(-3deg)}
 }
 

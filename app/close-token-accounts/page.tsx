@@ -24,18 +24,18 @@ import {
 } from '../game/solana-reclaim';
 
 const COIN_ARCS = [
-  { cx: 74, cy: -96, rot: 300, delay: 0.0 },
-  { cx: 118, cy: -74, rot: -260, delay: 0.28 },
-  { cx: 46, cy: -124, rot: 380, delay: 0.56 },
-  { cx: 152, cy: -88, rot: -330, delay: 0.84 },
-  { cx: 92, cy: -112, rot: 270, delay: 1.12 },
-  { cx: 178, cy: -68, rot: 420, delay: 1.4 },
-  { cx: 30, cy: -86, rot: -300, delay: 1.68 },
-  { cx: 134, cy: -130, rot: 350, delay: 1.96 },
-  { cx: 100, cy: -60, rot: -380, delay: 2.24 },
-  { cx: 196, cy: -102, rot: 310, delay: 2.52 },
-  { cx: 60, cy: -142, rot: -250, delay: 2.8 },
-  { cx: 160, cy: -116, rot: 400, delay: 3.08 },
+  { cx: -44, cy: -158, rot: -260, delay: 0.0 },
+  { cx: -14, cy: -186, rot: 300, delay: 0.3 },
+  { cx: 22, cy: -146, rot: -320, delay: 0.6 },
+  { cx: 52, cy: -172, rot: 280, delay: 0.9 },
+  { cx: -64, cy: -132, rot: 340, delay: 1.2 },
+  { cx: 8, cy: -206, rot: -240, delay: 1.5 },
+  { cx: 40, cy: -192, rot: 360, delay: 1.8 },
+  { cx: -30, cy: -166, rot: -300, delay: 2.1 },
+  { cx: 66, cy: -140, rot: 260, delay: 2.4 },
+  { cx: -52, cy: -198, rot: 320, delay: 2.7 },
+  { cx: 30, cy: -124, rot: -280, delay: 3.0 },
+  { cx: -6, cy: -152, rot: 300, delay: 3.3 },
 ];
 
 type CloserState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'closing' | 'won' | 'error' | 'demo';
