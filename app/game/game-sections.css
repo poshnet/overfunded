@@ -591,6 +591,7 @@ a.battle-card:hover{opacity:1}
 .game-actions button:not(.game-demo-link){padding:19px 28px;font-size:13px;box-shadow:6px 6px 0 var(--btn-shadow,#31511e)}
 .game-actions button:not(.game-demo-link):hover{box-shadow:8px 8px 0 var(--btn-shadow,#31511e)}
 .game-actions button:not(.game-demo-link):active{box-shadow:2px 2px 0 var(--btn-shadow,#31511e)}
+.game-actions .scan-primary{width:min(315px,100%);justify-content:center}
 
 /* The lid rolls back on its hinge: it swings past open, rebounds off the
    travel, and settles — rotateX so it tips away from the viewer instead of

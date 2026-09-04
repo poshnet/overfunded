@@ -416,7 +416,7 @@ export default function GamePrototype() {
               <a className="rollout-more" href="#rollout">SEE THE 5-STAGE ROLLOUT <span>↓</span></a>
             </div>
             <div className="game-actions">
-              <button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN ▶</button>
+              <button className="scan-primary" type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN ▶</button>
               <button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button>
                 <a className="game-text-link verify-link" href={SOURCE_URL} target="_blank" rel="noreferrer">VERIFY THE CODE <span aria-hidden="true">↗</span></a>
             </div>
