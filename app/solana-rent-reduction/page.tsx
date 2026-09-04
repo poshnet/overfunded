@@ -124,7 +124,9 @@ export default function RentCutPage() {
         <div className="srr-num"><span>02</span></div>
         <div className="srr-body">
           <h2>What SIMD-0437 changes</h2>
-          <p>The proposal leaves the formula alone and lowers one variable: <code>lamports_per_byte</code>. It drops from {LEGACY_LAMPORTS_PER_BYTE.toLocaleString('en-US')} to {finalRate} across five independently gated stages — a {stageReductionPercent(finalRate)}% cut once all five activate. Each gate is a separate switch, so the rate steps down over time rather than all at once.</p>
+          <p>First, whose decision this is: SIMD-0437 is a Solana Improvement Document — a change proposed, debated and ratified by the Solana protocol’s own contributors and validators, then shipped in the network’s client software. Overfunded did not create it, cannot influence it, and gains nothing from it beyond the fact that it leaves recoverable SOL in ordinary wallets. You can read the proposal and its rollout status on <a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">Solana’s own site</a>.</p>
+          <p>What it actually does is narrow. The proposal leaves the formula alone and lowers one variable: <code>lamports_per_byte</code>. It drops from {LEGACY_LAMPORTS_PER_BYTE.toLocaleString('en-US')} to {finalRate} across five independently gated stages — a {stageReductionPercent(finalRate)}% cut once all five activate. Each gate is a separate switch flipped by validators upgrading their software, so the rate steps down over time rather than all at once.</p>
+          <p>The reason it leaves money behind is equally mundane. Lowering a requirement is not the same as issuing a refund: the runtime has no mechanism to reach into millions of existing accounts and hand back the difference, so it does not try. That surplus is not an exploit or a loophole — it is your own deposit, and the Token Program has always had an instruction for withdrawing it.</p>
 
           <div className="rate-chart">
             <div className="rate-row legacy">

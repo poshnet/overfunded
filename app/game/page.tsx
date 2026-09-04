@@ -407,7 +407,6 @@ export default function GamePrototype() {
             <div className="game-actions">
               <button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN ▶</button>
               <button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button>
-              <a className="game-text-link" href="/solana-rent-reduction">HOW THE CUT WORKS →</a>
             </div>
             {quest === 'error' && <p className="live-notice error">{notice}</p>}
             <div className="game-warning"><i>!</i><div><b>KEEP-OPEN MODE NEVER DELETES TOKENS</b><span>No tokens or token accounts are deleted. Balances and account addresses stay intact.</span></div></div>
@@ -442,7 +441,7 @@ export default function GamePrototype() {
         <a className="hero-scroll-cue" href="#reduction">MORE DETAILS <span>↓</span></a>
       </section>
 
-      <div className="game-modebar"><span><i /> SAFE MODE ACTIVE</span><b>WITHDRAW EXCESS</b><b>KEEP ACCOUNTS</b><b>TOUCH ZERO TOKENS</b><a href={SOURCE_URL} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a><a href="/solana-rent-reduction">HOW THE CUT WORKS ↗</a></div>
+      <div className="game-modebar"><span><i /> SAFE MODE ACTIVE</span><b>WITHDRAW EXCESS</b><b>KEEP ACCOUNTS</b><b>TOUCH ZERO TOKENS</b><a href={SOURCE_URL} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a></div>
 
       <section className="plain-english" id="plain-english">
         <div className="plain-head">

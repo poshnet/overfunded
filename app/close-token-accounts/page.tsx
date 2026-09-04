@@ -284,7 +284,7 @@ export default function CloseTokenAccountsPage() {
 
         <div className="closer-stage">
           <div className="game-stage-head"><span>TOOL 02 / EMPTY ACCOUNT CLEANUP</span><b>{state === 'won' ? 'COMPLETE' : state === 'error' ? 'CHECK LOG' : busy ? 'ACTIVE' : 'READY'}</b></div>
-          <div className="closer-radar" aria-hidden="true"><i className="radar-ping" /><i className="radar-ping" /><i className="radar-ping" /><i className="radar-blip" /><i className="radar-blip" /><i className="radar-blip" /></div>
+          <div className="closer-analyzer" aria-hidden="true"><i className="scan-line" /><i className="target" /><i className="target" /><i className="target" /><i className="target" /></div>
           <div className="closer-stage-result"><small>{stageLabel}</small><strong>{busy ? '···' : accounts.length ? `${formatSol(selectedLamports, 5)} SOL` : foundNothing ? 'ALL CLEAN' : '??? SOL'}</strong></div>
           <div className="closer-stage-guard"><span>EMPTY ONLY</span><span>OWNER VERIFIED</span><span>DRY-RUN FIRST</span></div>
           <small className="closer-stage-fees">SERVICE + NETWORK</small>

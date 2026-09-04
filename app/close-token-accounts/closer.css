@@ -45,7 +45,7 @@
 .closer-stage-guard{display:flex;gap:5px;margin-top:4px}
 .closer-stage-guard span{padding:6px;border:1px solid #4c282c;color:#85595e;font-size:6px;font-weight:900;letter-spacing:.07em}
 .closer-stage-fees{position:absolute;right:18px;bottom:14px;left:18px;color:#70494d;font-size:7px;letter-spacing:.09em;text-align:center}
-.closer-connecting .closer-radar:before,.closer-scanning .closer-radar:before,.closer-closing .closer-radar:before{animation-duration:1.1s}.closer-connecting .radar-ping,.closer-scanning .radar-ping,.closer-closing .radar-ping{animation-duration:1.1s}.closer-connecting .radar-blip,.closer-scanning .radar-blip,.closer-closing .radar-blip{animation-duration:1.1s}
+.closer-connecting .radar-ping,.closer-scanning .radar-ping,.closer-closing .radar-ping{animation-duration:1.1s}.closer-connecting .radar-blip,.closer-scanning .radar-blip,.closer-closing .radar-blip{animation-duration:1.1s}
 
 .closer-inventory{width:100%;max-width:720px}
 .closer-shell .live-results-head span,.closer-shell .live-summary b,.closer-shell .live-account-list label strong,.closer-shell .live-approval b,.closer-shell .live-approval a,.closer-shell .live-signatures a{color:var(--closer-red)}
@@ -157,23 +157,23 @@
 
 /* Radar: a rotating wedge sweep with sonar pings expanding under it and blips
    that flare as it passes. The old 1px line was invisible at any distance. */
-.closer-radar{position:relative;display:grid;width:210px;height:210px;place-items:center;overflow:hidden;border:1px solid #6c4e40;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 33px,rgba(221,143,110,.12) 34px 35px),radial-gradient(circle,rgba(226,141,105,.1),transparent 68%);box-shadow:inset 0 0 50px rgba(221,143,110,.12)}
-.closer-radar:after{content:'';position:absolute;z-index:3;inset:0;pointer-events:none;background:linear-gradient(rgba(226,159,131,.16) 0 100%) 50% 0/1px 100% no-repeat,linear-gradient(rgba(226,159,131,.16) 0 100%) 0 50%/100% 1px no-repeat}
-.closer-radar:before{content:'';position:absolute;z-index:0;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(232,179,156,.5),rgba(226,141,105,.2) 20deg,rgba(226,141,105,.05) 44deg,transparent 74deg);animation:radar-sweep 3.2s linear infinite}
-.radar-ping{position:absolute;z-index:1;width:26px;height:26px;border:2px solid rgba(232,179,156,.55);border-radius:50%;opacity:0;animation:radar-ping 3.2s cubic-bezier(.19,.62,.33,1) infinite}
-.closer-radar i:nth-child(2){animation-delay:1.06s}
-.closer-radar i:nth-child(3){animation-delay:2.12s}
-.radar-blip{position:absolute;z-index:2;width:8px;height:8px;border-radius:50%;background:#f1b796;box-shadow:0 0 16px #dd9070,0 0 4px #fff;animation:radar-blip 3.2s ease-in-out infinite}
-.closer-radar i:nth-child(4){left:29%;top:27%}
-.closer-radar i:nth-child(5){left:69%;top:57%;animation-delay:1.06s}
-.closer-radar i:nth-child(6){left:43%;top:73%;animation-delay:2.12s}
-@keyframes radar-sweep{to{transform:rotate(360deg)}}
-@keyframes radar-ping{0%{opacity:.8;transform:scale(.2)}68%{opacity:.16}100%{opacity:0;transform:scale(7.6)}}
-@keyframes radar-blip{0%,100%{opacity:.12;transform:scale(.55)}10%{opacity:1;transform:scale(1.6)}34%{opacity:.4;transform:scale(1)}}
+
+
+
+
+
+
+
+
+
+
+
+
+
 @media(prefers-reduced-motion:reduce){
-  .closer-radar:before,.radar-ping,.radar-blip{animation:none}
-  .radar-ping{opacity:.2;transform:scale(3)}
-  .radar-blip{opacity:.9}
+  
+  
+  
 }
 
 /* Rent lifecycle. One coin travels wallet -> account -> wallet on a loop:
@@ -219,3 +219,33 @@
 .closer-section-head>small{display:block;margin-bottom:18px}
 .closer-section-head>p{max-width:62ch;margin:22px 0 0}
 .closer-copy>p{max-width:62ch}
+
+/* Analyzer: a scan line crosses the panel and target boxes lock on behind it,
+   so the panel reads as inspecting accounts rather than spinning for effect. */
+.closer-analyzer{position:relative;width:230px;height:200px;overflow:hidden;border:1px solid #6c4e40;border-radius:10px;background:linear-gradient(#8b513814 1px,transparent 1px) 0 0/100% 25px,linear-gradient(90deg,#8b513814 1px,transparent 1px) 0 0/25px 100%,radial-gradient(circle at 50% 45%,rgba(226,141,105,.1),transparent 70%),#140d0a;box-shadow:inset 0 0 40px rgba(221,143,110,.1)}
+.closer-analyzer:after{content:'';position:absolute;z-index:4;inset:0;pointer-events:none;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(226,141,105,.14)}
+.scan-line{position:absolute;z-index:3;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#f1b796,transparent);box-shadow:0 0 14px rgba(241,183,150,.7);animation:az-scan 3.4s cubic-bezier(.55,0,.45,1) infinite}
+.scan-line:before{content:'';position:absolute;left:0;right:0;top:2px;height:40px;background:linear-gradient(rgba(226,141,105,.16),transparent)}
+/* Each target locks on: brackets snap in, the box flashes, then it settles. */
+.target{position:absolute;z-index:2;width:38px;height:26px;border:1px solid rgba(226,141,105,.34);opacity:0;animation:az-lock 3.4s ease-out infinite}
+.target:before,.target:after{content:'';position:absolute;width:8px;height:8px;border:2px solid #f1b796}
+.target:before{left:-2px;top:-2px;border-right:0;border-bottom:0}
+.target:after{right:-2px;bottom:-2px;border-left:0;border-top:0}
+.closer-analyzer i:nth-child(2){left:26px;top:34px;animation-delay:.35s}
+.closer-analyzer i:nth-child(3){left:118px;top:66px;width:52px;animation-delay:1.05s}
+.closer-analyzer i:nth-child(4){left:44px;top:110px;width:46px;animation-delay:1.75s}
+.closer-analyzer i:nth-child(5){left:132px;top:146px;width:34px;animation-delay:2.35s}
+@keyframes az-scan{0%{top:-6%}50%{top:100%}50.01%{top:-6%}100%{top:100%}}
+@keyframes az-lock{
+  0%,6%{opacity:0;transform:scale(1.35)}
+  12%{opacity:1;transform:scale(1);background:rgba(241,183,150,.22)}
+  20%{background:rgba(241,183,150,.06)}
+  74%{opacity:1;background:transparent}
+  92%,100%{opacity:0;transform:scale(.94)}
+}
+.closer-connecting .scan-line,.closer-scanning .scan-line,.closer-closing .scan-line{animation-duration:1.2s}
+.closer-connecting .target,.closer-scanning .target,.closer-closing .target{animation-duration:1.2s}
+@media(prefers-reduced-motion:reduce){
+  .scan-line{animation:none;top:50%}
+  .target{animation:none;opacity:1;transform:none}
+}
