@@ -29,15 +29,15 @@
 .closer-stage:before{content:'';position:absolute;inset:9px;border:1px dashed rgba(225,157,129,.16);pointer-events:none}
 .closer-stage .game-stage-head{border-color:#593037;color:#95666b}
 .closer-stage .game-stage-head b{color:var(--closer-red)}
-.closer-radar{position:relative;display:grid;width:210px;height:210px;place-items:center;overflow:hidden;border:1px solid #6c4e40;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 34px,rgba(221,143,110,.1) 35px 36px),linear-gradient(135deg,rgba(221,143,110,.06),transparent)}
-.closer-radar:before,.closer-radar:after{content:'';position:absolute;background:rgba(226,159,131,.17)}
-.closer-radar:before{width:1px;height:100%}.closer-radar:after{width:100%;height:1px}
-.closer-radar i{position:absolute;left:50%;bottom:50%;width:50%;height:1px;transform-origin:left center;background:linear-gradient(90deg,#dd9070,transparent);animation:radar-sweep 3.4s linear infinite}
-.closer-radar i:nth-child(2){width:6px;height:6px;left:31%;bottom:65%;border-radius:50%;background:#e8b39c;box-shadow:0 0 13px #dd9070;animation:radar-blip 2.2s ease-in-out infinite}
-.closer-radar i:nth-child(3){width:5px;height:5px;left:70%;bottom:34%;border-radius:50%;background:#e8b39c;box-shadow:0 0 13px #dd9070;animation:radar-blip 2.2s .8s ease-in-out infinite}
 
-@keyframes radar-sweep{to{transform:rotate(360deg)}}
-@keyframes radar-blip{0%,100%{opacity:.3;scale:.7}50%{opacity:1;scale:1.35}}
+
+
+
+
+
+
+
+
 .closer-stage-result{display:flex;min-height:78px;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin-top:13px;text-align:center}
 .closer-stage-result small{color:#9d6e72;font-size:9px;letter-spacing:.11em}
 .closer-stage-result strong{color:#fff;font-size:clamp(28px,3.2vw,44px);font-weight:950;letter-spacing:-.055em;font-variant-numeric:tabular-nums}
@@ -45,7 +45,7 @@
 .closer-stage-guard{display:flex;gap:5px;margin-top:4px}
 .closer-stage-guard span{padding:6px;border:1px solid #4c282c;color:#85595e;font-size:6px;font-weight:900;letter-spacing:.07em}
 .closer-stage-fees{position:absolute;right:18px;bottom:14px;left:18px;color:#70494d;font-size:7px;letter-spacing:.09em;text-align:center}
-.closer-connecting .closer-radar i:first-child,.closer-scanning .closer-radar i:first-child,.closer-closing .closer-radar i:first-child{animation-duration:1s}
+.closer-connecting .closer-radar:before,.closer-scanning .closer-radar:before,.closer-closing .closer-radar:before{animation-duration:1.1s}.closer-connecting .radar-ping,.closer-scanning .radar-ping,.closer-closing .radar-ping{animation-duration:1.1s}.closer-connecting .radar-blip,.closer-scanning .radar-blip,.closer-closing .radar-blip{animation-duration:1.1s}
 
 .closer-inventory{width:100%;max-width:720px}
 .closer-shell .live-results-head span,.closer-shell .live-summary b,.closer-shell .live-account-list label strong,.closer-shell .live-approval b,.closer-shell .live-approval a,.closer-shell .live-signatures a{color:var(--closer-red)}
@@ -96,8 +96,8 @@
 .closer-warning{border-color:#765044;background:rgba(218,142,110,.055)}
 .closer-warning>i{border-color:#d78d6e;color:#dd997d}
 .closer-warning b{color:#e29f82}.closer-warning span{color:#a28c81}
-.closer-radar i{background:linear-gradient(90deg,#dc9476,transparent)}
-.closer-radar i:nth-child(2),.closer-radar i:nth-child(3){background:#e6ab92;box-shadow:0 0 11px #b87458}
+
+
 .closer-modebar span,.closer-modebar a{color:#dc9b80}.closer-modebar span i{background:#d88b6b;box-shadow:0 0 7px #a9684d}.closer-modebar b{color:#ad9386}
 .closer-steps,.closer-choice{border-color:#3c302b;background:#0a0908}.closer-choice{background:linear-gradient(135deg,#0c0b0a,#15110f)}
 .closer-shell .game-footer{border-color:#3c302b;background:#090807}
@@ -106,10 +106,10 @@
 .closer-shell .game-actions a.game-text-link{color:#b59b8e;text-decoration-color:#765d51}
 .closer-shell .game-actions a.game-text-link:hover{color:#e29f82;text-decoration-color:#e29f82}
 
-@media(prefers-reduced-motion:reduce){.closer-radar i,.closer-shell button{animation:none!important}}
+@media(prefers-reduced-motion:reduce){}
 @media(max-width:1050px){.closer-hero{grid-template-columns:1fr;padding-top:62px}.closer-copy{max-width:760px}.closer-stage{justify-self:center}.closer-choice{grid-template-columns:1fr;gap:38px}.closer-section-head{grid-template-columns:1fr;gap:20px}}
 @media(max-width:760px){.closer-modebar{flex-wrap:wrap;gap:12px 22px}.closer-step-grid{grid-template-columns:1fr}.closer-step-grid article{min-height:190px}.closer-choice-grid>a{grid-template-columns:44px 1fr}.closer-choice-grid>a>i{width:42px;height:42px}.closer-choice-grid>a>em{display:none}}
-@media(max-width:590px){.closer-hero{min-height:auto;padding:46px 17px 62px}.closer-copy h1{font-size:36px}.closer-copy>p{font-size:13px}.closer-rules{display:grid;grid-template-columns:1fr}.closer-warning{align-items:flex-start}.closer-stage{min-height:400px;padding-right:16px;padding-left:16px}.closer-radar{width:175px;height:175px}.closer-stage-result strong{font-size:30px}.closer-stage-guard{flex-wrap:wrap;justify-content:center}.closer-inventory{min-width:0}.closer-shell .live-summary{grid-template-columns:1fr}.closer-shell .live-approval{align-items:stretch;flex-direction:column}.closer-approval>button{width:100%}.closer-steps,.closer-choice{padding:68px 17px}.closer-section-head h2,.closer-choice h2{font-size:35px}.closer-modebar b:nth-of-type(3){display:none}}
+@media(max-width:590px){.closer-hero{min-height:auto;padding:46px 17px 62px}.closer-copy h1{font-size:36px}.closer-copy>p{font-size:13px}.closer-rules{display:grid;grid-template-columns:1fr}.closer-warning{align-items:flex-start}.closer-stage{min-height:400px;padding-right:16px;padding-left:16px}.closer-stage-result strong{font-size:30px}.closer-stage-guard{flex-wrap:wrap;justify-content:center}.closer-inventory{min-width:0}.closer-shell .live-summary{grid-template-columns:1fr}.closer-shell .live-approval{align-items:stretch;flex-direction:column}.closer-approval>button{width:100%}.closer-steps,.closer-choice{padding:68px 17px}.closer-section-head h2,.closer-choice h2{font-size:35px}.closer-modebar b:nth-of-type(3){display:none}}
 
 /* Shared game components inherit their accents from these, so the closer
    themes them warm instead of borrowing the reclaim tool's green. */
@@ -150,7 +150,28 @@
 }
 
 /* Radar polish: the sweep leaves a soft wedge behind it and the blips breathe. */
-.closer-radar{box-shadow:inset 0 0 46px rgba(221,143,110,.09)}
-.closer-radar i:first-child{height:2px;background:linear-gradient(90deg,rgba(232,179,156,.95),rgba(221,143,110,.35) 45%,transparent)}
-.closer-radar i:first-child:after{content:'';position:absolute;left:0;bottom:-30px;width:100%;height:60px;transform-origin:left center;background:conic-gradient(from -14deg at 0 50%,rgba(221,143,110,.16),transparent 14deg);pointer-events:none}
-@keyframes radar-blip{0%,100%{opacity:.25;transform:scale(.72)}45%{opacity:1;transform:scale(1.18)}}
+
+
+
+
+
+/* Radar: a rotating wedge sweep with sonar pings expanding under it and blips
+   that flare as it passes. The old 1px line was invisible at any distance. */
+.closer-radar{position:relative;display:grid;width:210px;height:210px;place-items:center;overflow:hidden;border:1px solid #6c4e40;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 33px,rgba(221,143,110,.12) 34px 35px),radial-gradient(circle,rgba(226,141,105,.1),transparent 68%);box-shadow:inset 0 0 50px rgba(221,143,110,.12)}
+.closer-radar:after{content:'';position:absolute;z-index:3;inset:0;pointer-events:none;background:linear-gradient(rgba(226,159,131,.16) 0 100%) 50% 0/1px 100% no-repeat,linear-gradient(rgba(226,159,131,.16) 0 100%) 0 50%/100% 1px no-repeat}
+.closer-radar:before{content:'';position:absolute;z-index:0;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(232,179,156,.5),rgba(226,141,105,.2) 20deg,rgba(226,141,105,.05) 44deg,transparent 74deg);animation:radar-sweep 3.2s linear infinite}
+.radar-ping{position:absolute;z-index:1;width:26px;height:26px;border:2px solid rgba(232,179,156,.55);border-radius:50%;opacity:0;animation:radar-ping 3.2s cubic-bezier(.19,.62,.33,1) infinite}
+.closer-radar i:nth-child(2){animation-delay:1.06s}
+.closer-radar i:nth-child(3){animation-delay:2.12s}
+.radar-blip{position:absolute;z-index:2;width:8px;height:8px;border-radius:50%;background:#f1b796;box-shadow:0 0 16px #dd9070,0 0 4px #fff;animation:radar-blip 3.2s ease-in-out infinite}
+.closer-radar i:nth-child(4){left:29%;top:27%}
+.closer-radar i:nth-child(5){left:69%;top:57%;animation-delay:1.06s}
+.closer-radar i:nth-child(6){left:43%;top:73%;animation-delay:2.12s}
+@keyframes radar-sweep{to{transform:rotate(360deg)}}
+@keyframes radar-ping{0%{opacity:.8;transform:scale(.2)}68%{opacity:.16}100%{opacity:0;transform:scale(7.6)}}
+@keyframes radar-blip{0%,100%{opacity:.12;transform:scale(.55)}10%{opacity:1;transform:scale(1.6)}34%{opacity:.4;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){
+  .closer-radar:before,.radar-ping,.radar-blip{animation:none}
+  .radar-ping{opacity:.2;transform:scale(3)}
+  .radar-blip{opacity:.9}
+}

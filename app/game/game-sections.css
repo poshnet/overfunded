@@ -494,7 +494,7 @@ a.battle-card{opacity:.78}
 a.battle-card:hover{opacity:1}
 
 /* Radar: a slower sweep with a fading tail, and blips that pulse under it. */
-.closer-radar i:first-child{animation-duration:4.2s!important;animation-timing-function:cubic-bezier(.4,0,.6,1)!important}
+
 @keyframes chest-lid-open{0%{transform:translateY(0) rotate(0)}52%{transform:translateY(-38px) rotate(-13deg)}74%{transform:translateY(-24px) rotate(-6deg)}88%{transform:translateY(-32px) rotate(-10deg)}100%{transform:translateY(-30px) rotate(-9deg)}}
 .lead-more{color:var(--g-lime);font-weight:700;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px;white-space:nowrap}
 .lead-more:hover{text-decoration-thickness:2px}
