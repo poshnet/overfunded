@@ -90,7 +90,7 @@ export default function Home() {
 
       <nav className="nav">
         <a className="brand" href="#top" aria-label="Lamport home"><span className="brand-mark">L</span><span>LAMPORT</span></a>
-        <div className="nav-links"><a href="#how">How it works</a><a href="#developers">Developers</a><a href="#safety">Safety</a></div>
+        <div className="nav-links"><a href="#how">How it works</a><a href="#community">Community coin</a><a href="#developers">Developers</a></div>
         <button className="wallet-button" type="button" onClick={connectWallet} disabled={busy}>
           {wallet ? shortAddress(wallet) : busy ? 'Checking wallet…' : 'Connect wallet'} <span aria-hidden="true">↗</span>
         </button>
@@ -98,9 +98,9 @@ export default function Home() {
 
       <section className="hero" id="top">
         <div className="hero-orbit orbit-one">◎</div><div className="hero-orbit orbit-two">◎</div>
-        <div className="eyebrow"><span /> Solana rent just got cheaper</div>
-        <h1>Your SOL is<br />waiting to come home.</h1>
-        <p className="hero-copy">Scan your wallet for excess rent sitting in token accounts. Reclaim it in one transaction—without closing anything.</p>
+        <div className="eyebrow"><span /> The reduced-rent era is here</div>
+        <h1>Solana lowered rent.<br /><em>Claim the difference.</em></h1>
+        <p className="hero-copy">Accounts funded under the old rent floor may now hold excess lamports. Scan and recover that SOL without closing the accounts or touching token balances.</p>
         <div className="hero-actions">
           <button className="primary-action" type="button" onClick={connectWallet} disabled={busy}><span className="sol-dot">◎</span> {busy ? 'Scanning…' : 'Scan my wallet'}</button>
           <button className="demo-action" type="button" onClick={loadDemo}>Try the demo <span>→</span></button>
@@ -129,7 +129,22 @@ export default function Home() {
 
       <section className="proof-strip" id="safety">
         <p>BUILT FOR THE NEW RENT ERA</p>
-        <div className="proof-items"><span><b>↓</b> Rent floor reduced</span><span><b>◇</b> Token accounts stay open</span><span><b>✓</b> Balances stay untouched</span></div>
+        <div className="proof-items"><span><b>↓</b> Rent floor is falling</span><span><b>◇</b> Token accounts stay open</span><span><b>✓</b> Balances stay untouched</span></div>
+      </section>
+
+      <section className="update-section">
+        <div className="update-number" aria-hidden="true">↓</div>
+        <div className="update-copy">
+          <p className="section-kicker">THE UPDATE CREATED THE OPPORTUNITY</p>
+          <h2>Old deposits.<br /><em>New rent floor.</em></h2>
+          <p>Solana is rolling out lower account rent. Accounts that were funded to an older, higher rent-exempt minimum can end up holding more lamports than they need.</p>
+        </div>
+        <div className="update-facts">
+          <article><span>01</span><b>The network lowers rent</b><p>The required minimum changes as the reduced-rent rollout advances.</p></article>
+          <article><span>02</span><b>Your account keeps the old deposit</b><p>Nothing automatically sweeps the surplus back to your wallet.</p></article>
+          <article><span>03</span><b>Lamport returns the difference</b><p>Withdraw only the excess and leave the account live and rent-exempt.</p></article>
+          <a href="https://solana.com/upgrades/reduced-rent" target="_blank" rel="noreferrer">Follow Solana’s official rollout <span>↗</span></a>
+        </div>
       </section>
 
       <section className="results-section" aria-label="Example scan results">
@@ -157,6 +172,30 @@ export default function Home() {
           <article><span>01</span><div className="step-icon">⌁</div><h3>Connect & scan</h3><p>We read public account data and compare each balance with today’s rent-exempt minimum.</p></article>
           <article><span>02</span><div className="step-icon">◫</div><h3>Review everything</h3><p>See the exact accounts, estimated network fee, and destination before you approve.</p></article>
           <article><span>03</span><div className="step-icon acid">↓</div><h3>Reclaim</h3><p>Excess lamports return to your wallet. Accounts and token balances stay exactly where they are.</p></article>
+        </div>
+      </section>
+
+      <section className="community-section" id="community">
+        <div className="community-coin" aria-hidden="true">
+          <div className="coin-halo" />
+          <div className="big-coin"><span>◎</span><b>L</b><small>$LAMPORT</small></div>
+          <span className="coin-tag">CONCEPT • NOT LAUNCHED</span>
+        </div>
+        <div className="community-copy">
+          <p className="section-kicker light">OPTIONAL COMMUNITY LAYER</p>
+          <h2>A coin for the movement.<br /><em>Never a tollbooth.</em></h2>
+          <p className="community-lead">$LAMPORT can turn every successful reclaim into a shareable community moment while the recovery tool remains free and useful on its own.</p>
+          <div className="coin-principles">
+            <div><b>Utility first</b><span>No token required to scan or reclaim.</span></div>
+            <div><b>Fair launch</b><span>If launched, everyone enters through the same pump.fun market.</span></div>
+            <div><b>One official address</b><span>The mint will appear here first—never in replies or DMs.</span></div>
+            <div><b>No promises</b><span>A community coin is speculative, not a claim on product revenue.</span></div>
+          </div>
+          <div className="coin-actions">
+            <a className="coin-primary" href="https://pump.fun/create" target="_blank" rel="noreferrer">Open pump.fun launch page <span>↗</span></a>
+            <span className="launch-status"><i /> OFFICIAL COIN NOT LIVE</span>
+          </div>
+          <p className="coin-risk">Pump.fun coins can move quickly and lose value. The reclaim product and its security must never depend on the token price.</p>
         </div>
       </section>
 
@@ -192,7 +231,7 @@ export default function Home() {
       <footer>
         <a className="brand footer-brand" href="#top"><span className="brand-mark">L</span><span>LAMPORT</span></a>
         <p>Built for Solana’s reduced-rent era.</p>
-        <div><a href="https://solana.com/upgrades/reduced-rent" target="_blank" rel="noreferrer">Rent rollout</a><a href="#developers">Developers</a><a href="#safety">Safety</a></div>
+        <div><a href="https://solana.com/upgrades/reduced-rent" target="_blank" rel="noreferrer">Rent rollout</a><a href="#community">Community coin</a><a href="#safety">Safety</a></div>
       </footer>
     </main>
   );

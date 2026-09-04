@@ -13,18 +13,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://lamport-reclaim-sol.open-hinny-7742.chatgpt.site'),
-  title: 'Lamport — Reclaim excess Solana rent',
-  description: 'Scan token accounts and reclaim excess rent without closing them.',
+  metadataBase: new URL('https://lamport-reclaim-sol.hunrtech.chatgpt.site'),
+  title: 'Lamport — Solana lowered rent. Claim the difference.',
+  description: 'The rent floor changed. Scan token accounts and recover excess SOL without closing them.',
   openGraph: {
-    title: 'Your SOL is waiting',
-    description: 'Reclaim excess rent. Keep every account open.',
+    title: 'Solana lowered rent. Claim the difference.',
+    description: 'Scan token accounts and recover excess SOL without closing them.',
     images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Lamport — reclaim excess Solana rent' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Your SOL is waiting',
-    description: 'Reclaim excess rent. Keep every account open.',
+    title: 'Solana lowered rent. Claim the difference.',
+    description: 'Scan token accounts and recover excess SOL without closing them.',
     images: ['/og.png'],
   },
 };
