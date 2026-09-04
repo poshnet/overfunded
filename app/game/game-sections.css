@@ -222,13 +222,13 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
   .rollout-stages em{grid-column:2;grid-row:2}
   .rollout-stages small{grid-column:3;grid-row:2}
 }
-.battle-source{grid-column:1/3;display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:13px;padding:17px;border:1px solid #47634b;background:#0e1710}
-.battle-source>div{display:flex;max-width:640px;flex-direction:column;gap:6px}
-.battle-source b{color:var(--g-lime);font-size:9px;letter-spacing:.1em}
-.battle-source span{color:#8fa293;font-family:Arial,sans-serif;font-size:12px;line-height:1.55}
-.battle-source>a{flex:none;padding:13px 15px;border:1px solid var(--g-lime);background:#17311c;color:var(--g-lime);font-size:10px;font-weight:900;letter-spacing:.08em;text-decoration:none;box-shadow:4px 4px 0 #31551e}
-@media(max-width:1050px){.battle-source{grid-column:auto}}
-@media(max-width:640px){.battle-source{align-items:stretch;flex-direction:column;gap:14px}.battle-source>a{text-align:center}}
+
+
+
+
+
+@media(max-width:1050px){}
+@media(max-width:640px){}
 /* Fees read as one number the user actually pays, with the split kept visible
    underneath so the disclosure is not lost to the tidier layout. */
 .live-summary em{color:#5f7164;font-size:9px;font-style:normal;letter-spacing:.03em;line-height:1.45}
@@ -530,3 +530,12 @@ a.battle-card:hover{opacity:1}
 .quest-idle .chest-body i{animation:lock-glint 5.2s ease-in-out infinite}
 @keyframes lock-glint{0%,86%,100%{filter:brightness(1)}92%{filter:brightness(1.55) saturate(1.15)}}
 @media(prefers-reduced-motion:reduce){.quest-idle .chest-body i{animation:none}}
+
+/* Closing verifiability note: a full-width strip in front of the final CTA,
+   where "and you can check all of this yourself" actually belongs. */
+.verify-strip{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px clamp(22px,7vw,110px);border-top:1px solid #263528;border-bottom:1px solid #263528;background:#0a110b}
+.verify-strip>div{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.verify-strip b{color:var(--g-lime);font-size:10px;letter-spacing:.11em;white-space:nowrap}
+.verify-strip span{color:#8fa293;font-family:Arial,sans-serif;font-size:13px}
+.verify-strip>a{flex:none;padding:12px 15px;border:1px solid var(--g-lime);background:#17311c;color:var(--g-lime);font-size:10px;font-weight:900;letter-spacing:.08em;text-decoration:none;box-shadow:3px 3px 0 var(--btn-shadow,#31511e)}
+@media(max-width:760px){.verify-strip{align-items:stretch;flex-direction:column;gap:16px}.verify-strip>a{text-align:center}}

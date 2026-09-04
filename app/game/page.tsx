@@ -570,7 +570,6 @@ export default function GamePrototype() {
         <div className="battle-head"><small>KNOW YOUR OPPONENT</small><h2>This is not<br /><em>an incinerator.</em></h2><p>Traditional cleanup tools reclaim rent by closing eligible accounts. Overfunded’s target is different: surplus rent inside accounts you want to keep.</p></div>
         <ToolCompare current="reclaim" />
         <div className="battle-alert"><b>!</b><span><strong>TOKEN ACCOUNT CLOSING: BLOCKED</strong>Overfunded never adds a CloseAccount instruction. Your token accounts stay open and usable.</span><i>0 CLOSED</i></div>
-        <div className="battle-source"><div><b>DON’T TAKE OUR WORD FOR IT</b><span>Every instruction this site builds is in the open. Read the transaction builder, check the fee maths, and verify the rent floor against your own node.</span></div><a href={SOURCE_URL} target="_blank" rel="noreferrer">READ THE SOURCE ON GITHUB ↗</a></div>
       </section>
 
       <section className="game-ledger">
@@ -606,6 +605,14 @@ export default function GamePrototype() {
           <i>CANNOT MOVE</i>
         </div>
       </section>
+
+      <div className="verify-strip">
+        <div>
+          <b>DON’T TAKE OUR WORD FOR IT</b>
+          <span>Every instruction is public. Read the builder, check the fee maths.</span>
+        </div>
+        <a href={SOURCE_URL} target="_blank" rel="noreferrer">READ THE SOURCE ↗</a>
+      </div>
 
       <section className="game-finale">
         <div className="finale-rays" aria-hidden="true" />

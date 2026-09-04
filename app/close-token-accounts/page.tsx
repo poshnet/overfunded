@@ -334,33 +334,32 @@ export default function CloseTokenAccountsPage() {
           <p>Not a fee, not a charge — a deposit. It goes in when the account opens, sits there for as long as the account exists, and comes back out only when something asks for it. Here is that whole life in three steps.</p>
         </div>
 
-        <div className="lifecycle-panel">
-          <div className="lifecycle-track" aria-hidden="true">
-            <div className="lc-node"><i /><b>YOUR WALLET</b><small>funds the account</small></div>
-            <div className="lc-rail"><span /></div>
-            <div className="lc-node lc-vault"><i /><b>TOKEN ACCOUNT</b><small>holds the deposit</small></div>
-            <div className="lc-rail"><span /></div>
-            <div className="lc-node"><i /><b>YOUR WALLET</b><small>gets it back</small></div>
-          </div>
-
-          <ol className="lifecycle-steps">
-            <li>
-              <b>01</b>
+        <ol className="lifecycle-panel">
+          <li>
+            <span className="lc-mark"><i /></span>
+            <div className="lc-body">
+              <b>YOUR WALLET → THE ACCOUNT</b>
               <h3>It is created</h3>
-              <p>The first time you hold a token, a token account is opened for it and your wallet funds that account with the rent-exempt minimum — <strong>0.00203928 SOL</strong> under the legacy rate. You paid it without a prompt.</p>
-            </li>
-            <li>
-              <b>02</b>
+              <p>The first time you hold a token, an account is opened for it and your wallet funds that account with the rent-exempt minimum — <strong>0.00203928 SOL</strong> under the legacy rate. You paid it without a prompt.</p>
+            </div>
+          </li>
+          <li>
+            <span className="lc-mark lc-hold"><i /></span>
+            <div className="lc-body">
+              <b>INSIDE THE ACCOUNT</b>
               <h3>It sits there</h3>
-              <p>The deposit never leaves the account and is never spent. It exists so validators are paid for keeping the account in memory — and it stays yours the entire time.</p>
-            </li>
-            <li>
-              <b>03</b>
+              <p>The deposit never leaves and is never spent. It exists so validators are paid for keeping the account in memory — and it stays yours the entire time.</p>
+            </div>
+          </li>
+          <li>
+            <span className="lc-mark"><i /></span>
+            <div className="lc-body">
+              <b>THE ACCOUNT → YOUR WALLET</b>
               <h3>It is released</h3>
-              <p>Two instructions can move it. <strong>CloseAccount</strong> returns the whole deposit and deletes the account. <strong>WithdrawExcessLamports</strong> returns only what sits above today’s lowered floor and leaves the account alive.</p>
-            </li>
-          </ol>
-        </div>
+              <p><strong>CloseAccount</strong> returns the whole deposit and deletes the account. <strong>WithdrawExcessLamports</strong> returns only what sits above today’s lowered floor and leaves the account alive.</p>
+            </div>
+          </li>
+        </ol>
       </section>
 
       <section className="closer-choice">

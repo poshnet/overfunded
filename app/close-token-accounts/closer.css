@@ -180,35 +180,35 @@
    it is funded in, held while the vault pulses, then released back out.
    Pure CSS transforms so the section costs nothing to run. */
 .rent-lifecycle{padding:clamp(78px,8vw,112px) clamp(22px,7vw,110px);border-bottom:1px solid #3c302b;background:#0a0908;content-visibility:auto;contain-intrinsic-size:auto 700px}
-.lifecycle-panel{margin-top:clamp(38px,4vw,54px);padding:clamp(26px,3vw,40px);border:1px solid #4a3a33;background:linear-gradient(180deg,rgba(46,33,28,.55),rgba(12,9,8,.9))}
-.lifecycle-track{position:relative;display:grid;grid-template-columns:auto 1fr auto 1fr auto;align-items:start;gap:clamp(10px,2vw,22px)}
-.lc-node{display:flex;width:clamp(96px,13vw,150px);flex-direction:column;align-items:center;gap:9px;text-align:center}
-.lc-node i{display:block;width:44px;height:44px;border:2px solid #8b5138;border-radius:10px;background:#20130e}
-.lc-node b{color:#e8b39c;font-size:9px;letter-spacing:.1em}
-.lc-node small{color:#a08476;font-family:Arial,sans-serif;font-size:11px;line-height:1.4}
-.lc-vault i{border-color:#e28d69;border-radius:50%;background:radial-gradient(circle,rgba(226,141,105,.3),#20130e 68%);animation:lc-vault 5s ease-in-out infinite}
-.lc-rail{position:relative;height:44px;display:grid;place-items:center}
+
+
+
+
+
+
+
+
 /* Progress creeps along each rail in turn: funded in, then released out.
    A thin fill reads as flow without a coin overshooting the end of the track. */
-.lc-rail span{position:relative;display:block;overflow:hidden;width:100%;height:2px;background:repeating-linear-gradient(90deg,#5c4338 0 7px,transparent 7px 14px)}
-.lc-rail span:after{content:'';position:absolute;left:0;top:0;width:0;height:100%;background:linear-gradient(90deg,rgba(221,143,110,.35),#f1b796);box-shadow:0 0 9px rgba(241,183,150,.45);animation:lc-fill 5s cubic-bezier(.45,0,.3,1) infinite}
-.lifecycle-track>.lc-rail:nth-of-type(2) span:after{animation-delay:2.5s}
-@keyframes lc-fill{0%{width:0;opacity:0}6%{opacity:1}42%{width:100%;opacity:1}62%{width:100%;opacity:1}72%{width:100%;opacity:0}73%{width:0;opacity:0}100%{width:0;opacity:0}}
 
-@keyframes lc-vault{0%,34%,100%{box-shadow:0 0 0 0 rgba(226,141,105,0)}48%{box-shadow:0 0 0 10px rgba(226,141,105,.14)}62%{box-shadow:0 0 0 0 rgba(226,141,105,0)}}
 
-.lifecycle-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:clamp(30px,3vw,44px) 0 0;padding:0;list-style:none}
-.lifecycle-steps li{padding:20px;border:1px solid #40342e;background:#100c0a}
-.lifecycle-steps b{display:grid;width:34px;height:34px;place-items:center;margin-bottom:15px;border:1px solid #6b4a3a;background:#1d1512;color:#e8b39c;font-size:10px}
-.lifecycle-steps h3{margin:0 0 10px;color:#f2e6df;font-family:Arial,sans-serif;font-size:18px;letter-spacing:-.01em}
-.lifecycle-steps p{margin:0;color:#b8a094;font-family:Arial,sans-serif;font-size:13px;line-height:1.7}
-.lifecycle-steps strong{color:#e8b39c;font-weight:700}
+
+
+
+
+
+
+
+
+
+
+
 @media(max-width:820px){
-  .lifecycle-track{grid-template-columns:1fr;justify-items:center;gap:6px}
-  .lc-rail{width:2px;height:34px}
-  .lc-rail span{width:2px;height:100%;background:repeating-linear-gradient(180deg,#5c4338 0 7px,transparent 7px 14px)}
   
-  .lifecycle-steps{grid-template-columns:1fr}
+  
+  
+  
+  
 }
 @media(prefers-reduced-motion:reduce){}
 
@@ -344,3 +344,23 @@
   .has-closers.closer-ready .closer-chest .chest-lid,.closer-demo .closer-chest .chest-lid,.closer-won .closer-chest .chest-lid{transform:translateY(-30px) rotate(-9deg)}
   .no-closers.closer-ready .closer-chest .chest-lid{transform:translateY(-9px) rotate(-3deg)}
 }
+
+/* Vertical timeline: one rail down the left, a marker per stage, the copy
+   beside it. Each marker lights in turn — no bar sliding across the screen. */
+.lifecycle-panel{display:grid;gap:0;max-width:820px;margin:clamp(34px,4vw,50px) 0 0;padding:0;list-style:none}
+.lifecycle-panel li{position:relative;display:grid;grid-template-columns:46px minmax(0,1fr);gap:20px;padding:0 0 clamp(28px,3vw,40px)}
+.lifecycle-panel li:last-child{padding-bottom:0}
+.lc-mark{position:relative;display:grid;place-items:start center}
+.lc-mark i{position:relative;z-index:1;display:block;width:18px;height:18px;margin-top:5px;border:2px solid #8b5138;border-radius:50%;background:#20130e;animation:lc-step 6s ease-in-out infinite}
+.lc-hold i{border-radius:4px}
+/* The rail runs behind the markers and stops at the last one. */
+.lifecycle-panel li:not(:last-child) .lc-mark:after{content:'';position:absolute;z-index:0;left:50%;top:22px;bottom:-4px;width:2px;margin-left:-1px;background:repeating-linear-gradient(180deg,#5c4338 0 6px,transparent 6px 12px)}
+.lifecycle-panel li:nth-child(2) .lc-mark i{animation-delay:2s}
+.lifecycle-panel li:nth-child(3) .lc-mark i{animation-delay:4s}
+@keyframes lc-step{0%,100%{border-color:#8b5138;background:#20130e;box-shadow:0 0 0 0 rgba(226,141,105,0)}12%{border-color:#f1b796;background:#e8b39c;box-shadow:0 0 0 7px rgba(226,141,105,.14)}30%{border-color:#a9684d;background:#3a2117;box-shadow:0 0 0 0 rgba(226,141,105,0)}}
+.lc-body b{display:block;margin-bottom:9px;color:#a9684d;font-size:9px;letter-spacing:.11em}
+.lc-body h3{margin:0 0 11px;color:#f2e6df;font-family:Arial,sans-serif;font-size:20px;letter-spacing:-.015em}
+.lc-body p{max-width:62ch;margin:0;color:#b8a094;font-family:Arial,sans-serif;font-size:14px;line-height:1.75}
+.lc-body strong{color:#e8b39c;font-weight:700}
+@media(max-width:640px){.lifecycle-panel li{grid-template-columns:34px minmax(0,1fr);gap:14px}.lc-body h3{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.lc-mark i{animation:none}}
