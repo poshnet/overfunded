@@ -110,3 +110,30 @@
 @media(max-width:1050px){.closer-hero{grid-template-columns:1fr;padding-top:62px}.closer-copy{max-width:760px}.closer-stage{justify-self:center}.closer-choice{grid-template-columns:1fr;gap:38px}.closer-section-head{grid-template-columns:1fr;gap:20px}}
 @media(max-width:760px){.closer-modebar{flex-wrap:wrap;gap:12px 22px}.closer-step-grid{grid-template-columns:1fr}.closer-step-grid article{min-height:190px}.closer-choice-grid>a{grid-template-columns:44px 1fr}.closer-choice-grid>a>i{width:42px;height:42px}.closer-choice-grid>a>em{display:none}}
 @media(max-width:590px){.closer-hero{min-height:auto;padding:46px 17px 62px}.closer-copy h1{font-size:39px}.closer-copy>p{font-size:13px}.closer-rules{display:grid;grid-template-columns:1fr}.closer-warning{align-items:flex-start}.closer-stage{min-height:400px;padding-right:16px;padding-left:16px}.closer-radar{width:175px;height:175px}.closer-stage-result strong{font-size:30px}.closer-stage-guard{flex-wrap:wrap;justify-content:center}.closer-inventory{min-width:0}.closer-shell .live-summary{grid-template-columns:1fr}.closer-shell .live-approval{align-items:stretch;flex-direction:column}.closer-approval>button{width:100%}.closer-steps,.closer-choice{padding:68px 17px}.closer-section-head h2,.closer-choice h2{font-size:35px}.closer-modebar b:nth-of-type(3){display:none}}
+
+/* Shared game components inherit their accents from these, so the closer
+   themes them warm instead of borrowing the reclaim tool's green. */
+.closer-shell{
+  --brand-tile-bg:#3a2117;
+  --btn-edge:#edcec1;
+  --brand-tile-shadow:#7c4128;
+  --brand-sub:#816d64;
+  --nav-stat:#85736c;
+  --nav-btn-shadow:#5e3321;
+  --btn-shadow:#512d1e;
+  --ghost-border:#4d3b34;
+  --ghost-ink:#cbb9b1;
+  --panel-line:#433630;
+  --panel-ink:#86766f;
+  --btn2-border:#8b5138;
+  --btn2-shadow:#41271c;
+  --btn2-bg:#201713;
+  --btn2-bg-hover:#2c1f1a;
+  --footer-line:#352a26;
+  --footer-ink:#85756e;
+  --footer-link:#837873;
+  --text-link:#bcafa9;
+  --text-link-rule:#76655e;
+  --ghost-hover:rgba(226,141,105,.09);
+  --btn-glow:rgba(226,141,105,.45);
+}
