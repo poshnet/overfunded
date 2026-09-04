@@ -293,30 +293,32 @@ export default function CloseTokenAccountsPage() {
             </div>
             <div className="game-actions"><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + FIND EMPTY ACCOUNTS ▶</button><button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button><a className="game-text-link" href="#how-it-works">HOW IT WORKS ↓</a></div>
             {state === 'error' && <p className="live-notice error">{notice}</p>}
-            <div className="closer-warning"><i>!</i><div><b>DESTRUCTIVE: THIS MODE CLOSES TOKEN ACCOUNTS</b><span>Selected empty token-account addresses are permanently deleted. Tokens are never burned, and your wallet is never closed.</span></div></div>
+            <div className="closer-warning"><i>!</i><div><b>DESTRUCTIVE: THIS MODE CLOSES EMPTY TOKEN ACCOUNTS</b><span>Selected empty token-account addresses are permanently deleted. Tokens are never burned, and your wallet is never closed.</span></div></div>
           </div>
         )}
 
         <div className="closer-stage">
           <div className="game-stage-head"><span>TOOL 02 / EMPTY ACCOUNT CLEANUP</span><b>{state === 'won' ? 'COMPLETE' : state === 'error' ? 'CHECK LOG' : busy ? 'ACTIVE' : 'READY'}</b></div>
-          <div className="game-chest closer-chest" aria-hidden="true">
-            <div className="chest-glow" />
-            <div className="chest-dust" />
-            <div className="chest-lid" />
-            <div className="chest-body"><i /></div>
-            {COIN_ARCS.map((arc, index) => (
-              <span
-                key={index}
-                className="coin"
-                style={{
-                  '--cx': `${arc.cx}px`,
-                  '--cy': `${arc.cy}px`,
-                  '--fall': `${arc.fall}px`,
-                  '--rot': `${arc.rot}deg`,
-                  animationDelay: `${arc.delay}s`,
-                } as React.CSSProperties}
-              >◎</span>
-            ))}
+          <div className="game-chest-frame">
+            <div className="game-chest closer-chest" aria-hidden="true">
+              <div className="chest-glow" />
+              <div className="chest-dust" />
+              <div className="chest-lid" />
+              <div className="chest-body"><i /></div>
+              {COIN_ARCS.map((arc, index) => (
+                <span
+                  key={index}
+                  className="coin"
+                  style={{
+                    '--cx': `${arc.cx}px`,
+                    '--cy': `${arc.cy}px`,
+                    '--fall': `${arc.fall}px`,
+                    '--rot': `${arc.rot}deg`,
+                    animationDelay: `${arc.delay}s`,
+                  } as React.CSSProperties}
+                >◎</span>
+              ))}
+            </div>
           </div>
           <div className="closer-stage-result"><small>{stageLabel}</small><strong>{busy ? '···' : accounts.length ? `${formatSol(selectedLamports, 5)} SOL` : foundNothing ? 'ALL CLEAN' : '??? SOL'}</strong></div>
           <div className="closer-stage-guard"><span>EMPTY ONLY</span><span>OWNER VERIFIED</span><span>DRY-RUN FIRST</span></div>
