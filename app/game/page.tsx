@@ -1,17 +1,26 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import {
   calculateServiceFeeLamports,
   estimatedNetworkFeeLamports,
   formatSol,
+  getCurrentRentFloorLamports,
+  activeStageIndex,
   getWalletProvider,
+  lamportsPerByteFromFloor,
+  LEGACY_LAMPORTS_PER_BYTE,
+  LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS,
+  RENT_STAGES,
+  rentFloorFor,
+  stageReductionPercent,
   reclaimAccounts,
   scanReclaimableAccounts,
   SERVICE_FEE_CAP_LAMPORTS,
   SERVICE_FEE_PERCENT,
   shortenAddress,
+  TOKEN_ACCOUNT_SPACE,
   TREASURY_ADDRESS,
   type ReclaimableAccount,
 } from './solana-reclaim';
@@ -33,6 +42,19 @@ export default function GamePrototype() {
   const [signatures, setSignatures] = useState<string[]>([]);
   const [progress, setProgress] = useState('');
   const [chargedFeeLamports, setChargedFeeLamports] = useState(0);
+  const [liveFloorLamports, setLiveFloorLamports] = useState<number | null>(null);
+  const [scannedCount, setScannedCount] = useState(0);
+  const [stagesOpen, setStagesOpen] = useState(false);
+
+  // Read the cluster's own rent-exempt minimum so the reduction section quotes a
+  // number the visitor can verify instead of a marketing figure.
+  useEffect(() => {
+    let cancelled = false;
+    getCurrentRentFloorLamports()
+      .then(floor => { if (!cancelled) setLiveFloorLamports(floor); })
+      .catch(() => { if (!cancelled) setLiveFloorLamports(null); });
+    return () => { cancelled = true; };
+  }, []);
 
   const selectedAccounts = useMemo(() => accounts.filter(account => account.selected), [accounts]);
   const selectedLamports = useMemo(() => selectedAccounts.reduce((sum, account) => sum + account.excessLamports, 0), [selectedAccounts]);
@@ -40,9 +62,45 @@ export default function GamePrototype() {
   const serviceFeeLamports = calculateServiceFeeLamports(selectedLamports);
   const estimatedReceiveLamports = Math.max(0, selectedLamports - serviceFeeLamports - networkFeeLamports);
   const busy = quest === 'connecting' || quest === 'scanning' || quest === 'reclaiming';
-  const isLiveResult = quest === 'ready' || quest === 'reclaiming' || quest === 'won';
+  const showInventory = busy || quest === 'ready' || quest === 'won' || quest === 'demo' || (quest === 'error' && wallet !== '');
+  // A finished scan that found nothing gets its own state. The chest must not
+  // burst open on an empty wallet, and zeroed summary tiles read as a bug.
+  const foundNothing = quest === 'ready' && accounts.length === 0;
+
+  const reductionPercent = liveFloorLamports === null
+    ? null
+    : Math.max(0, Math.round((1 - liveFloorLamports / LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS) * 100));
+  const perAccountUnlockedLamports = liveFloorLamports === null
+    ? null
+    : Math.max(0, LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS - liveFloorLamports);
+  const newFloorBarWidth = liveFloorLamports === null
+    ? 100
+    : Math.max(2, Math.round((liveFloorLamports / LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS) * 100));
+
+  // Which SIMD-0437 stages have actually activated is read off the live floor,
+  // never assumed, so the ladder stays honest as the rollout advances.
+  const liveRate = liveFloorLamports === null ? null : Math.round(lamportsPerByteFromFloor(liveFloorLamports));
+  const stageIndex = liveFloorLamports === null ? -1 : activeStageIndex(liveFloorLamports);
+  const stagesLive = stageIndex + 1;
+  const finalStage = RENT_STAGES[RENT_STAGES.length - 1];
+  const finalFloorLamports = rentFloorFor(TOKEN_ACCOUNT_SPACE, finalStage.lamportsPerByte);
+  const finalSurplusLamports = LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS - finalFloorLamports;
+  const rolloutMultiplier = perAccountUnlockedLamports && perAccountUnlockedLamports > 0
+    ? finalSurplusLamports / perAccountUnlockedLamports
+    : null;
+
+  function focusQuest() {
+    const hero = document.getElementById('quest');
+    if (!hero) return;
+    const box = hero.getBoundingClientRect();
+    const alreadyLooking = box.top < window.innerHeight * 0.5 && box.bottom > 0;
+    if (alreadyLooking) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    hero.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  }
 
   async function connectAndScan() {
+    focusQuest();
     const provider = getWalletProvider();
     if (!provider) {
       setQuest('error');
@@ -54,18 +112,21 @@ export default function GamePrototype() {
       setQuest('connecting');
       setNotice('Waiting for wallet permission…');
       setSignatures([]);
+      setProgress('');
       setChargedFeeLamports(0);
+      setScannedCount(0);
       const response = await provider.connect();
       const owner = new PublicKey(response.publicKey.toString());
       setWallet(owner.toBase58());
       setQuest('scanning');
       setNotice('Reading Token Program and Token-2022 accounts from mainnet…');
-      const liveAccounts = await scanReclaimableAccounts(owner);
-      setAccounts(liveAccounts);
+      const scan = await scanReclaimableAccounts(owner);
+      setAccounts(scan.accounts);
+      setScannedCount(scan.scannedCount);
       setQuest('ready');
-      setNotice(liveAccounts.length
-        ? `Found ${liveAccounts.length} account${liveAccounts.length === 1 ? '' : 's'} with excess rent. Review and select them below.`
-        : 'Scan complete. This wallet has no reclaimable excess in supported token accounts right now.');
+      setNotice(scan.accounts.length
+        ? `Found ${scan.accounts.length} account${scan.accounts.length === 1 ? '' : 's'} with excess rent. Review and select them below.`
+        : 'Scan complete. Nothing in this wallet is above the current rent floor.');
     } catch (error) {
       setQuest('error');
       setNotice(error instanceof Error ? error.message : 'The wallet scan was cancelled or could not complete.');
@@ -73,15 +134,27 @@ export default function GamePrototype() {
   }
 
   function playDemo() {
+    focusQuest();
     setQuest('scanning');
     setNotice('Running a sample scan—no wallet or network request is being used.');
     setSignatures([]);
+    setProgress('');
     setChargedFeeLamports(0);
     window.setTimeout(() => {
       setAccounts(demoAccounts);
+      setScannedCount(demoAccounts.length);
       setQuest('demo');
       setNotice('Demo result only. Connect a wallet to scan and reclaim live mainnet SOL.');
     }, 900);
+  }
+
+  function backToOverview() {
+    setQuest('idle');
+    setAccounts([]);
+    setScannedCount(0);
+    setSignatures([]);
+    setProgress('');
+    setNotice('Connect a wallet to scan live Solana mainnet data.');
   }
 
   function toggleAccount(address: string) {
@@ -106,12 +179,25 @@ export default function GamePrototype() {
       const result = await reclaimAccounts(provider, owner, selectedAccounts, (completed, total) => {
         setProgress(`Confirmed ${completed} of ${total} transaction${total === 1 ? '' : 's'}`);
       });
+
+      // Confirmed batches are on-chain and already paid for, so they are always
+      // reported — a failure part way through is a partial result, not a reset.
       setSignatures(result.signatures);
       setChargedFeeLamports(result.serviceFeeLamports);
+
+      if (result.error) {
+        setQuest('error');
+        setProgress(result.signatures.length ? `Stopped after ${result.completedBatches} of ${result.totalBatches} transactions` : '');
+        setNotice(result.signatures.length
+          ? `${result.error} ${result.signatures.length} transaction${result.signatures.length === 1 ? '' : 's'} had already confirmed: ${formatSol(result.recoveredLamports - result.serviceFeeLamports)} SOL reached your wallet and ${formatSol(result.serviceFeeLamports)} SOL was charged as the disclosed fee. The remaining accounts were left untouched — scan again to finish them.`
+          : `${result.error} No transaction was submitted and no fee was charged.`);
+        return;
+      }
+
       setQuest('won');
       setProgress('Quest complete');
       setNotice(result.signatures.length
-        ? `Recovered ${formatSol(result.recoveredLamports - result.serviceFeeLamports)} SOL before network fees. The disclosed ${formatSol(result.serviceFeeLamports)} SOL service fee went to the treasury. No token accounts were closed.`
+        ? `Recovered ${formatSol(result.recoveredLamports - result.serviceFeeLamports)} SOL before network fees. ${result.serviceFeeWaived ? 'The service fee was waived on this reclaim.' : `The disclosed ${formatSol(result.serviceFeeLamports)} SOL service fee went to the treasury.`} No token accounts were closed.`
         : 'The accounts were already at the current rent floor. Nothing was changed.');
     } catch (error) {
       setQuest('error');
@@ -125,72 +211,275 @@ export default function GamePrototype() {
       : quest === 'reclaiming' ? (progress || 'WAITING FOR APPROVAL…')
         : quest === 'won' ? 'RECOVERY CONFIRMED'
           : quest === 'demo' ? 'SAMPLE TREASURE FOUND'
-            : quest === 'ready' && accounts.length === 0 ? 'NO EXCESS FOUND'
-              : isLiveResult ? 'TREASURE FOUND' : 'UNCLAIMED SOL';
+            : quest === 'ready' && accounts.length === 0 ? 'ALREADY AT THE RENT FLOOR'
+              : quest === 'ready' ? 'TREASURE FOUND' : 'UNCLAIMED SOL';
+  // '???' is the unknown-yet hook. Once a scan has finished, the answer is
+  // known even when it is zero, so it must not keep teasing an amount.
   const stageAmount = busy ? '••••'
-    : accounts.length ? `${formatSol(selectedLamports, 5)} SOL`
-      : '??? SOL';
-  const primaryLabel = quest === 'reclaiming' ? 'WAITING FOR WALLET…'
-    : quest === 'ready' && accounts.length ? `RECLAIM ${formatSol(selectedLamports, 5)} SOL`
-      : quest === 'won' ? 'SCAN AGAIN ↻'
-        : quest === 'demo' ? 'CONNECT TO RECLAIM'
-          : busy ? 'SCANNING MAINNET…' : 'CONNECT + SCAN ▶';
-  const primaryAction = quest === 'ready' && accounts.length ? reclaimSelected : connectAndScan;
+    : foundNothing ? 'ALL CAUGHT UP'
+      : accounts.length ? `${formatSol(selectedLamports, 5)} SOL`
+        : '??? SOL';
+
+  // One action at a time: the hero shows either the marketing CTA or the
+  // inventory's own button, never two copies of the same control.
+  const inventoryAction = quest === 'won'
+    ? { label: 'SCAN AGAIN ↻', onClick: connectAndScan, disabled: busy }
+    : quest === 'demo'
+      ? { label: 'CONNECT A REAL WALLET →', onClick: connectAndScan, disabled: busy }
+      : quest === 'error'
+        ? { label: 'TRY AGAIN ↻', onClick: connectAndScan, disabled: busy }
+        : busy
+          ? { label: quest === 'reclaiming' ? 'WAITING FOR WALLET…' : 'SCANNING MAINNET…', onClick: () => {}, disabled: true }
+          : accounts.length === 0
+            ? { label: 'SCAN AGAIN ↻', onClick: connectAndScan, disabled: false }
+            : {
+              label: `RECLAIM ${formatSol(selectedLamports, 5)} SOL →`,
+              onClick: reclaimSelected,
+              disabled: selectedAccounts.length === 0 || estimatedReceiveLamports <= 0,
+            };
 
   return (
-    <main className={'game-shell quest-' + quest}>
+    <main className={`game-shell quest-${quest} ${accounts.length ? 'has-loot' : 'no-loot'}`}>
       <nav className="game-nav">
-        <a className="game-brand" href="/game"><i>L</i><span><b>LAMPORT</b><small>RENT QUEST</small></span></a>
+        <a className="game-brand" href="/"><i>L</i><span><b>LAMPORT</b><small>RENT QUEST</small></span></a>
         <div className="game-nav-stats"><span>MODE <b>SAFE</b></span><span>ACCOUNTS CLOSED <b>0</b></span><span>NETWORK <b>MAINNET</b></span></div>
         <button type="button" onClick={connectAndScan} disabled={busy}>{wallet ? shortenAddress(wallet) : busy ? 'SCANNING…' : 'CONNECT WALLET'} <span>+</span></button>
       </nav>
 
-      <section className="game-hero">
+      <section className="game-hero" id="quest">
         <div className="game-grid" aria-hidden="true" />
-        <div className="game-copy">
-          <div className="game-level"><b>NEW QUEST</b><span>RENT FLOOR REDUCTION</span></div>
-          <h1>Unlock the SOL<br /><em>your wallet already owns.</em></h1>
-          <p>Solana lowered account rent. Your token accounts may now hold bonus lamports above the new minimum.</p>
-          <div className="game-actions"><button type="button" onClick={primaryAction} disabled={busy || (quest === 'ready' && (selectedAccounts.length === 0 || estimatedReceiveLamports <= 0))}>{primaryLabel}</button><button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button><a href="/classic">EXIT TO CLASSIC</a></div>
-          <div className="game-warning"><i>!</i><div><b>NO TOKEN ACCOUNTS ARE EVER CLOSED</b><span>Only excess rent moves. Tokens and account addresses stay intact.</span></div></div>
-        </div>
+
+        {showInventory ? (
+          <div className="game-copy hero-inventory" aria-live="polite">
+            <div className="live-results-head">
+              <div>
+                <small>{quest === 'demo' ? 'DEMO INVENTORY' : 'LIVE WALLET INVENTORY'}</small>
+                <h2>{wallet ? shortenAddress(wallet, 6) : 'Sample wallet'}</h2>
+              </div>
+              <span className={quest === 'demo' ? 'demo' : ''}>{quest === 'demo' ? 'DEMO DATA' : 'SOLANA MAINNET'}</span>
+            </div>
+
+            {foundNothing ? (
+              <div className="inventory-empty">
+                <i aria-hidden="true">∅</i>
+                <b>NOTHING TO RECLAIM</b>
+                <p>
+                  {scannedCount === 0
+                    ? 'This wallet holds no supported SPL token accounts, so there is no rent to check.'
+                    : `Checked ${scannedCount} token account${scannedCount === 1 ? '' : 's'}. Every one is already sitting at the current rent floor${liveFloorLamports === null ? '' : ` of ${formatSol(liveFloorLamports, 8)} SOL`}, so there is no excess to withdraw.`}
+                </p>
+                <div className="empty-facts">
+                  <div><span>Accounts checked</span><b>{scannedCount}</b></div>
+                  <div><span>Excess found</span><b>0.000000 SOL</b></div>
+                  <div><span>Accounts closed</span><b>0</b></div>
+                </div>
+                <p className="empty-hint">Accounts created after the rent change already start at the new floor. Nothing was signed and nothing was charged.</p>
+                <div className="empty-actions">
+                  <button type="button" onClick={connectAndScan} disabled={busy}>SCAN AGAIN ↻</button>
+                  <button className="game-demo-link" type="button" onClick={backToOverview}>← BACK TO OVERVIEW</button>
+                </div>
+              </div>
+            ) : (
+            <>
+            <div className="live-summary">
+              <div><span>Selected excess</span><b>{formatSol(selectedLamports, 6)} SOL</b></div>
+              <div><span>Est. you receive</span><b>~{formatSol(estimatedReceiveLamports, 6)} SOL</b></div>
+              <div><span>Service fee ({SERVICE_FEE_PERCENT}%)</span><b>{formatSol(quest === 'won' ? chargedFeeLamports : serviceFeeLamports, 6)} SOL</b></div>
+              <div><span>Est. network fee</span><b>~{formatSol(networkFeeLamports, 6)} SOL</b></div>
+            </div>
+
+            <div className="live-account-list">
+              {accounts.length ? accounts.map(account => (
+                <label key={account.address} className={account.selected ? 'selected' : ''}>
+                  <input type="checkbox" checked={account.selected} onChange={() => toggleAccount(account.address)} disabled={busy || quest === 'won'} />
+                  <i>{account.selected ? '✓' : ''}</i>
+                  <span><b>{account.program === 'token-2022' ? 'Token-2022 account' : 'Token account'}</b><small>{shortenAddress(account.address, 6)} · mint {shortenAddress(account.mint, 4)}</small></span>
+                  <strong>+{formatSol(account.excessLamports, 6)} SOL</strong>
+                </label>
+              )) : (
+                <div className="live-empty">
+                  <b>{busy ? 'READING MAINNET…' : 'NO RECLAIMABLE EXCESS FOUND'}</b>
+                  <span>{busy ? 'Comparing every token account against today’s rent floor.' : 'This wallet’s supported token accounts are already at the current rent floor.'}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="live-approval">
+              <div>
+                <b>TRANSACTION RULE</b>
+                <span>Selected WithdrawExcessLamports instructions plus one disclosed System Program fee transfer. No CloseAccount, Burn, or token transfer instruction is added.</span>
+                <a href={`https://solscan.io/account/${TREASURY_ADDRESS}`} target="_blank" rel="noreferrer">FEE WALLET: {shortenAddress(TREASURY_ADDRESS, 8)} ↗</a>
+              </div>
+              <button type="button" onClick={inventoryAction.onClick} disabled={inventoryAction.disabled}>{inventoryAction.label}</button>
+            </div>
+            </>
+            )}
+
+            {!foundNothing && <p className={quest === 'error' ? 'live-notice error' : 'live-notice'}>{notice}</p>}
+            {signatures.length > 0 && (
+              <div className="live-signatures">
+                {signatures.map((signature, index) => (
+                  <a key={signature} href={`https://solscan.io/tx/${signature}`} target="_blank" rel="noreferrer">Transaction {index + 1}: {shortenAddress(signature, 7)} ↗</a>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="game-copy">
+            <div className="game-level"><b>NEW QUEST</b><span>RENT FLOOR REDUCTION</span></div>
+            <h1>Unlock the SOL<br /><em>your wallet already owns.</em></h1>
+            <p className="hero-lead">Solana lowered the rent-exempt minimum. Your token accounts were funded at the old floor, and nothing sweeps the difference back to you.</p>
+            <p className="hero-mech"><code>WithdrawExcessLamports</code><span>The Token Program instruction that moves the surplus out. The account stays open, rent-exempt, and keeps every token.</span></p>
+
+            <div className="rollout-panel">
+              <div className="rollout-head">
+                <span>SIMD-0437 · RENT ROLLOUT</span>
+                <b className={liveFloorLamports === null ? 'pending' : ''}>
+                  {liveFloorLamports === null ? 'READING MAINNET…' : `STAGE ${stagesLive} OF ${RENT_STAGES.length} LIVE`}
+                </b>
+              </div>
+
+              <div className="rollout-pips" aria-hidden="true">
+                {RENT_STAGES.map((stage, index) => (
+                  <i key={stage.id} className={index <= stageIndex ? 'on' : ''} />
+                ))}
+              </div>
+
+              <div className="rollout-values">
+                <div><span>UNLOCKED NOW</span><b>{perAccountUnlockedLamports === null ? '—' : `+${formatSol(perAccountUnlockedLamports, 8)}`}</b></div>
+                <div className="rollout-target"><span>AT FULL ROLLOUT</span><b>+{formatSol(finalSurplusLamports, 8)}</b></div>
+                <div><span>PER ACCOUNT</span><b>{rolloutMultiplier === null ? '—' : `${Math.round(rolloutMultiplier * 10) / 10}× more`}</b></div>
+              </div>
+
+              <button className="rollout-toggle" type="button" onClick={() => setStagesOpen(open => !open)} aria-expanded={stagesOpen}>
+                {stagesOpen ? 'HIDE STAGES ▴' : `SEE ALL ${RENT_STAGES.length} STAGES ▾`}
+              </button>
+
+              {stagesOpen && (
+                <div className="rollout-stages">
+                  {RENT_STAGES.map((stage, index) => (
+                    <div key={stage.id} className={index <= stageIndex ? 'on' : ''}>
+                      <i />
+                      <span>{stage.id}</span>
+                      <em>{stage.lamportsPerByte.toLocaleString('en-US')} / byte</em>
+                      <b>−{stageReductionPercent(stage.lamportsPerByte)}%</b>
+                      <small>{index <= stageIndex ? 'ACTIVE' : 'PENDING'}</small>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <small className="rollout-source">
+                Rent floor <code>{liveFloorLamports === null ? '—' : `${formatSol(liveFloorLamports, 8)} SOL`}</code> read live with <code>getMinimumBalanceForRentExemption({TOKEN_ACCOUNT_SPACE})</code>. Active gates are derived from it, not assumed.
+              </small>
+            </div>
+            <div className="game-actions">
+              <button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN ▶</button>
+              <button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button>
+              <a href="/rent-cut">HOW THE CUT WORKS →</a>
+            </div>
+            {quest === 'error' && <p className="live-notice error">{notice}</p>}
+            <div className="game-warning"><i>!</i><div><b>NO TOKEN ACCOUNTS ARE EVER CLOSED</b><span>Only excess rent moves. Tokens and account addresses stay intact.</span></div></div>
+          </div>
+        )}
 
         <div className="game-stage">
           <div className="game-stage-head"><span>QUEST 01 / WALLET SCAN</span><b>{quest === 'won' ? 'COMPLETE' : quest === 'error' ? 'CHECK LOG' : busy ? 'ACTIVE' : 'READY'}</b></div>
           <div className="game-stars" aria-hidden="true"><i /><i /><i /><i /><i /></div>
-          <div className="game-chest" aria-hidden="true"><div className="chest-glow" /><div className="chest-lid" /><div className="chest-body"><i /></div><span className="coin coin-one">◎</span><span className="coin coin-two">◎</span><span className="coin coin-three">◎</span></div>
-          <div className="game-result"><small>{stageLabel}</small><strong>{stageAmount}</strong></div>
-          <button type="button" onClick={primaryAction} disabled={busy || (quest === 'ready' && (selectedAccounts.length === 0 || estimatedReceiveLamports <= 0))}>{primaryLabel}</button>
-          <p>LIVE MAINNET · 5% SUCCESS FEE · 0.05 SOL MAX · YOU APPROVE EVERY TRANSACTION</p>
+          <div className="game-chest" aria-hidden="true"><div className="chest-glow" /><div className="chest-dust" /><div className="chest-lid" /><div className="chest-body"><i /></div><span className="coin coin-one">◎</span><span className="coin coin-two">◎</span><span className="coin coin-three">◎</span><span className="coin coin-four">◎</span><span className="coin coin-five">◎</span></div>
+          <div className={foundNothing ? 'game-result is-verdict' : 'game-result'}><small>{stageLabel}</small><strong>{stageAmount}</strong></div>
+          <p>LIVE MAINNET · {SERVICE_FEE_PERCENT}% SUCCESS FEE · {formatSol(SERVICE_FEE_CAP_LAMPORTS, 2)} SOL MAX · YOU APPROVE EVERY TRANSACTION</p>
         </div>
       </section>
 
-      <div className="game-modebar"><span><i /> SAFE MODE ACTIVE</span><b>WITHDRAW EXCESS</b><b>KEEP ACCOUNTS</b><b>TOUCH ZERO TOKENS</b><a href="/classic">CLASSIC UI ↗</a></div>
+      <div className="game-modebar"><span><i /> SAFE MODE ACTIVE</span><b>WITHDRAW EXCESS</b><b>KEEP ACCOUNTS</b><b>TOUCH ZERO TOKENS</b><a href="/rent-cut">HOW THE CUT WORKS ↗</a></div>
 
-      {(wallet || accounts.length > 0 || quest === 'error') && (
-        <section className="game-live-results" aria-live="polite">
-          <div className="live-results-head"><div><small>{quest === 'demo' ? 'DEMO INVENTORY' : 'LIVE WALLET INVENTORY'}</small><h2>{wallet ? shortenAddress(wallet, 6) : 'Sample wallet'}</h2></div><span className={quest === 'demo' ? 'demo' : ''}>{quest === 'demo' ? 'DEMO DATA' : 'SOLANA MAINNET'}</span></div>
-          <div className="live-summary">
-            <div><span>Selected excess</span><b>{formatSol(selectedLamports, 6)} SOL</b></div>
-            <div><span>Est. you receive</span><b>~{formatSol(estimatedReceiveLamports, 6)} SOL</b></div>
-            <div><span>Service fee ({SERVICE_FEE_PERCENT}%)</span><b>{formatSol(quest === 'won' ? chargedFeeLamports : serviceFeeLamports, 6)} SOL</b></div>
-            <div><span>Est. network fee</span><b>~{formatSol(networkFeeLamports, 6)} SOL</b></div>
+      <section className="game-reduction" id="reduction">
+        <div className="reduction-copy">
+          <small>PATCH NOTES · RENT FLOOR</small>
+          <h2>Rent dropped.<br /><em>Your accounts didn’t notice.</em></h2>
+          <p>Rent is <code>(128 + data_len) × lamports_per_byte</code>. SIMD-0437 steps that rate down in five gated stages, from the legacy 6,960 to 696 — a 90% cut by the end. Each stage that activates widens the gap between what your accounts were funded with and what they now need, and nothing sweeps the difference back.</p>
+          <div className="reduction-facts">
+            <article><b>01</b><span>The floor moves down</span><p>The rent-exempt minimum for a 165-byte account is recalculated by the network.</p></article>
+            <article><b>02</b><span>The deposit stays put</span><p>Your account keeps the lamports it was funded with. There is no automatic refund.</p></article>
+            <article><b>03</b><span>The gap is yours</span><p>WithdrawExcessLamports moves the difference out while the account stays open.</p></article>
           </div>
-          <div className="live-account-list">
-            {accounts.length ? accounts.map(account => (
-              <label key={account.address} className={account.selected ? 'selected' : ''}>
-                <input type="checkbox" checked={account.selected} onChange={() => toggleAccount(account.address)} disabled={busy || quest === 'won'} />
-                <i>{account.selected ? '✓' : ''}</i>
-                <span><b>{account.program === 'token-2022' ? 'Token-2022 account' : 'Token account'}</b><small>{shortenAddress(account.address, 6)} · mint {shortenAddress(account.mint, 4)}</small></span>
-                <strong>+{formatSol(account.excessLamports, 6)} SOL</strong>
-              </label>
-            )) : <div className="live-empty"><b>NO RECLAIMABLE EXCESS FOUND</b><span>This wallet’s supported token accounts are already at the current rent floor.</span></div>}
+        </div>
+
+        <div className="reduction-panel">
+          <div className="reduction-scan" aria-hidden="true" />
+          <div className="reduction-panel-head">
+            <span>RENT FLOOR · {TOKEN_ACCOUNT_SPACE}-BYTE TOKEN ACCOUNT</span>
+            <b className={liveFloorLamports === null ? 'pending' : ''}>{liveFloorLamports === null ? 'READING…' : 'LIVE FROM MAINNET'}</b>
           </div>
-          <div className="live-approval"><div><b>TRANSACTION RULE</b><span>Selected WithdrawExcessLamports instructions plus one disclosed System Program fee transfer. No CloseAccount, Burn, or token transfer instruction is added.</span><a href={`https://solscan.io/account/${TREASURY_ADDRESS}`} target="_blank" rel="noreferrer">FEE WALLET: {shortenAddress(TREASURY_ADDRESS, 8)} ↗</a></div><button type="button" onClick={quest === 'demo' ? connectAndScan : reclaimSelected} disabled={busy || quest === 'won' || (!accounts.length || selectedAccounts.length === 0) || (quest !== 'demo' && estimatedReceiveLamports <= 0)}>{quest === 'demo' ? 'CONNECT A REAL WALLET →' : quest === 'won' ? 'RECOVERY COMPLETE ✓' : `APPROVE ${selectedAccounts.length} ACCOUNT${selectedAccounts.length === 1 ? '' : 'S'} →`}</button></div>
-          <p className={quest === 'error' ? 'live-notice error' : 'live-notice'}>{notice}</p>
-          {signatures.length > 0 && <div className="live-signatures">{signatures.map((signature, index) => <a key={signature} href={`https://solscan.io/tx/${signature}`} target="_blank" rel="noreferrer">Transaction {index + 1}: {shortenAddress(signature, 7)} ↗</a>)}</div>}
-        </section>
-      )}
+
+          <div className="reduction-figure">
+            <strong>{reductionPercent === null ? '—' : `−${reductionPercent}%`}</strong>
+            <span>MEASURED AGAINST THE ORIGINAL {formatSol(LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS, 8)} SOL FLOOR</span>
+          </div>
+
+          <div className="reduction-bars">
+            <div className="reduction-bar">
+              <span>ORIGINAL FLOOR</span>
+              <i><em className="bar-old" style={{ width: '100%' }} /></i>
+              <b>{formatSol(LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS, 8)} SOL</b>
+            </div>
+            <div className="reduction-bar">
+              <span>CURRENT FLOOR</span>
+              <i><em className="bar-new" style={{ width: `${newFloorBarWidth}%` }} /></i>
+              <b>{liveFloorLamports === null ? '—' : `${formatSol(liveFloorLamports, 8)} SOL`}</b>
+            </div>
+          </div>
+
+          <div className="reduction-delta">
+            <span>UNLOCKED PER TOKEN ACCOUNT<em>Multiply by every overfunded account in your wallet</em></span>
+            <strong>{perAccountUnlockedLamports === null ? '— SOL' : `${formatSol(perAccountUnlockedLamports, 8)} SOL`}</strong>
+          </div>
+
+          <p className="reduction-note">
+            {liveFloorLamports === null
+              ? 'The current floor is read live from mainnet with getMinimumBalanceForRentExemption. It could not be reached just now, so no reduction is being claimed here.'
+              : reductionPercent === 0
+                ? 'This RPC still reports the original rent floor, so no reduction is being claimed. Your wallet’s real excess is whatever the scan finds account by account.'
+                : 'Read live from mainnet with getMinimumBalanceForRentExemption. Accounts created after the change already sit at the new floor and will show no excess.'}
+          </p>
+        </div>
+
+        <div className="stage-ladder">
+          <div className="ladder-head">
+            <span>ROLLOUT · SIMD-0437</span>
+            <b className={liveFloorLamports === null ? 'pending' : ''}>
+              {liveFloorLamports === null ? 'READING MAINNET…' : `STAGE ${stagesLive} OF ${RENT_STAGES.length} LIVE`}
+            </b>
+          </div>
+          <div className="ladder-rows">
+            <div className="ladder-row legend">
+              <span>GATE</span><span>LAMPORTS / BYTE</span><span>FLOOR · 165 B</span><span>SURPLUS / ACCOUNT</span><span>CUT</span><span>STATUS</span>
+            </div>
+            {RENT_STAGES.map((stage, index) => {
+              const floor = rentFloorFor(TOKEN_ACCOUNT_SPACE, stage.lamportsPerByte);
+              const live = index <= stageIndex;
+              return (
+                <div key={stage.id} className={live ? 'ladder-row live' : 'ladder-row'}>
+                  <span><i />{stage.id}</span>
+                  <span>{stage.lamportsPerByte.toLocaleString('en-US')}</span>
+                  <span>{formatSol(floor, 8)} SOL</span>
+                  <span>{formatSol(LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS - floor, 8)} SOL</span>
+                  <span>−{stageReductionPercent(stage.lamportsPerByte)}%</span>
+                  <span>{live ? 'ACTIVE' : 'PENDING'}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="ladder-foot">
+            <div><span>LEGACY RATE</span><b>{LEGACY_LAMPORTS_PER_BYTE.toLocaleString('en-US')} / byte</b></div>
+            <div><span>LIVE RATE</span><b>{liveRate === null ? '—' : `${liveRate.toLocaleString('en-US')} / byte`}</b></div>
+            <div><span>UNLOCKED NOW</span><b>{perAccountUnlockedLamports === null ? '—' : `${formatSol(perAccountUnlockedLamports, 8)} SOL`}</b></div>
+            <div className="ladder-target"><span>AT FULL ROLLOUT</span><b>{formatSol(finalSurplusLamports, 8)} SOL</b></div>
+          </div>
+          <small>Stage rates are the published SIMD-0437 schedule. Which gates are active is derived from this cluster’s own rent-exempt minimum, so pending rows become active on their own as the rollout advances — and your wallet gains more to reclaim at each one.</small>
+        </div>
+      </section>
 
       <section className="game-missions" id="missions">
         <div className="game-section-title"><small>MISSION BOARD</small><h2>Three moves.<br /><em>One clean win.</em></h2><p>Every step is visible before you sign. The game layer makes the process easier to follow; it does not hide what the transaction does.</p></div>
@@ -218,21 +507,12 @@ export default function GamePrototype() {
         <div className="ledger-screen"><span>ACCOUNTS CLOSED</span><strong>0</strong><p>The defining score. It never moves.</p><i>NON-DESTRUCTIVE FOREVER</i></div>
       </section>
 
-      <section className="game-rewards">
-        <div className="reward-vault">
-          <div className="reward-coin"><span>◎</span><b>L</b><small>$LAMPORT</small></div>
-          <div className="reward-pixels" aria-hidden="true"><i /><i /><i /><i /></div>
-          <div className="reward-label">BONUS LEVEL · NOT LIVE</div>
-        </div>
-        <div className="reward-copy"><small>OPTIONAL COMMUNITY QUEST</small><h2>Utility coin.<br /><em>No paywall.</em></h2><p>The live success fee is {SERVICE_FEE_PERCENT}%, capped at {formatSol(SERVICE_FEE_CAP_LAMPORTS, 2)} SOL. If $LAMPORT launches on pump.fun later, holders could qualify for a lower rate. Nobody needs the coin to scan, review, or reclaim their own SOL.</p><div className="reward-stats"><div><span>LIVE SUCCESS FEE</span><b>5%</b></div><div><span>MAXIMUM FEE</span><b>0.05 SOL</b></div><div><span>PROPOSED HOLDER RATE</span><b>2.5%</b></div><div><span>FAILED TRANSACTION</span><b>0 SOL</b></div></div><a href="https://pump.fun/create" target="_blank" rel="noreferrer">OPEN LAUNCH WORKSPACE ↗</a><i>CONCEPT ONLY · MEMECOINS ARE HIGH RISK · OFFICIAL MINT WILL APPEAR HERE FIRST</i></div>
-      </section>
-
       <section className="game-finale">
         <div className="finale-rays" aria-hidden="true" />
-        <small>READY PLAYER WALLET?</small><h2>Find the hidden SOL.<br /><em>Keep every account alive.</em></h2><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN MAINNET ▶</button><a href="/classic">RETURN TO THE CLASSIC VERSION ↗</a>
+        <small>READY PLAYER WALLET?</small><h2>Find the hidden SOL.<br /><em>Keep every account alive.</em></h2><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN MAINNET ▶</button><a href="/rent-cut">READ: HOW THE RENT CUT WORKS ↗</a>
       </section>
 
-      <footer className="game-footer"><a className="game-brand" href="/"><i>L</i><span><b>LAMPORT</b><small>RENT QUEST</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/classic">Classic</a><a href="/fun">Fun Lab</a><a href="#safety">Safety</a></div></footer>
+      <footer className="game-footer"><a className="game-brand" href="/"><i>L</i><span><b>LAMPORT</b><small>RENT QUEST</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/rent-cut">How the cut works</a><a href="#reduction">Rent change</a><a href="#safety">Safety</a></div></footer>
     </main>
   );
 }

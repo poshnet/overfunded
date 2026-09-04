@@ -25,8 +25,8 @@ export default function FunPrototype() {
       </div>
       <nav className="fun-nav">
         <a className="fun-brand" href="/fun"><i>L</i><b>LAMPORT</b><em>FUN LAB</em></a>
-        <div className="fun-nav-links"><a href="#why">Why different</a><a href="#how">How it works</a><a href="/">Classic version ↗</a></div>
-        <button type="button">CONNECT WALLET <span>↗</span></button>
+        <div className="fun-nav-links"><a href="#why">Why different</a><a href="#how">How it works</a><a href="/rent-cut">How the cut works ↗</a></div>
+        <a className="fun-nav-cta" href="/">OPEN LIVE APP <span>↗</span></a>
       </nav>
 
       <section className="fun-hero">
@@ -102,30 +102,15 @@ export default function FunPrototype() {
         <div className="fun-number-card small"><small>CLAIMED THROUGH LAMPORT</small><strong>$0</strong><p>Pre-launch baseline. This moves only after confirmed reclaim transactions.</p><i>VERIFIABLE PRODUCT COUNTER</i></div>
       </section>
 
-      <section className="fun-community">
-        <div className="fun-coin-zone">
-          <div className="fun-big-coin"><span>◎</span><b>L</b><small>$LAMPORT</small></div>
-          <i className="fun-sticker one">OPTIONAL!</i><i className="fun-sticker two">NOT LIVE</i>
-        </div>
-        <div className="fun-community-copy">
-          <p>THE COMMUNITY LAYER</p>
-          <h2>A coin with utility.<br /><em>Never a tollbooth.</em></h2>
-          <span>Everyone can scan and reclaim. If $LAMPORT launches on pump.fun, eligible holders get a lower proposed success fee—not special access to your SOL.</span>
-          <div className="fun-fee-table"><div><span>Standard success fee</span><b>5%</b></div><div><span>Eligible holder rate</span><b>2.5%</b></div><div><span>If nothing is recovered</span><b>0 SOL</b></div><div><span>Maximum per transaction</span><b>0.05 SOL</b></div></div>
-          <a href="https://pump.fun/create" target="_blank" rel="noreferrer">VIEW THE LAUNCH WORKSPACE <span>↗</span></a>
-          <small>CONCEPT ONLY · THE OFFICIAL MINT ADDRESS WILL APPEAR HERE FIRST · MEMECOINS ARE HIGH RISK</small>
-        </div>
-      </section>
-
       <section className="fun-final">
         <div className="fun-final-marks" aria-hidden="true"><i>L</i><i>◎</i><i>↓</i></div>
         <p>YOUR LAMPORTS. YOUR WALLET.</p>
         <h2>There might be SOL<br /><em>under the couch.</em></h2>
         <button className="fun-primary" type="button" onClick={runDemo}>CHECK THE CUSHIONS <span>→</span></button>
-        <a href="/">Prefer the calm version? View classic Lamport ↗</a>
+        <a href="/">Reclaim real SOL on the live app ↗</a>
       </section>
 
-      <footer className="fun-footer"><a className="fun-brand" href="/fun"><i>L</i><b>LAMPORT</b><em>FUN LAB</em></a><p>Built for Solana’s reduced-rent era.</p><div><a href="/">Classic</a><a href="#why">Safety</a><a href="#how">How it works</a></div></footer>
+      <footer className="fun-footer"><a className="fun-brand" href="/fun"><i>L</i><b>LAMPORT</b><em>FUN LAB</em></a><p>Built for Solana’s reduced-rent era.</p><div><a href="/">Live app</a><a href="/rent-cut">How the cut works</a><a href="#why">Safety</a></div></footer>
     </main>
   );
 }

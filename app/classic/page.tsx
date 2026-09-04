@@ -2,15 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-type ScanState = 'idle' | 'connecting' | 'scanning' | 'results' | 'error';
-type SolanaProvider = {
-  publicKey?: { toString(): string };
-  connect(): Promise<{ publicKey: { toString(): string } }>;
-};
-
-declare global {
-  interface Window { solana?: SolanaProvider }
-}
+type ScanState = 'idle' | 'scanning' | 'results';
 
 const demoAccounts = [
   { name: 'USDC token account', address: '8kP3…xR42', excess: 0.02218, tone: 'mint' },
@@ -26,14 +18,8 @@ const coins = Array.from({ length: 18 }, (_, i) => ({
   size: 20 + (i % 4) * 7,
 }));
 
-function shortAddress(value: string) {
-  return value.slice(0, 4) + '…' + value.slice(-4);
-}
-
 export default function Home() {
   const [scanState, setScanState] = useState<ScanState>('idle');
-  const [wallet, setWallet] = useState('');
-  const [demo, setDemo] = useState(false);
   const [dropping, setDropping] = useState(false);
   const [notice, setNotice] = useState('');
 
@@ -44,32 +30,9 @@ export default function Home() {
   }, [dropping]);
 
   const loadDemo = () => {
-    setDemo(true);
     setScanState('scanning');
     setNotice('');
     window.setTimeout(() => setScanState('results'), 900);
-  };
-
-  const connectWallet = async () => {
-    if (!window.solana) {
-      loadDemo();
-      setNotice('No Solana wallet was detected, so we opened a clearly labeled demo scan.');
-      return;
-    }
-    try {
-      setScanState('connecting');
-      const response = await window.solana.connect();
-      setWallet(response.publicKey.toString());
-      setDemo(false);
-      setScanState('scanning');
-      window.setTimeout(() => {
-        setScanState('results');
-        setNotice('Wallet connected. Results are illustrative while the audited transaction builder is being integrated.');
-      }, 1100);
-    } catch {
-      setScanState('error');
-      setNotice('The wallet connection was cancelled. Nothing was signed or changed.');
-    }
   };
 
   const reclaimDemo = () => {
@@ -78,7 +41,7 @@ export default function Home() {
   };
 
   const isResults = scanState === 'results';
-  const busy = scanState === 'connecting' || scanState === 'scanning';
+  const busy = scanState === 'scanning';
 
   return (
     <main className="site-shell">
@@ -90,31 +53,29 @@ export default function Home() {
 
       <nav className="nav">
         <a className="brand" href="#top" aria-label="Lamport home"><span className="brand-mark" aria-hidden="true">L</span><span>LAMPORT</span></a>
-        <div className="nav-links"><a href="#difference">Why different</a><a href="#how">How it works</a><a href="#community">Community coin</a></div>
-        <button className="wallet-button" type="button" onClick={connectWallet} disabled={busy}>
-          {wallet ? shortAddress(wallet) : busy ? 'Checking wallet…' : 'Connect wallet'} <span aria-hidden="true">↗</span>
-        </button>
+        <div className="nav-links"><a href="#difference">Why different</a><a href="#how">How it works</a><a href="#safety">Safety</a></div>
+        <a className="wallet-button" href="/">Open the live app <span aria-hidden="true">↗</span></a>
       </nav>
 
       <section className="hero" id="top">
         <div className="hero-orbit orbit-one">◎</div><div className="hero-orbit orbit-two">◎</div>
-        <div className="eyebrow"><span /> The reduced-rent era is here</div>
+        <div className="eyebrow"><span /> Design preview — the live scanner lives on the home page</div>
         <h1>Solana lowered rent.<br /><em>Claim the difference.</em></h1>
         <p className="hero-copy">Accounts funded under the old rent floor may now hold excess lamports. Scan and recover that SOL without closing the accounts or touching token balances.</p>
         <div className="hero-actions">
-          <button className="primary-action" type="button" onClick={connectWallet} disabled={busy}><span className="sol-dot">◎</span> {busy ? 'Scanning…' : 'Scan my wallet'}</button>
-          <button className="demo-action" type="button" onClick={loadDemo}>Try the demo <span>→</span></button>
+          <a className="primary-action" href="/"><span className="sol-dot">◎</span> Scan my wallet on the live app</a>
+          <button className="demo-action" type="button" onClick={loadDemo} disabled={busy}>{busy ? 'Running demo…' : 'Try the demo'} <span>→</span></button>
         </div>
-        <p className="trust-line">NON-CUSTODIAL&nbsp;&nbsp;·&nbsp;&nbsp; OPEN SOURCE&nbsp;&nbsp;·&nbsp;&nbsp; YOU APPROVE EVERY TRANSACTION</p>
+        <p className="trust-line">THIS PAGE IS A DESIGN PREVIEW&nbsp;&nbsp;·&nbsp;&nbsp; EVERY NUMBER BELOW IS SAMPLE DATA</p>
 
         <div className={'reclaim-card ' + (isResults ? 'is-demo' : '')}>
           <div className="card-head">
             <div>
-              <p>AVAILABLE TO RECLAIM</p>
-              <strong className={!isResults ? 'word-value' : ''}>{isResults ? '0.0842' : busy ? 'SCANNING' : 'READY'} {isResults && <small>SOL</small>}</strong>
-              <span>{isResults ? 'Across 7 token accounts' : busy ? 'Reading account rent floors…' : 'Your wallet may already be overfunded'}</span>
+              <p>EXAMPLE SCAN RESULT</p>
+              <strong className={!isResults ? 'word-value' : ''}>{isResults ? '0.0842' : busy ? 'SCANNING' : 'SAMPLE'} {isResults && <small>SOL</small>}</strong>
+              <span>{isResults ? 'Across 7 sample token accounts' : busy ? 'Playing back a recorded scan…' : 'Illustrative figures — your real result comes from the live app'}</span>
             </div>
-            <div className="status-pill"><i /> {demo && isResults ? 'DEMO SCAN' : wallet ? 'WALLET CONNECTED' : 'READY TO SCAN'}</div>
+            <div className="status-pill"><i /> {isResults ? 'DEMO SCAN' : busy ? 'RUNNING DEMO' : 'SAMPLE PREVIEW'}</div>
           </div>
           <div className="meter"><span style={{ width: busy ? '42%' : isResults ? '68%' : '0%' }} /></div>
           <div className="card-stats">
@@ -127,7 +88,8 @@ export default function Home() {
             <span>Lamport withdraws only excess rent. Your accounts and token balances stay intact.</span>
           </div>
           {isResults && <div className="fee-preview"><span>Service fee <b>0.004210 SOL</b></span><span>You receive <strong>0.079985 SOL</strong></span></div>}
-          <button className="reclaim-button" type="button" disabled={!isResults} onClick={reclaimDemo}>{isResults ? 'Reclaim 0.079985 SOL after fee' : busy ? 'Scanning accounts…' : 'Scan first — no accounts will close'}</button>
+          <button className="reclaim-button" type="button" disabled={busy} onClick={isResults ? reclaimDemo : loadDemo}>{isResults ? 'Play the demo reclaim (0.079985 SOL)' : busy ? 'Scanning accounts…' : 'Run the demo scan'}</button>
+          <a className="inline-live-link" href="/">Reclaim real SOL on the live app ↗</a>
           {notice && <p className="inline-notice" role="status">{notice}</p>}
         </div>
       </section>
@@ -257,32 +219,7 @@ export default function Home() {
           <div className="price-row"><span>Standard success fee</span><b>5%</b></div>
           <div className="price-row"><span>Maximum per transaction</span><b>0.05 SOL</b></div>
           <div className="price-row"><span>If nothing is recovered</span><b>0 SOL</b></div>
-          <div className="price-row member"><span>Eligible $LAMPORT holder rate</span><b>2.5%</b></div>
-          <p>Network fees remain separate and are estimated before signing. The holder threshold will be published before the coin launches.</p>
-        </div>
-      </section>
-
-      <section className="community-section" id="community">
-        <div className="community-coin" aria-hidden="true">
-          <div className="coin-halo" />
-          <div className="big-coin"><span>◎</span><b>L</b><small>$LAMPORT</small></div>
-          <span className="coin-tag">CONCEPT • NOT LAUNCHED</span>
-        </div>
-        <div className="community-copy">
-          <p className="section-kicker light">OPTIONAL COMMUNITY LAYER</p>
-          <h2>A coin for the movement.<br /><em>Never a tollbooth.</em></h2>
-          <p className="community-lead">$LAMPORT turns the community into product users: eligible holders receive a lower success fee, while everyone keeps access to the same recovery flow.</p>
-          <div className="coin-principles">
-            <div><b>Fee utility</b><span>Eligible holders receive the proposed 2.5% community rate.</span></div>
-            <div><b>Fair launch</b><span>If launched, everyone enters through the same pump.fun market.</span></div>
-            <div><b>One official address</b><span>The mint will appear here first—never in replies or DMs.</span></div>
-            <div><b>Never required</b><span>No token is needed to scan, review, or reclaim SOL.</span></div>
-          </div>
-          <div className="coin-actions">
-            <a className="coin-primary" href="https://pump.fun/create" target="_blank" rel="noreferrer">Open pump.fun launch page <span>↗</span></a>
-            <span className="launch-status"><i /> OFFICIAL COIN NOT LIVE</span>
-          </div>
-          <p className="coin-risk">Pump.fun coins can move quickly and lose value. The reclaim product and its security must never depend on the token price.</p>
+          <p>Network fees remain separate and are estimated before signing.</p>
         </div>
       </section>
 
@@ -294,14 +231,14 @@ export default function Home() {
           <a href="https://solana.com/upgrades/reduced-rent" target="_blank" rel="noreferrer">Read the rent rollout <span>↗</span></a>
         </div>
         <div className="code-card" aria-label="Rust reclaim example">
-          <code className="code-dim">// Keep the current rent-exempt floor</code>
+          <code className="code-dim">{'// Keep the current rent-exempt floor'}</code>
           <code><span className="code-green">let</span> reserve = Rent::get()?</code>
           <code>&nbsp;&nbsp;.minimum_balance(target.data_len());</code>
           <code>&nbsp;</code>
           <code><span className="code-green">let</span> excess = target.lamports()</code>
           <code>&nbsp;&nbsp;.saturating_sub(reserve);</code>
           <code>&nbsp;</code>
-          <code className="code-dim">// Debit and credit the same amount</code>
+          <code className="code-dim">{'// Debit and credit the same amount'}</code>
           <code>**destination.try_borrow_mut_lamports()? += excess;</code>
           <code>**target.try_borrow_mut_lamports()? -= excess;</code>
         </div>
@@ -312,13 +249,13 @@ export default function Home() {
         <p className="section-kicker">YOUR LAMPORTS. YOUR WALLET.</p>
         <h2>See what’s waiting.</h2>
         <p>A scan is free. You’ll review every account and every lamport before approving anything.</p>
-        <button className="primary-action" type="button" onClick={connectWallet}><span className="sol-dot">◎</span> Scan my wallet</button>
+        <a className="primary-action" href="/"><span className="sol-dot">◎</span> Scan my wallet on the live app</a>
       </section>
 
       <footer>
         <a className="brand footer-brand" href="#top"><span className="brand-mark" aria-hidden="true">L</span><span>LAMPORT</span></a>
         <p>Built for Solana’s reduced-rent era.</p>
-        <div><a href="https://solana.com/upgrades/reduced-rent" target="_blank" rel="noreferrer">Rent rollout</a><a href="#community">Community coin</a><a href="#safety">Safety</a></div>
+        <div><a href="https://solana.com/upgrades/reduced-rent" target="_blank" rel="noreferrer">Rent rollout</a><a href="/">Live app</a><a href="#safety">Safety</a></div>
       </footer>
     </main>
   );

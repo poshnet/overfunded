@@ -1,4 +1,5 @@
 import {
+  ComputeBudgetProgram,
   Connection,
   PublicKey,
   SystemProgram,
@@ -23,9 +24,79 @@ const RPC_ENDPOINT = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || (
 );
 const ACCOUNTS_PER_TRANSACTION = 6;
 
+// Rent-floor reference. Token accounts are 165 bytes and were funded to
+// 2_039_280 lamports under the original rent schedule; the live floor is read
+// from the cluster so the site never hard-codes a reduction it cannot prove.
+export const TOKEN_ACCOUNT_SPACE = 165;
+export const LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS = 2_039_280;
+
+// Rent is (128 + data_len) * lamports_per_byte. SIMD-0437 steps that rate down
+// in five gated stages from the legacy 6,960 to 696 — a 90% cut once all five
+// activate. Stage rates below are the published schedule; which of them are
+// actually live is never assumed, it is derived from the cluster's own floor.
+export const RENT_ACCOUNT_OVERHEAD_BYTES = 128;
+export const LEGACY_LAMPORTS_PER_BYTE = 6_960;
+export const RENT_STAGES = [
+  { id: 'SIMD-0437-1', lamportsPerByte: 6_333 },
+  { id: 'SIMD-0437-2', lamportsPerByte: 5_080 },
+  { id: 'SIMD-0437-3', lamportsPerByte: 2_575 },
+  { id: 'SIMD-0437-4', lamportsPerByte: 1_322 },
+  { id: 'SIMD-0437-5', lamportsPerByte: 696 },
+] as const;
+
+export function rentFloorFor(space: number, lamportsPerByte: number) {
+  return (RENT_ACCOUNT_OVERHEAD_BYTES + space) * lamportsPerByte;
+}
+
+export function stageReductionPercent(lamportsPerByte: number) {
+  return Math.round((1 - lamportsPerByte / LEGACY_LAMPORTS_PER_BYTE) * 100);
+}
+
+export function lamportsPerByteFromFloor(floorLamports: number, space = TOKEN_ACCOUNT_SPACE) {
+  return floorLamports / (RENT_ACCOUNT_OVERHEAD_BYTES + space);
+}
+
+/** Index of the last activated stage, or -1 while the cluster is still at the legacy rate. */
+export function activeStageIndex(floorLamports: number, space = TOKEN_ACCOUNT_SPACE) {
+  const rate = Math.round(lamportsPerByteFromFloor(floorLamports, space));
+  let index = -1;
+  RENT_STAGES.forEach((stage, position) => {
+    if (rate <= stage.lamportsPerByte) index = position;
+  });
+  return index;
+}
+
+// Fee model. One signature per transaction plus a priority fee derived from the
+// compute budget we request, so the quoted network cost matches what is sent.
+const BASE_SIGNATURE_FEE_LAMPORTS = 5_000;
+const COMPUTE_UNIT_MARGIN = 12_000;
+const COMPUTE_UNITS_PER_ACCOUNT = 15_000;
+const DEFAULT_PRIORITY_MICRO_LAMPORTS = 20_000;
+const MAX_PRIORITY_MICRO_LAMPORTS = 100_000;
+
 export const connection = new Connection(RPC_ENDPOINT, 'confirmed');
 
 const wait = (milliseconds: number) => new Promise(resolve => window.setTimeout(resolve, milliseconds));
+
+function computeUnitLimitFor(accountCount: number) {
+  return COMPUTE_UNIT_MARGIN + accountCount * COMPUTE_UNITS_PER_ACCOUNT;
+}
+
+function priorityFeeLamports(accountCount: number, microLamportsPerUnit: number) {
+  return Math.ceil((computeUnitLimitFor(accountCount) * microLamportsPerUnit) / 1_000_000);
+}
+
+async function getPriorityMicroLamports() {
+  try {
+    const recent = await connection.getRecentPrioritizationFees();
+    const fees = recent.map(entry => entry.prioritizationFee).filter(fee => fee > 0).sort((a, b) => a - b);
+    if (fees.length === 0) return DEFAULT_PRIORITY_MICRO_LAMPORTS;
+    const median = fees[Math.floor(fees.length / 2)];
+    return Math.min(Math.max(median, DEFAULT_PRIORITY_MICRO_LAMPORTS), MAX_PRIORITY_MICRO_LAMPORTS);
+  } catch {
+    return DEFAULT_PRIORITY_MICRO_LAMPORTS;
+  }
+}
 
 async function confirmSignature(signature: string, lastValidBlockHeight: number) {
   for (let attempt = 0; attempt < 45; attempt += 1) {
@@ -68,6 +139,16 @@ export type ReclaimableAccount = {
   selected: boolean;
 };
 
+export type ReclaimOutcome = {
+  completedBatches: number;
+  serviceFeeWaived: boolean;
+  error: string | null;
+  recoveredLamports: number;
+  serviceFeeLamports: number;
+  signatures: string[];
+  totalBatches: number;
+};
+
 type ParsedTokenInfo = {
   isNative?: boolean;
   mint?: string;
@@ -92,7 +173,13 @@ export function formatSol(lamports: number, maximumFractionDigits = 6) {
 }
 
 export function estimatedNetworkFeeLamports(accountCount: number) {
-  return Math.ceil(accountCount / ACCOUNTS_PER_TRANSACTION) * 5_000;
+  const batches = Math.ceil(accountCount / ACCOUNTS_PER_TRANSACTION);
+  let total = 0;
+  for (let index = 0; index < batches; index += 1) {
+    const accountsInBatch = Math.min(ACCOUNTS_PER_TRANSACTION, accountCount - index * ACCOUNTS_PER_TRANSACTION);
+    total += BASE_SIGNATURE_FEE_LAMPORTS + priorityFeeLamports(accountsInBatch, DEFAULT_PRIORITY_MICRO_LAMPORTS);
+  }
+  return total;
 }
 
 export function calculateServiceFeeLamports(grossLamports: number) {
@@ -102,7 +189,16 @@ export function calculateServiceFeeLamports(grossLamports: number) {
   );
 }
 
-export async function scanReclaimableAccounts(owner: PublicKey): Promise<ReclaimableAccount[]> {
+export function getCurrentRentFloorLamports(space = TOKEN_ACCOUNT_SPACE) {
+  return connection.getMinimumBalanceForRentExemption(space, 'confirmed');
+}
+
+export type WalletScan = {
+  accounts: ReclaimableAccount[];
+  scannedCount: number;
+};
+
+export async function scanReclaimableAccounts(owner: PublicKey): Promise<WalletScan> {
   const [legacyResponse, token2022Response] = await Promise.all([
     connection.getParsedTokenAccountsByOwner(owner, { programId: TOKEN_PROGRAM_ID }, 'confirmed'),
     connection.getParsedTokenAccountsByOwner(owner, { programId: TOKEN_2022_PROGRAM_ID }, 'confirmed'),
@@ -130,7 +226,7 @@ export async function scanReclaimableAccounts(owner: PublicKey): Promise<Reclaim
   )));
   const rentByLength = new Map(rentEntries);
 
-  return candidates.flatMap(candidate => {
+  const accounts = candidates.flatMap(candidate => {
     const rentFloorLamports = rentByLength.get(candidate.dataLength) ?? candidate.lamports;
     const excessLamports = candidate.lamports - rentFloorLamports;
     if (excessLamports <= 0) return [];
@@ -144,6 +240,10 @@ export async function scanReclaimableAccounts(owner: PublicKey): Promise<Reclaim
       selected: true,
     }];
   }).sort((a, b) => b.excessLamports - a.excessLamports);
+
+  // scannedCount is every supported token account examined, so an empty result
+  // can say what was actually checked instead of just showing nothing.
+  return { accounts, scannedCount: candidates.length };
 }
 
 function chunk<T>(items: T[], size: number) {
@@ -195,68 +295,158 @@ async function getFreshInstruction(account: ReclaimableAccount, authority: Publi
   };
 }
 
+/**
+ * Smallest fee transfer the treasury can legally receive.
+ *
+ * Solana rejects any transaction that leaves a newly created account holding
+ * less than the rent-exempt minimum (InsufficientFundsForRent). If the treasury
+ * has never been funded it does not exist on-chain yet, so a small fee transfer
+ * would fail the user's entire reclaim along with it. Once the account holds
+ * lamports, any amount is fine.
+ */
+async function minimumTreasuryTransferLamports() {
+  try {
+    const treasury = await connection.getAccountInfo(TREASURY_PUBLIC_KEY, 'confirmed');
+    if (treasury && treasury.lamports > 0) return 1;
+    return await connection.getMinimumBalanceForRentExemption(0, 'confirmed');
+  } catch {
+    return await connection.getMinimumBalanceForRentExemption(0, 'confirmed');
+  }
+}
+
+// Simulate before the wallet prompt so an unsupported program build or an
+// underfunded fee payer fails without costing the user a signature. A relay or
+// RPC that cannot simulate degrades to the send-time preflight instead.
+async function assertBatchSimulates(transaction: Transaction) {
+  let logs: string[] = [];
+  let simulationError: unknown;
+  try {
+    const simulation = await connection.simulateTransaction(transaction.compileMessage());
+    simulationError = simulation.value.err;
+    logs = simulation.value.logs ?? [];
+  } catch {
+    return;
+  }
+  if (!simulationError) return;
+
+  const unsupportedInstruction = logs.some(line => (
+    /invalid instruction data|InvalidInstructionData|not supported|unknown instruction/i.test(line)
+  ));
+  if (unsupportedInstruction) {
+    throw new Error(
+      'The Token Program deployed on this cluster does not support WithdrawExcessLamports yet, so nothing was signed.',
+    );
+  }
+  throw new Error(`Simulation failed before signing: ${JSON.stringify(simulationError)}. Nothing was signed.`);
+}
+
+/**
+ * Reclaims in batches and always reports what actually landed. A failure part
+ * way through returns the confirmed signatures and charged fees alongside the
+ * error instead of throwing them away, because earlier batches are already
+ * on-chain and the user has already paid for them.
+ */
 export async function reclaimAccounts(
   provider: WalletProvider,
   owner: PublicKey,
   accounts: ReclaimableAccount[],
   onProgress?: (completed: number, total: number) => void,
-) {
+): Promise<ReclaimOutcome> {
   const signatures: string[] = [];
   const batches = chunk(accounts, ACCOUNTS_PER_TRANSACTION);
+  const [priorityMicroLamports, minimumFeeTransfer] = await Promise.all([
+    getPriorityMicroLamports(),
+    minimumTreasuryTransferLamports(),
+  ]);
   let recoveredLamports = 0;
   let serviceFeeLamports = 0;
+  let completedBatches = 0;
+  let serviceFeeWaived = false;
 
   for (let batchIndex = 0; batchIndex < batches.length; batchIndex += 1) {
-    const freshAccounts = (await Promise.all(
-      batches[batchIndex].map(account => getFreshInstruction(account, owner)),
-    )).filter((result): result is NonNullable<typeof result> => result !== null);
+    try {
+      const freshAccounts = (await Promise.all(
+        batches[batchIndex].map(account => getFreshInstruction(account, owner)),
+      )).filter((result): result is NonNullable<typeof result> => result !== null);
 
-    if (freshAccounts.length === 0) {
-      onProgress?.(batchIndex + 1, batches.length);
-      continue;
+      if (freshAccounts.length === 0) {
+        completedBatches += 1;
+        onProgress?.(completedBatches, batches.length);
+        continue;
+      }
+
+      const batchRecoveredLamports = freshAccounts.reduce((sum, account) => sum + account.excessLamports, 0);
+      const remainingFeeCap = SERVICE_FEE_CAP_LAMPORTS - serviceFeeLamports;
+      const chargeableFeeLamports = Math.min(
+        Math.floor((batchRecoveredLamports * SERVICE_FEE_BASIS_POINTS) / 10_000),
+        remainingFeeCap,
+      );
+      // Never fail a user's reclaim to collect our own fee.
+      const batchServiceFeeLamports = chargeableFeeLamports >= minimumFeeTransfer ? chargeableFeeLamports : 0;
+      if (chargeableFeeLamports > 0 && batchServiceFeeLamports === 0) serviceFeeWaived = true;
+
+      const latestBlockhash = await connection.getLatestBlockhash('confirmed');
+      const transaction = new Transaction({
+        feePayer: owner,
+        recentBlockhash: latestBlockhash.blockhash,
+      }).add(
+        ComputeBudgetProgram.setComputeUnitLimit({ units: computeUnitLimitFor(freshAccounts.length) }),
+        ComputeBudgetProgram.setComputeUnitPrice({ microLamports: priorityMicroLamports }),
+        ...freshAccounts.map(account => account.instruction),
+      );
+
+      if (batchServiceFeeLamports > 0) {
+        transaction.add(SystemProgram.transfer({
+          fromPubkey: owner,
+          toPubkey: TREASURY_PUBLIC_KEY,
+          lamports: batchServiceFeeLamports,
+        }));
+      }
+
+      await assertBatchSimulates(transaction);
+
+      let signature: string;
+      if (provider.signTransaction) {
+        const signed = await provider.signTransaction(transaction);
+        signature = await connection.sendRawTransaction(signed.serialize(), {
+          maxRetries: 3,
+          skipPreflight: false,
+        });
+      } else if (provider.signAndSendTransaction) {
+        const result = await provider.signAndSendTransaction(transaction);
+        signature = typeof result === 'string' ? result : result.signature;
+      } else {
+        throw new Error('This wallet cannot sign Solana transactions from the browser.');
+      }
+
+      await confirmSignature(signature, latestBlockhash.lastValidBlockHeight);
+      signatures.push(signature);
+      recoveredLamports += batchRecoveredLamports;
+      serviceFeeLamports += batchServiceFeeLamports;
+      completedBatches += 1;
+      onProgress?.(completedBatches, batches.length);
+    } catch (error) {
+      return {
+        completedBatches,
+        serviceFeeWaived,
+        error: error instanceof Error
+          ? error.message
+          : 'The transaction was cancelled or failed.',
+        recoveredLamports,
+        serviceFeeLamports,
+        signatures,
+        totalBatches: batches.length,
+      };
     }
-
-    const batchRecoveredLamports = freshAccounts.reduce((sum, account) => sum + account.excessLamports, 0);
-    const remainingFeeCap = SERVICE_FEE_CAP_LAMPORTS - serviceFeeLamports;
-    const batchServiceFeeLamports = Math.min(
-      Math.floor((batchRecoveredLamports * SERVICE_FEE_BASIS_POINTS) / 10_000),
-      remainingFeeCap,
-    );
-
-    const latestBlockhash = await connection.getLatestBlockhash('confirmed');
-    const transaction = new Transaction({
-      feePayer: owner,
-      recentBlockhash: latestBlockhash.blockhash,
-    }).add(...freshAccounts.map(account => account.instruction));
-
-    if (batchServiceFeeLamports > 0) {
-      transaction.add(SystemProgram.transfer({
-        fromPubkey: owner,
-        toPubkey: TREASURY_PUBLIC_KEY,
-        lamports: batchServiceFeeLamports,
-      }));
-    }
-
-    let signature: string;
-    if (provider.signTransaction) {
-      const signed = await provider.signTransaction(transaction);
-      signature = await connection.sendRawTransaction(signed.serialize(), {
-        maxRetries: 3,
-        skipPreflight: false,
-      });
-    } else if (provider.signAndSendTransaction) {
-      const result = await provider.signAndSendTransaction(transaction);
-      signature = typeof result === 'string' ? result : result.signature;
-    } else {
-      throw new Error('This wallet cannot sign Solana transactions from the browser.');
-    }
-
-    await confirmSignature(signature, latestBlockhash.lastValidBlockHeight);
-    signatures.push(signature);
-    recoveredLamports += batchRecoveredLamports;
-    serviceFeeLamports += batchServiceFeeLamports;
-    onProgress?.(batchIndex + 1, batches.length);
   }
 
-  return { recoveredLamports, serviceFeeLamports, signatures };
+  return {
+    completedBatches,
+    serviceFeeWaived,
+    error: null,
+    recoveredLamports,
+    serviceFeeLamports,
+    signatures,
+    totalBatches: batches.length,
+  };
 }
