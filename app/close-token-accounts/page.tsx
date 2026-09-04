@@ -330,7 +330,7 @@ export default function CloseTokenAccountsPage() {
             </div>
           </div>
           <div className={foundNothing ? 'closer-stage-result is-verdict' : 'closer-stage-result'}><small>{stageLabel}</small><StageAmount mode={amountMode} lamports={selectedLamports} verdict="ALL CLEAN" /></div>
-          <div className="stage-guard"><span>EMPTY ONLY</span><span>OWNER VERIFIED</span><span>DRY-RUN FIRST</span></div>
+          <div className="stage-mark">{SITE_URL.replace(/^https?:\/\//, '')}</div>
           <small className="closer-stage-fees">SERVICE + NETWORK</small>
         </div>
         <a className="hero-scroll-cue" href="#how-it-works">MORE DETAILS <span>↓</span></a>

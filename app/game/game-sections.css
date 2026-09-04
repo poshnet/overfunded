@@ -123,7 +123,7 @@
 @media(prefers-reduced-motion:reduce){
   .game-actions button,.game-demo-link{animation:none!important;transition:none!important}
   .game-chest,.chest-lid,.chest-glow,.chest-dust,.coin,.chest-body i{animation:none!important}
-  .has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.quest-won .chest-lid,.has-loot.quest-reclaiming .chest-lid{transform:rotateX(-78deg)}
+  .has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.quest-won .chest-lid,.has-loot.quest-reclaiming .chest-lid{transform:rotateX(-70deg)}
   .no-loot.quest-ready .chest-lid{transform:rotateX(-24deg)}
   .coin{opacity:0!important}
 }
@@ -583,9 +583,9 @@ a.battle-card:hover{opacity:1}
 /* Stage guarantees. Lives in the global sheet so both tools get it — it was
    defined only in the closer's route CSS, so the reclaim tool rendered the
    badges as unstyled run-together text. */
-.stage-guard{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:14px}
-.stage-guard span{padding:7px 9px;border:1px solid var(--panel-line,#304332);border-radius:2px;color:var(--panel-ink,#6f8673);font-size:9px;font-weight:900;letter-spacing:.09em;white-space:nowrap}
-@media(max-width:590px){.stage-guard{gap:5px}.stage-guard span{padding:6px 7px;font-size:8px}}
+
+
+@media(max-width:590px){}
 
 /* Primary action: the loudest control on either tool. */
 .game-actions button:not(.game-demo-link){padding:19px 28px;font-size:13px;box-shadow:6px 6px 0 var(--btn-shadow,#31511e)}
@@ -595,14 +595,7 @@ a.battle-card:hover{opacity:1}
 /* The lid rolls back on its hinge: it swings past open, rebounds off the
    travel, and settles — rotateX so it tips away from the viewer instead of
    tilting sideways like a plate. */
-@keyframes chest-lid-open{
-  0%{transform:rotateX(0deg);animation-timing-function:cubic-bezier(.25,.9,.35,1)}
-  48%{transform:rotateX(-92deg)}
-  68%{transform:rotateX(-68deg)}
-  84%{transform:rotateX(-83deg)}
-  93%{transform:rotateX(-75deg)}
-  100%{transform:rotateX(-78deg)}
-}
+
 /* Empty box: it lifts a crack and stops. */
 @keyframes chest-lid-crack{
   0%{transform:rotateX(0deg)}
@@ -617,3 +610,15 @@ a.battle-card:hover{opacity:1}
    the demo-link styling, which was two pixels taller and a point larger. */
 .empty-actions .game-demo-link{padding:15px 19px!important;font-size:11px}
 .empty-actions{gap:12px}
+
+/* Propped open, not flopped over: it never passes vertical. */
+@keyframes chest-lid-open{
+  0%{transform:rotateX(0deg);animation-timing-function:cubic-bezier(.25,.9,.35,1)}
+  48%{transform:rotateX(-78deg)}
+  70%{transform:rotateX(-58deg)}
+  86%{transform:rotateX(-74deg)}
+  100%{transform:rotateX(-70deg)}
+}
+
+/* The panel signs itself instead of listing guarantees the page already makes. */
+.stage-mark{margin-top:16px;color:var(--panel-ink,#6f8673);font-size:9px;font-weight:900;letter-spacing:.2em;text-align:center;text-transform:uppercase}
