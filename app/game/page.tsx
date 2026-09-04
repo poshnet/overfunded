@@ -141,7 +141,7 @@ export default function GamePrototype() {
           <div className="game-level"><b>NEW QUEST</b><span>RENT FLOOR REDUCTION</span></div>
           <h1>Unlock the SOL<br /><em>your wallet already owns.</em></h1>
           <p>Solana lowered account rent. Your token accounts may now hold bonus lamports above the new minimum.</p>
-          <div className="game-actions"><button type="button" onClick={primaryAction} disabled={busy || (quest === 'ready' && (selectedAccounts.length === 0 || selectedLamports <= networkFeeLamports))}>{primaryLabel}</button><button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button><a href="/">EXIT TO CLASSIC</a></div>
+          <div className="game-actions"><button type="button" onClick={primaryAction} disabled={busy || (quest === 'ready' && (selectedAccounts.length === 0 || selectedLamports <= networkFeeLamports))}>{primaryLabel}</button><button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button><a href="/classic">EXIT TO CLASSIC</a></div>
           <div className="game-warning"><i>!</i><div><b>NO TOKEN ACCOUNTS ARE EVER CLOSED</b><span>Only excess rent moves. Tokens and account addresses stay intact.</span></div></div>
         </div>
 
@@ -155,7 +155,7 @@ export default function GamePrototype() {
         </div>
       </section>
 
-      <div className="game-modebar"><span><i /> SAFE MODE ACTIVE</span><b>WITHDRAW EXCESS</b><b>KEEP ACCOUNTS</b><b>TOUCH ZERO TOKENS</b><a href="/">CLASSIC UI ↗</a></div>
+      <div className="game-modebar"><span><i /> SAFE MODE ACTIVE</span><b>WITHDRAW EXCESS</b><b>KEEP ACCOUNTS</b><b>TOUCH ZERO TOKENS</b><a href="/classic">CLASSIC UI ↗</a></div>
 
       {(wallet || accounts.length > 0 || quest === 'error') && (
         <section className="game-live-results" aria-live="polite">
@@ -219,10 +219,10 @@ export default function GamePrototype() {
 
       <section className="game-finale">
         <div className="finale-rays" aria-hidden="true" />
-        <small>READY PLAYER WALLET?</small><h2>Find the hidden SOL.<br /><em>Keep every account alive.</em></h2><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN MAINNET ▶</button><a href="/">RETURN TO THE CLASSIC VERSION ↗</a>
+        <small>READY PLAYER WALLET?</small><h2>Find the hidden SOL.<br /><em>Keep every account alive.</em></h2><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN MAINNET ▶</button><a href="/classic">RETURN TO THE CLASSIC VERSION ↗</a>
       </section>
 
-      <footer className="game-footer"><a className="game-brand" href="/game"><i>L</i><span><b>LAMPORT</b><small>RENT QUEST</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/">Classic</a><a href="/fun">Fun Lab</a><a href="#safety">Safety</a></div></footer>
+      <footer className="game-footer"><a className="game-brand" href="/"><i>L</i><span><b>LAMPORT</b><small>RENT QUEST</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/classic">Classic</a><a href="/fun">Fun Lab</a><a href="#safety">Safety</a></div></footer>
     </main>
   );
 }
