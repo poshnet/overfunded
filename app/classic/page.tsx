@@ -217,7 +217,6 @@ export default function Home() {
         <div className="pricing-card">
           <div className="pricing-badge">PROPOSED LAUNCH PRICING</div>
           <div className="price-row"><span>Standard success fee</span><b>5%</b></div>
-          <div className="price-row"><span>Maximum per transaction</span><b>0.05 SOL</b></div>
           <div className="price-row"><span>If nothing is recovered</span><b>0 SOL</b></div>
           <p>Network fees remain separate and are estimated before signing.</p>
         </div>

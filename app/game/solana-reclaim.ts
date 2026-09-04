@@ -15,7 +15,6 @@ const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ
 const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
 export const TREASURY_ADDRESS = '1Jpbzs17ihaezC18SaoBtJKMjoNx4ekjGKNDYs6NczM';
 export const SERVICE_FEE_PERCENT = 5;
-export const SERVICE_FEE_CAP_LAMPORTS = 50_000_000;
 const TREASURY_PUBLIC_KEY = new PublicKey(TREASURY_ADDRESS);
 const SERVICE_FEE_BASIS_POINTS = SERVICE_FEE_PERCENT * 100;
 const RPC_ENDPOINT = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || (
@@ -198,10 +197,7 @@ export function estimatedNetworkFeeLamports(accountCount: number) {
 }
 
 export function calculateServiceFeeLamports(grossLamports: number) {
-  return Math.min(
-    Math.floor((grossLamports * SERVICE_FEE_BASIS_POINTS) / 10_000),
-    SERVICE_FEE_CAP_LAMPORTS,
-  );
+  return Math.floor((grossLamports * SERVICE_FEE_BASIS_POINTS) / 10_000);
 }
 
 export function getCurrentRentFloorLamports(space = TOKEN_ACCOUNT_SPACE) {
@@ -409,10 +405,8 @@ export async function reclaimAccounts(
       }
 
       const batchRecoveredLamports = freshAccounts.reduce((sum, account) => sum + account.excessLamports, 0);
-      const remainingFeeCap = SERVICE_FEE_CAP_LAMPORTS - serviceFeeLamports;
-      const chargeableFeeLamports = Math.min(
-        Math.floor((batchRecoveredLamports * SERVICE_FEE_BASIS_POINTS) / 10_000),
-        remainingFeeCap,
+      const chargeableFeeLamports = Math.floor(
+        (batchRecoveredLamports * SERVICE_FEE_BASIS_POINTS) / 10_000,
       );
       // Never fail a user's reclaim to collect our own fee.
       const batchServiceFeeLamports = chargeableFeeLamports >= minimumFeeTransfer ? chargeableFeeLamports : 0;

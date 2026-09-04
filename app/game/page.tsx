@@ -19,7 +19,6 @@ import {
   stageReductionPercent,
   reclaimAccounts,
   scanReclaimableAccounts,
-  SERVICE_FEE_CAP_LAMPORTS,
   SERVICE_FEE_PERCENT,
   shortenAddress,
   TOKEN_ACCOUNT_SPACE,
@@ -400,7 +399,7 @@ export default function GamePrototype() {
           <div className="game-stars" aria-hidden="true"><i /><i /><i /><i /><i /></div>
           <div className="game-chest" aria-hidden="true"><div className="chest-glow" /><div className="chest-dust" /><div className="chest-lid" /><div className="chest-body"><i /></div><span className="coin coin-one">◎</span><span className="coin coin-two">◎</span><span className="coin coin-three">◎</span><span className="coin coin-four">◎</span><span className="coin coin-five">◎</span></div>
           <div className={foundNothing ? 'game-result is-verdict' : 'game-result'}><small>{stageLabel}</small><strong>{stageAmount}</strong></div>
-          <p>LIVE MAINNET · {SERVICE_FEE_PERCENT}% SUCCESS FEE · {formatSol(SERVICE_FEE_CAP_LAMPORTS, 2)} SOL MAX · YOU APPROVE EVERY TRANSACTION</p>
+          <p>LIVE MAINNET · {SERVICE_FEE_PERCENT}% SUCCESS FEE · NOTHING RECOVERED, NOTHING CHARGED · YOU APPROVE EVERY TRANSACTION</p>
         </div>
       </section>
 
@@ -556,7 +555,7 @@ export default function GamePrototype() {
               '@type': 'Offer',
               price: '0',
               priceCurrency: 'USD',
-              description: `${SERVICE_FEE_PERCENT}% of the recovered surplus, capped at ${formatSol(SERVICE_FEE_CAP_LAMPORTS, 2)} SOL, charged only on success.`,
+              description: `${SERVICE_FEE_PERCENT}% of the recovered surplus, charged only on success. Nothing is charged if nothing is recovered.`,
             },
           },
         ]) }}

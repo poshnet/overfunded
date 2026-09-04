@@ -46,8 +46,8 @@ label ACTIVE — no figure on the site is hardcoded.
 
 ## Fees
 
-5% of the gross surplus, capped at 0.05 SOL, collected only on success, in the
-same transaction you approve. Nothing is charged if nothing is recovered.
+5% of the gross surplus, collected only on success, in the same transaction you
+approve. Nothing is charged if nothing is recovered.
 
 ## Stack
 

@@ -47,7 +47,7 @@ const FAQ = [
   },
   {
     q: 'What does it cost?',
-    a: 'A 5% fee on the gross surplus, capped at 0.05 SOL, charged only on a successful reclaim and included in the same transaction you approve. Network fees are separate and estimated before signing. Nothing is charged if nothing is recovered.',
+    a: 'A 5% fee on the gross surplus, charged only on a successful reclaim and included in the same transaction you approve. Network fees are separate and estimated before signing. Nothing is charged if nothing is recovered.',
   },
 ];
 
