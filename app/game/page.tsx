@@ -394,7 +394,7 @@ export default function GamePrototype() {
         ) : (
           <div className="game-copy">
             <h1>Rent dropped.<br /><em>Your accounts didn’t notice.</em></h1>
-            <p className="hero-lead">Solana lowered the rent-exempt minimum, in a network upgrade called SIMD-0437. Your token accounts were funded at the old floor, and nothing sweeps the difference back to you. <a className="lead-more" href="/solana-rent-reduction">Learn more <span aria-hidden="true">→</span></a></p>
+            <p className="hero-lead">Solana lowered the rent-exempt minimum, in a network upgrade called <a className="source-link" href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">SIMD-0437<span aria-hidden="true">↗</span></a>. Your token accounts were funded at the old floor, and nothing sweeps the difference back to you. <a className="lead-more" href="/solana-rent-reduction">Learn more <span aria-hidden="true">→</span></a></p>
             <div className="rollout-panel rollout-compact">
               <div className="rollout-head">
                 <span>SIMD-0437 · LIVE RENT UPDATE</span>
@@ -661,7 +661,7 @@ export default function GamePrototype() {
         ]) }}
       />
 
-      <footer className="game-footer"><a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/blog">Blog</a><a href="/solana-rent-reduction">How the cut works</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href="/legal/risk">Risk</a><a href="/legal/terms">Terms</a><a href="/legal/privacy">Privacy</a></div></footer>
+      <footer className="game-footer"><a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/blog">Blog</a><a href="/solana-rent-reduction">How the cut works</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">Solana&rsquo;s rollout</a><a href="/legal/risk">Risk</a><a href="/legal/terms">Terms</a><a href="/legal/privacy">Privacy</a></div></footer>
     </main>
   );
 }

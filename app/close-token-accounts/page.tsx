@@ -7,6 +7,7 @@ import { SITE_NAME, SITE_URL, SOURCE_URL } from '../site-config';
 import { ToolToggle } from '../game/tool-toggle';
 import { ToolCompare } from '../tool-compare';
 import { StageAmount, type AmountMode } from '../game/stage-amount';
+import { RENT_SOURCE_URL } from '../game/solana-reclaim';
 import { TokenPortrait } from '../token-portrait';
 import {
   calculateServiceFeeLamports,
@@ -367,7 +368,7 @@ export default function CloseTokenAccountsPage() {
             <div className="lc-body">
               <b>THE ACCOUNT → YOUR WALLET</b>
               <h3>It is released</h3>
-              <p><strong>CloseAccount</strong> returns the whole deposit and deletes the account. <strong>WithdrawExcessLamports</strong> returns only what sits above today’s lowered floor and leaves the account alive.</p>
+              <p><strong>CloseAccount</strong> returns the whole deposit and deletes the account. <strong>WithdrawExcessLamports</strong> returns only what sits above today’s lowered floor and leaves the account alive — that floor is being cut by Solana under <a className="source-link" href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">SIMD-0437<span aria-hidden="true">↗</span></a>.</p>
             </div>
           </li>
         </ol>
@@ -391,7 +392,7 @@ export default function CloseTokenAccountsPage() {
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', description: `${SERVICE_FEE_PERCENT}% success fee on recovered rent.` },
       }) }} />
 
-      <footer className="game-footer"><a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/">Keep token accounts</a><a href="/blog">Blog</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href="/legal/risk">Risk</a><a href="/legal/terms">Terms</a><a href="/legal/privacy">Privacy</a></div></footer>
+      <footer className="game-footer"><a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/">Keep token accounts</a><a href="/blog">Blog</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">Solana&rsquo;s rollout</a><a href="/legal/risk">Risk</a><a href="/legal/terms">Terms</a><a href="/legal/privacy">Privacy</a></div></footer>
     </main>
   );
 }

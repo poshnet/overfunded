@@ -633,3 +633,7 @@ a.battle-card:hover{opacity:1}
    left it low on the screen. Nudge it up without disturbing the panel. */
 .game-copy{margin-top:calc(-1 * clamp(18px,3.4vw,58px))}
 @media(max-width:940px){.game-copy{margin-top:0}}
+/* Inline citation: reads as a reference, not a button. */
+.source-link{color:inherit;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px;text-decoration-color:currentColor;white-space:nowrap}
+.source-link:hover{color:var(--g-lime);text-decoration-thickness:2px}
+.source-link span{margin-left:3px;font-size:.85em;opacity:.8}
