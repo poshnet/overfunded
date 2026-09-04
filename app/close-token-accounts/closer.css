@@ -9,7 +9,7 @@
 .closer-copy{max-width:700px}
 .closer-kicker{display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid #74503f;background:#231a16;color:#e2a085;font-size:9px;font-weight:900;letter-spacing:.13em}
 .closer-kicker:before{content:'×';display:grid;width:17px;height:17px;place-items:center;background:var(--closer-red);color:#210608;font-size:13px}
-.closer-copy h1{margin:28px 0 20px;font-family:Arial,sans-serif;font-size:clamp(44px,5vw,72px);font-weight:950;line-height:.91;letter-spacing:-.045em;text-transform:uppercase}
+.closer-copy h1{margin:30px 0 23px;font-family:Arial,sans-serif;font-size:clamp(40px,4.4vw,68px);font-weight:900;line-height:.95;letter-spacing:-.035em;text-transform:uppercase}
 .closer-copy h1 em{display:block;margin-top:12px;color:var(--closer-red);font-family:Georgia,serif;font-weight:500;text-transform:none}
 .closer-copy>p{max-width:620px;margin:0;color:#ae8589;font-family:Arial,sans-serif;font-size:16px;line-height:1.58}
 .closer-rules{display:flex;flex-wrap:wrap;gap:8px;margin-top:25px}
@@ -109,7 +109,7 @@
 @media(prefers-reduced-motion:reduce){.closer-radar i,.closer-shell button{animation:none!important}}
 @media(max-width:1050px){.closer-hero{grid-template-columns:1fr;padding-top:62px}.closer-copy{max-width:760px}.closer-stage{justify-self:center}.closer-choice{grid-template-columns:1fr;gap:38px}.closer-section-head{grid-template-columns:1fr;gap:20px}}
 @media(max-width:760px){.closer-modebar{flex-wrap:wrap;gap:12px 22px}.closer-step-grid{grid-template-columns:1fr}.closer-step-grid article{min-height:190px}.closer-choice-grid>a{grid-template-columns:44px 1fr}.closer-choice-grid>a>i{width:42px;height:42px}.closer-choice-grid>a>em{display:none}}
-@media(max-width:590px){.closer-hero{min-height:auto;padding:46px 17px 62px}.closer-copy h1{font-size:39px}.closer-copy>p{font-size:13px}.closer-rules{display:grid;grid-template-columns:1fr}.closer-warning{align-items:flex-start}.closer-stage{min-height:400px;padding-right:16px;padding-left:16px}.closer-radar{width:175px;height:175px}.closer-stage-result strong{font-size:30px}.closer-stage-guard{flex-wrap:wrap;justify-content:center}.closer-inventory{min-width:0}.closer-shell .live-summary{grid-template-columns:1fr}.closer-shell .live-approval{align-items:stretch;flex-direction:column}.closer-approval>button{width:100%}.closer-steps,.closer-choice{padding:68px 17px}.closer-section-head h2,.closer-choice h2{font-size:35px}.closer-modebar b:nth-of-type(3){display:none}}
+@media(max-width:590px){.closer-hero{min-height:auto;padding:46px 17px 62px}.closer-copy h1{font-size:36px}.closer-copy>p{font-size:13px}.closer-rules{display:grid;grid-template-columns:1fr}.closer-warning{align-items:flex-start}.closer-stage{min-height:400px;padding-right:16px;padding-left:16px}.closer-radar{width:175px;height:175px}.closer-stage-result strong{font-size:30px}.closer-stage-guard{flex-wrap:wrap;justify-content:center}.closer-inventory{min-width:0}.closer-shell .live-summary{grid-template-columns:1fr}.closer-shell .live-approval{align-items:stretch;flex-direction:column}.closer-approval>button{width:100%}.closer-steps,.closer-choice{padding:68px 17px}.closer-section-head h2,.closer-choice h2{font-size:35px}.closer-modebar b:nth-of-type(3){display:none}}
 
 /* Shared game components inherit their accents from these, so the closer
    themes them warm instead of borrowing the reclaim tool's green. */
