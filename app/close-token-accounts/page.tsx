@@ -244,8 +244,12 @@ export default function CloseTokenAccountsPage() {
               <div className="inventory-empty closer-empty">
                 <i aria-hidden="true">✓</i>
                 <b>NOTHING TO CLEAN UP</b>
-                <p>Checked {scannedCount} supported token account{scannedCount === 1 ? '' : 's'}. None are both empty and closable by this wallet.</p>
+                <p>Checked {scannedCount} supported token account{scannedCount === 1 ? '' : 's'}. None are both empty and closable by this wallet, so there is nothing to remove.</p>
                 <p className="empty-hint">No transaction was signed and no fee was charged.</p>
+                <div className="empty-actions">
+                  <button type="button" onClick={connectAndScan} disabled={busy}>SCAN AGAIN ↻</button>
+                  <button className="game-demo-link" type="button" onClick={backToOverview}>← BACK</button>
+                </div>
               </div>
             ) : (
               <>
@@ -291,7 +295,7 @@ export default function CloseTokenAccountsPage() {
               <span><b>✓</b> YOU REVIEW EVERY ADDRESS</span>
               <span><b>5%</b> SUCCESS FEE</span>
             </div>
-            <div className="game-actions"><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + FIND EMPTY ACCOUNTS ▶</button><button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button><a className="game-text-link" href="#how-it-works">HOW IT WORKS ↓</a></div>
+            <div className="game-actions"><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + FIND EMPTY ACCOUNTS ▶</button><button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button><a className="game-text-link verify-link" href={SOURCE_URL} target="_blank" rel="noreferrer">VERIFY THE CODE <span aria-hidden="true">↗</span></a><a className="game-text-link" href="#how-it-works">HOW IT WORKS ↓</a></div>
             {state === 'error' && <p className="live-notice error">{notice}</p>}
             <div className="closer-warning"><i>!</i><div><b>DESTRUCTIVE: THIS MODE CLOSES EMPTY TOKEN ACCOUNTS</b><span>Selected empty token-account addresses are permanently deleted. Tokens are never burned, and your wallet is never closed.</span></div></div>
           </div>

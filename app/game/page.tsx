@@ -330,17 +330,12 @@ export default function GamePrototype() {
                 <p>
                   {scannedCount === 0
                     ? 'This wallet holds no supported SPL token accounts, so there is no rent to check.'
-                    : `Checked ${scannedCount} token account${scannedCount === 1 ? '' : 's'}. Every one is already sitting at the current rent floor${liveFloorLamports === null ? '' : ` of ${formatSol(liveFloorLamports, 8)} SOL`}, so there is no excess to withdraw.`}
+                    : `Checked ${scannedCount} supported token account${scannedCount === 1 ? '' : 's'}. Every one is already sitting at the current rent floor, so there is no surplus to withdraw.`}
                 </p>
-                <div className="empty-facts">
-                  <div><span>Accounts checked</span><b>{scannedCount}</b></div>
-                  <div><span>Excess found</span><b>0.000000 SOL</b></div>
-                  <div><span>Accounts closed</span><b>0</b></div>
-                </div>
-                <p className="empty-hint">Accounts created after the rent change already start at the new floor. Nothing was signed and nothing was charged.</p>
+                <p className="empty-hint">No transaction was signed and no fee was charged.</p>
                 <div className="empty-actions">
                   <button type="button" onClick={connectAndScan} disabled={busy}>SCAN AGAIN ↻</button>
-                  <button className="game-demo-link" type="button" onClick={backToOverview}>← BACK TO OVERVIEW</button>
+                  <button className="game-demo-link" type="button" onClick={backToOverview}>← BACK</button>
                 </div>
               </div>
             ) : (
@@ -423,6 +418,7 @@ export default function GamePrototype() {
             <div className="game-actions">
               <button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN ▶</button>
               <button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button>
+                <a className="game-text-link verify-link" href={SOURCE_URL} target="_blank" rel="noreferrer">VERIFY THE CODE <span aria-hidden="true">↗</span></a>
             </div>
             {quest === 'error' && <p className="live-notice error">{notice}</p>}
             <div className="game-warning"><i>!</i><div><b>KEEP-OPEN MODE NEVER DELETES TOKENS</b><span>No tokens or token accounts are deleted. Balances and account addresses stay intact.</span></div></div>
@@ -430,7 +426,7 @@ export default function GamePrototype() {
         )}
 
         <div className="game-stage">
-          <div className="game-stage-head"><span>QUEST 01 / WALLET SCAN</span><b>{quest === 'won' ? 'COMPLETE' : quest === 'error' ? 'CHECK LOG' : busy ? 'ACTIVE' : 'READY'}</b></div>
+          <div className="game-stage-head"><span>TOOL 01 / RENT SURPLUS SCAN</span><b>{quest === 'won' ? 'COMPLETE' : quest === 'error' ? 'CHECK LOG' : busy ? 'ACTIVE' : 'READY'}</b></div>
           <div className="game-stars" aria-hidden="true"><i /><i /><i /><i /><i /></div>
           <div className="game-chest-frame">
             <div className="game-chest" aria-hidden="true"><div className="chest-glow" /><div className="chest-dust" /><div className="chest-lid" /><div className="chest-body"><i /></div>{COIN_ARCS.map((arc, index) => (
@@ -447,11 +443,7 @@ export default function GamePrototype() {
             ))}</div>
           </div>
           <div className={foundNothing ? 'game-result is-verdict' : 'game-result'}><small>{stageLabel}</small><StageAmount mode={amountMode} lamports={selectedLamports} verdict="ALL CAUGHT UP" /></div>
-          <small className="stage-fees">
-            {amountMode === 'value'
-              ? <>SERVICE {formatSol(chargedOrQuotedFee, 6)} + NETWORK ~{formatSol(networkFeeLamports, 6)}</>
-              : <>SERVICE + NETWORK</>}
-          </small>
+          <div className="closer-stage-guard"><span>NOTHING CLOSED</span><span>OWNER VERIFIED</span><span>DRY-RUN FIRST</span></div>
         </div>
         <a className="hero-scroll-cue" href="#reduction">MORE DETAILS <span>↓</span></a>
       </section>
