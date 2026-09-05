@@ -698,3 +698,39 @@ a.battle-card:hover{opacity:1}
   .ca-addr .ca-short{display:inline}
   .ca-link{display:none}
 }
+
+/* Phone layout for the stage ladder. The six-column table turns into one card
+   per gate, labelled from data-label, so nothing scrolls sideways to be read. */
+@media(max-width:640px){
+  .stage-ladder{overflow-x:visible}
+  .ladder-rows{min-width:0}
+  .ladder-row.legend{display:none}
+  .ladder-row{grid-template-columns:1fr;gap:0;padding:0;border-bottom:1px solid #2b3a2e}
+  .ladder-row:last-child{border-bottom:0}
+  .ladder-row>span{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:9px 14px;border-top:1px solid #1b251d}
+  .ladder-row>span:before{content:attr(data-label);flex:none;color:#6e8575;font-size:9px;letter-spacing:.1em}
+  .ladder-row>span:first-child{justify-content:flex-start;padding:11px 14px;border-top:0;background:#0a110b;color:#c3d2c0;font-size:11px;letter-spacing:.08em}
+  .ladder-row>span:first-child:before{content:none}
+  .ladder-row>span:last-child{font-size:10px}
+  .ladder-head{align-items:flex-start;flex-direction:column;gap:9px}
+}
+
+/* The ledger tiles are sized for a wide grid; on a phone the display type and
+   the reserved heights both have to come down or each tile reads as a screen. */
+@media(max-width:640px){
+  .ledger-screen{min-height:0;padding:18px}
+  .ledger-screen.primary{min-height:0;box-shadow:5px 5px 0 #1e3b22}
+  .ledger-screen>strong{margin:22px 0 12px;font-size:44px}
+  .ledger-screen.primary>strong{font-size:52px}
+  .ledger-screen>strong em{margin-top:9px;font-size:13px}
+  .ledger-screen.primary>strong em{font-size:14px}
+  .ledger-screen.locked>strong{gap:12px}
+}
+
+/* Scroll reveal. The hidden state only applies once the observer is running
+   (html.reveal-ready), so with JS off or blocked every section renders as-is. */
+.reveal-ready [data-reveal]{opacity:0;transform:translateY(20px);transition:opacity .6s cubic-bezier(.22,.61,.36,1),transform .6s cubic-bezier(.22,.61,.36,1)}
+.reveal-ready [data-reveal].revealed{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  .reveal-ready [data-reveal]{opacity:1;transform:none;transition:none}
+}

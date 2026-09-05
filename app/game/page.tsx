@@ -35,6 +35,7 @@ import { TokenPortrait } from '../token-portrait';
 import { BrandMark } from '../brand-mark';
 import { ToolToggle } from './tool-toggle';
 import { CoinBar } from '../coin-bar';
+import { ScrollReveal } from '../scroll-reveal';
 
 type QuestState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'reclaiming' | 'won' | 'error' | 'demo';
 
@@ -307,6 +308,7 @@ export default function GamePrototype() {
   return (
     <main className={`game-shell quest-${quest} ${accounts.length ? 'has-loot' : 'no-loot'}`}>
       <CoinBar />
+      <ScrollReveal />
       <nav className="game-nav">
         <a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a>
         <ToolToggle mode="reclaim" />
@@ -539,11 +541,11 @@ export default function GamePrototype() {
               return (
                 <div key={stage.id} className={`ladder-row stage-${state}`}>
                   <span><i />{stage.id}</span>
-                  <span>{stage.lamportsPerByte.toLocaleString('en-US')}</span>
-                  <span>{formatSol(floor, 8)} SOL</span>
-                  <span>{formatSol(LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS - floor, 8)} SOL</span>
-                  <span>−{stageReductionPercent(stage.lamportsPerByte)}%</span>
-                  <span title={stage.eta || stage.declared}>{state === 'live' ? 'MAINNET' : stage.short}</span>
+                  <span data-label="LAMPORTS / BYTE">{stage.lamportsPerByte.toLocaleString('en-US')}</span>
+                  <span data-label="FLOOR · 165 B">{formatSol(floor, 8)} SOL</span>
+                  <span data-label="SURPLUS / ACCOUNT">{formatSol(LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS - floor, 8)} SOL</span>
+                  <span data-label="CUT">−{stageReductionPercent(stage.lamportsPerByte)}%</span>
+                  <span data-label="STATUS" title={stage.eta || stage.declared}>{state === 'live' ? 'MAINNET' : stage.short}</span>
                 </div>
               );
             })}

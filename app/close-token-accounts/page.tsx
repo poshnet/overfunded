@@ -10,6 +10,7 @@ import { StageAmount, type AmountMode } from '../game/stage-amount';
 import { RENT_SOURCE_URL } from '../game/solana-reclaim';
 import { TokenPortrait } from '../token-portrait';
 import { CoinBar } from '../coin-bar';
+import { ScrollReveal } from '../scroll-reveal';
 import {
   calculateServiceFeeLamports,
   closeTokenAccounts,
@@ -235,6 +236,7 @@ export default function CloseTokenAccountsPage() {
   return (
     <main className={`game-shell closer-shell closer-${state} ${accounts.length ? 'has-closers' : 'no-closers'}`}>
       <CoinBar />
+      <ScrollReveal />
       <nav className="game-nav">
         <a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a>
         <ToolToggle mode="close" />
