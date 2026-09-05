@@ -34,6 +34,7 @@ import { ToolCompare } from '../tool-compare';
 import { TokenPortrait } from '../token-portrait';
 import { BrandMark } from '../brand-mark';
 import { ToolToggle } from './tool-toggle';
+import { CoinBar } from '../coin-bar';
 
 type QuestState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'reclaiming' | 'won' | 'error' | 'demo';
 
@@ -305,6 +306,7 @@ export default function GamePrototype() {
 
   return (
     <main className={`game-shell quest-${quest} ${accounts.length ? 'has-loot' : 'no-loot'}`}>
+      <CoinBar />
       <nav className="game-nav">
         <a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a>
         <ToolToggle mode="reclaim" />
@@ -408,12 +410,6 @@ export default function GamePrototype() {
                   <i key={stage.id} className={index <= stageIndex ? 'on' : ''} />
                 ))}
               </div>
-
-              <div className="rollout-values">
-                <div><span>CURRENT FLOOR / ACCOUNT</span><b>{liveFloorLamports === null ? '—' : formatSol(liveFloorLamports, 8)}</b></div>
-                <div className="rollout-target"><span>UNLOCKED NOW / ACCOUNT</span><b>{perAccountUnlockedLamports === null ? '—' : `+${formatSol(perAccountUnlockedLamports, 8)}`}</b></div>
-              </div>
-              <a className="rollout-more" href="#rollout">SEE THE 5-STAGE ROLLOUT <span>↓</span></a>
             </div>
             <div className="game-actions">
               <button className="scan-primary" type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN ▶</button>

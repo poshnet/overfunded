@@ -331,11 +331,6 @@ a.hero-mech i{flex:none;color:var(--g-lime);font-size:14px;font-style:normal}
 .rollout-panel.rollout-compact{max-width:600px;margin-top:20px}
 .rollout-compact .rollout-head{padding:11px 13px}
 .rollout-compact .rollout-pips{padding:0 13px 11px}
-.rollout-compact .rollout-values{grid-template-columns:repeat(2,1fr)}
-.rollout-compact .rollout-values>div{min-height:62px;padding:10px 13px}
-.rollout-more{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-top:1px solid #2b3a2e;color:var(--g-lime);font-size:10px;font-weight:900;letter-spacing:.11em;text-decoration:none}
-.rollout-more:hover{background:rgba(170,255,62,.08)}
-.rollout-more span{font-size:14px}
 .game-actions{margin-top:22px}
 .game-actions a.game-text-link{min-width:0;padding:17px 5px;border:0;border-radius:0;background:transparent;color:var(--text-link,#a9bcac);text-decoration:underline;text-decoration-color:var(--text-link-rule,#5e765f);text-decoration-thickness:1px;text-underline-offset:5px;box-shadow:none}
 .game-actions a.game-text-link:hover{border:0;background:transparent;color:var(--g-lime);text-decoration-color:var(--g-lime)}
@@ -677,4 +672,29 @@ a.battle-card:hover{opacity:1}
   .game-stage-head{gap:10px;padding:13px 12px;font-size:8px}
   .game-stage-head span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .game-stage-head b{flex:none}
+}
+
+/* Contract-address bar. Sits above the nav on every tool page and is rendered
+   only once a mint address exists, so these rules are inert until launch. */
+.ca-bar{position:relative;z-index:6;display:flex;align-items:center;justify-content:center;gap:12px;min-height:34px;padding:6px clamp(15px,5vw,76px);border-bottom:1px solid var(--g-line);background:linear-gradient(90deg,rgba(170,255,62,.06),rgba(170,255,62,.13),rgba(170,255,62,.06));font-size:10px;letter-spacing:.1em}
+.ca-tag{display:inline-flex;flex:none;align-items:center;gap:7px;color:var(--g-lime);font-weight:900}
+.ca-tag i{width:6px;height:6px;border-radius:50%;background:var(--g-lime);box-shadow:0 0 7px var(--g-lime);animation:ca-pulse 2.2s ease-in-out infinite}
+@keyframes ca-pulse{0%,100%{opacity:1}50%{opacity:.22}}
+.ca-bar .ca-addr{display:inline-flex;min-width:0;align-items:center;gap:10px;padding:4px 9px;border:1px solid rgba(170,255,62,.3);border-radius:3px;background:rgba(5,8,6,.55);color:var(--g-cream);font-size:10px;letter-spacing:.04em;cursor:pointer;transition:border-color .15s ease,background .15s ease}
+.ca-bar .ca-addr:hover{border-color:var(--g-lime);background:rgba(170,255,62,.1)}
+.ca-addr>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ca-addr .ca-short{display:none}
+.ca-addr b{flex:none;color:var(--g-lime);font-size:9px;font-weight:900;letter-spacing:.12em}
+.ca-link{flex:none;color:var(--nav-stat,#6c8573);font-size:9px;font-weight:900;letter-spacing:.12em;text-decoration:none}
+.ca-link:hover{color:var(--g-lime)}
+.ca-live{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@media(min-width:641px){
+  .game-shell:has(.ca-bar) .game-hero{min-height:calc(100svh - 116px)}
+  .game-shell:has(.ca-bar) .closer-hero{min-height:max(680px,calc(100svh - 116px))}
+}
+@media(max-width:700px){
+  .ca-bar{gap:9px;padding:6px 15px}
+  .ca-addr .ca-full{display:none}
+  .ca-addr .ca-short{display:inline}
+  .ca-link{display:none}
 }
