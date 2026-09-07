@@ -69,3 +69,208 @@
 .lab-v6 .chest-glow{filter:none;opacity:.3}
 .lab-v6 .chest-body i{border-radius:0;border-width:6px;background:var(--g-gold);box-shadow:none}
 .lab-v6 .chest-body i:after{display:none}
+
+/* ---- v7 refined chest: the current silhouette, properly finished ---- */
+.lab-v7{--chest-lid-a:#2f5c2a;--chest-lid-b:#3d7534;--chest-lid-top:#8ad04f;--chest-body-a:#24451f;--chest-body-b:#2f5a28;--chest-band:#d8b24a;--chest-ink:#060c07}
+.lab-v7 .chest-lid{box-shadow:0 -4px 0 var(--chest-lid-top),inset 0 3px 0 rgba(255,255,255,.22),inset 0 -10px 18px rgba(0,0,0,.35)}
+.lab-v7 .chest-body{box-shadow:0 8px 0 #030603,inset 0 3px 0 rgba(255,255,255,.10),inset 0 -14px 22px rgba(0,0,0,.5)}
+.lab-v7 .chest-body:before{background:linear-gradient(180deg,#f0d382,var(--chest-band) 45%,#9c7a24)}
+.lab-v7 .chest-body i{border-color:#3a2c08;background:linear-gradient(180deg,#fff3bd,#e3bd52 42%,#8f6f1c);box-shadow:inset 0 2px 0 rgba(255,255,255,.7),0 4px 0 rgba(0,0,0,.5)}
+.lab-v7 .chest-glow{opacity:.4}
+
+/* ---- v8 vault door: circular steel, swings on its hinge ---- */
+.lab-v8 .chest-lid{left:38px;top:44px;width:184px;height:184px;border:9px solid #0a0e10;border-radius:50%;transform-origin:14% 50%;background:radial-gradient(circle at 34% 30%,#8d9aa3,#4a555d 46%,#232a2f);box-shadow:inset 0 0 0 10px #39434a,inset 0 0 34px rgba(0,0,0,.6)}
+.lab-v8 .chest-lid:before,.lab-v8 .chest-lid:after{display:none}
+.lab-v8 .chest-body{left:30px;top:36px;width:200px;height:200px;border:8px solid #0a0e10;border-radius:50%;background:radial-gradient(circle,#141a1e,#080b0d);box-shadow:0 8px 0 #04070a}
+.lab-v8 .chest-body:before,.lab-v8 .chest-body:after{display:none}
+.lab-v8 .chest-body i{top:74px;width:52px;height:52px;border:7px solid #0a0e10;border-radius:50%;background:conic-gradient(#c9d3da,#6d777e,#c9d3da,#6d777e,#c9d3da);box-shadow:0 0 0 5px #2b3439}
+.lab-v8 .chest-body i:before{top:6px;left:50%;width:6px;height:6px;background:#0a0e10}
+.lab-v8 .chest-body i:after{display:none}
+.lab-v8.lab-cell .chest-glow{--chest-glow:rgba(150,200,255,.28)}
+.lab .lab-v8 .lab-open .chest-lid,.lab-v8 .lab-open .chest-lid{animation:vault-swing .55s cubic-bezier(.16,.84,.3,1) .12s both}
+@keyframes vault-swing{0%{transform:rotateY(0)}100%{transform:rotateY(-108deg)}}
+
+/* ---- v9 deposit safe: square door, lever handle ---- */
+.lab-v9 .chest-lid{left:36px;top:52px;width:188px;height:170px;border:9px solid #0b0d0f;border-radius:8px;transform-origin:8% 50%;background:linear-gradient(135deg,#5a646b,#2b3238 55%,#1b2126);box-shadow:inset 0 0 0 8px #3b444a}
+.lab-v9 .chest-lid:before,.lab-v9 .chest-lid:after{display:none}
+.lab-v9 .chest-body{left:28px;top:44px;width:204px;height:186px;border:8px solid #0b0d0f;border-radius:10px;background:linear-gradient(180deg,#121719,#080b0c)}
+.lab-v9 .chest-body:before,.lab-v9 .chest-body:after{display:none}
+.lab-v9 .chest-body i{top:60px;left:auto;right:22px;width:20px;height:74px;transform:none;border:6px solid #0b0d0f;border-radius:10px;background:linear-gradient(180deg,#e6ebee,#8b959b);box-shadow:0 3px 0 rgba(0,0,0,.5)}
+.lab-v9 .chest-body i:before,.lab-v9 .chest-body i:after{display:none}
+.lab-v9 .lab-open .chest-lid{animation:vault-swing .5s cubic-bezier(.16,.84,.3,1) .12s both}
+
+/* ---- v10 geode: faceted crystal splitting on its seam ---- */
+.lab-v10 .chest-lid{left:44px;top:34px;width:172px;height:104px;border:0;border-radius:0;transform-origin:50% 100%;clip-path:polygon(50% 0,100% 42%,82% 100%,18% 100%,0 42%);background:linear-gradient(160deg,#d8ffa8,#8ce03c 40%,#3f7a18);box-shadow:none}
+.lab-v10 .chest-lid:before,.lab-v10 .chest-lid:after{display:none}
+.lab-v10 .chest-body{left:44px;top:132px;width:172px;height:96px;border:0;border-radius:0;clip-path:polygon(18% 0,82% 0,100% 52%,50% 100%,0 52%);background:linear-gradient(200deg,#2f6415,#123f08);box-shadow:none}
+.lab-v10 .chest-body:before,.lab-v10 .chest-body:after{display:none}
+.lab-v10 .chest-body i{top:20px;width:30px;height:30px;border:0;border-radius:50%;background:radial-gradient(circle,#f6ffdf,#aaff3e 55%,transparent 72%);box-shadow:0 0 26px rgba(170,255,62,.9)}
+.lab-v10 .chest-body i:before,.lab-v10 .chest-body i:after{display:none}
+.lab-v10 .chest-glow{opacity:.75;filter:blur(14px)}
+.lab-v10 .lab-open .chest-lid{animation:geode-split .5s cubic-bezier(.2,.9,.3,1) .1s both}
+@keyframes geode-split{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(-54px) rotate(-11deg)}}
+
+/* ---- v11 dispenser: no fantasy, just hardware ---- */
+.lab-v11 .chest-lid{left:46px;top:74px;width:168px;height:26px;border:0;border-radius:13px;transform-origin:50% 50%;background:linear-gradient(180deg,#20282a,#0d1214);box-shadow:inset 0 2px 0 rgba(255,255,255,.12),0 0 22px rgba(170,255,62,.28)}
+.lab-v11 .chest-lid:before{content:'';position:absolute;left:16px;right:16px;top:9px;bottom:9px;border-radius:5px;background:#050807;box-shadow:inset 0 0 12px rgba(170,255,62,.55)}
+.lab-v11 .chest-lid:after{display:none}
+.lab-v11 .chest-body{left:38px;top:92px;width:184px;height:132px;border:2px solid #1d2426;border-radius:18px;background:linear-gradient(180deg,#161d1f,#0a0e0f);box-shadow:0 10px 0 rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08)}
+.lab-v11 .chest-body:before{left:26px;right:26px;top:34px;height:5px;border:0;border-radius:3px;background:#2a3436}
+.lab-v11 .chest-body:after{display:none}
+.lab-v11 .chest-body i{top:60px;width:64px;height:10px;border:0;border-radius:5px;background:var(--g-lime);box-shadow:0 0 18px rgba(170,255,62,.8)}
+.lab-v11 .chest-body i:before,.lab-v11 .chest-body i:after{display:none}
+.lab-v11 .lab-open .chest-lid{animation:slot-open .34s cubic-bezier(.2,1.3,.4,1) .1s both}
+@keyframes slot-open{0%{transform:scaleY(1)}55%{transform:scaleY(.18) translateY(-3px)}100%{transform:scaleY(.28) translateY(-4px)}}
+
+/* ---- share card workbench ---- */
+.lab-field{display:flex;align-items:center;gap:8px;color:#6f8574;font-size:9px;letter-spacing:.14em}
+.lab-field input{width:110px;padding:11px 10px;border:1px solid #3a4d34;border-radius:3px;background:#0d130e;color:#e6efe2;font:inherit;font-size:12px}
+.lab-link{display:inline-flex;align-items:center;padding:12px 16px;border:1px solid #aaff3e;border-radius:3px;background:#aaff3e;color:#071008;font-size:10px;font-weight:900;letter-spacing:.1em;text-decoration:none}
+.share-treatments{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.share-treatments button{display:flex;flex-direction:column;gap:5px;padding:12px 15px;border:1px solid #2b3a2e;border-radius:3px;background:#0d130e;color:#8fa093;font:inherit;text-align:left;cursor:pointer}
+.share-treatments button b{color:#dfe8d8;font-size:11px;letter-spacing:.1em}
+.share-treatments button span{font-family:Arial,sans-serif;font-size:11px}
+.share-treatments button.on{border-color:#aaff3e}
+.share-treatments button.on b{color:#aaff3e}
+.share-stage{margin-top:22px;padding:18px;border:1px solid #2b3a2e;background:#0a0f0b}
+
+.lab-section{margin:52px 0 -6px;padding-top:30px;border-top:1px solid #263528;color:#dfe8d8;font-family:Arial,sans-serif;font-size:20px;letter-spacing:-.01em}
+
+/* ---- Lid studies. All sit on the iron-banded body (.lab-v5), so only the lid
+   changes and the comparison is honest. Each keeps the 136px hinge line. ---- */
+.lab-lid1 .chest-lid{/* barrel: inherits the shipping shape, kept as reference */}
+
+/* Flat strongbox top with a band across the face. */
+.lab-lid2 .chest-lid{top:82px;height:54px;border-radius:7px 7px 5px 5px;background:
+  linear-gradient(#1b2417,#1b2417) 24px 0/13px 100% no-repeat,
+  linear-gradient(#1b2417,#1b2417) calc(100% - 37px) 0/13px 100% no-repeat,
+  linear-gradient(#232e1d,#232e1d) 0 19px/100% 12px no-repeat,
+  linear-gradient(180deg,rgba(255,255,255,.14),rgba(0,0,0,.16)),
+  repeating-linear-gradient(90deg,var(--chest-lid-a) 0 25px,var(--chest-lid-b) 25px 50px)}
+
+/* Arched, with a wide iron keystone at the crown. */
+.lab-lid3 .chest-lid:after{width:54px;margin-left:-27px;border-radius:30px 30px 4px 4px;background:linear-gradient(180deg,#2b3722,#151d11);border-left-width:4px;border-right-width:4px}
+.lab-lid3 .chest-lid{background:
+  linear-gradient(90deg,rgba(0,0,0,.4),transparent 22%,transparent 78%,rgba(0,0,0,.4)),
+  linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.02) 58%,rgba(0,0,0,.14)),
+  repeating-linear-gradient(90deg,var(--chest-lid-a) 0 25px,var(--chest-lid-b) 25px 50px)}
+
+/* Three iron ribs following the curve. */
+.lab-lid4 .chest-lid{background:
+  linear-gradient(#1b2417,#1b2417) 0 12px/100% 9px no-repeat,
+  linear-gradient(#1b2417,#1b2417) 0 30px/100% 9px no-repeat,
+  linear-gradient(#1b2417,#1b2417) 0 48px/100% 9px no-repeat,
+  linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.02) 60%,rgba(0,0,0,.16)),
+  repeating-linear-gradient(90deg,var(--chest-lid-a) 0 25px,var(--chest-lid-b) 25px 50px)}
+.lab-lid4 .chest-lid:after{width:20px;margin-left:-10px}
+
+/* Cooper-built: narrow staves with dark seams between them. */
+.lab-lid5 .chest-lid{background:
+  repeating-linear-gradient(90deg,rgba(0,0,0,.55) 0 3px,transparent 3px 21px),
+  linear-gradient(90deg,rgba(0,0,0,.4),transparent 20%,transparent 80%,rgba(0,0,0,.4)),
+  linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.02) 58%,rgba(0,0,0,.12)),
+  repeating-linear-gradient(90deg,var(--chest-lid-a) 0 21px,var(--chest-lid-b) 21px 42px)}
+
+/* Shallow arc with a heavy overhanging iron trim along the bottom edge. */
+.lab-lid6 .chest-lid{left:24px;width:212px;top:84px;height:52px;border-radius:120px 120px 5px 5px/46px 46px 5px 5px;box-shadow:0 -4px 0 var(--chest-lid-top),0 5px 0 #10170d}
+.lab-lid6 .chest-lid:before{height:11px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.75))}
+.lab-lid6 .chest-lid:after{width:22px;margin-left:-11px;border-radius:9px 9px 0 0}
+
+/* Peaked roof line instead of a curve. */
+.lab-lid7 .chest-lid{top:56px;height:80px;border:0;border-radius:0;clip-path:polygon(50% 0,100% 58%,100% 100%,0 100%,0 58%);background:
+  linear-gradient(#1b2417,#1b2417) 24px 0/12px 100% no-repeat,
+  linear-gradient(#1b2417,#1b2417) calc(100% - 36px) 0/12px 100% no-repeat,
+  linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.03) 55%,rgba(0,0,0,.2)),
+  repeating-linear-gradient(90deg,var(--chest-lid-a) 0 25px,var(--chest-lid-b) 25px 50px)}
+.lab-lid7 .chest-lid:before,.lab-lid7 .chest-lid:after{display:none}
+
+/* ---- Coin studies. Two axes throughout: the wrapper carries horizontal motion
+   and opacity, the disc inside carries vertical motion and spin, because one
+   timing function cannot both decelerate upward and accelerate downward. ---- */
+
+/* coin1 inherits the shipping animation and is the reference. */
+
+/* 2 — thrown out hard, then gravity wins and they fall past the chest. */
+.lab-coin2 .coin{animation:c2x 1.5s linear both}
+.lab-coin2 .coin i{animation-name:c2y}
+@keyframes c2x{
+  0%{opacity:1;z-index:1;transform:translateX(var(--sx)) scale(.5)}
+  10%{z-index:5;transform:translateX(calc(var(--sx) + var(--cx) * 1.4)) scale(1.1)}
+  40%{transform:translateX(calc(var(--sx) + var(--cx) * 2.6)) scale(1)}
+  80%{opacity:1;transform:translateX(calc(var(--sx) + var(--cx) * 3.4))}
+  100%{opacity:0;transform:translateX(calc(var(--sx) + var(--cx) * 3.8))}
+}
+@keyframes c2y{
+  0%{transform:translateY(0) rotate(0);animation-timing-function:cubic-bezier(.06,.85,.3,1)}
+  34%{transform:translateY(var(--cy)) rotate(calc(var(--rot) * .5));animation-timing-function:cubic-bezier(.55,0,.85,.5)}
+  100%{transform:translateY(120px) rotate(var(--rot))}
+}
+
+/* 3 — a fountain: out of the mouth, over, and back down inside it. */
+.lab-coin3 .coin{animation:c3x 1.35s linear both}
+.lab-coin3 .coin i{animation-name:c3y}
+@keyframes c3x{
+  0%{opacity:1;z-index:1;transform:translateX(var(--sx))}
+  12%{z-index:5;transform:translateX(calc(var(--sx) + var(--cx) * .4))}
+  86%{opacity:1;transform:translateX(calc(var(--sx) + var(--cx)))}
+  88%{z-index:1;opacity:1}
+  100%{opacity:0;transform:translateX(calc(var(--sx) + var(--cx)))}
+}
+@keyframes c3y{
+  0%{transform:translateY(0) rotate(0);animation-timing-function:cubic-bezier(.1,.62,.32,1)}
+  44%{transform:translateY(var(--cy)) rotate(calc(var(--rot) * .5));animation-timing-function:cubic-bezier(.5,.02,.82,.6)}
+  100%{transform:translateY(24px) rotate(var(--rot))}
+}
+
+/* 4 — rising while circling an axis. The X pass is a full sine period. */
+.lab-coin4 .coin{animation:c4x 1.9s ease-in-out both}
+.lab-coin4 .coin i{animation-name:c4y}
+@keyframes c4x{
+  0%{opacity:1;z-index:1;transform:translateX(var(--sx))}
+  12%{z-index:5;opacity:1}
+  25%{transform:translateX(calc(var(--sx) + var(--cx) * 1.6))}
+  50%{transform:translateX(var(--sx))}
+  75%{transform:translateX(calc(var(--sx) - var(--cx) * 1.6))}
+  90%{opacity:1;transform:translateX(var(--sx))}
+  100%{opacity:0;transform:translateX(var(--sx))}
+}
+@keyframes c4y{
+  0%{transform:translateY(0) rotate(0);animation-timing-function:linear}
+  100%{transform:translateY(calc(var(--cy) * 1.15)) rotate(calc(var(--rot) * 2))}
+}
+
+/* 5 — barely clears the lip, then tumbles down the front of the chest. */
+.lab-coin5 .coin{animation:c5x 1.6s linear both}
+.lab-coin5 .coin i{animation-name:c5y}
+@keyframes c5x{
+  0%{opacity:1;z-index:1;transform:translateX(calc(var(--sx) * .4)) scale(.6)}
+  16%{z-index:5;transform:translateX(calc(var(--sx) * .8)) scale(1)}
+  100%{opacity:0;transform:translateX(var(--sx))}
+}
+@keyframes c5y{
+  0%{transform:translateY(0) rotate(0);animation-timing-function:cubic-bezier(.2,.8,.4,1)}
+  26%{transform:translateY(-34px) rotate(calc(var(--rot) * .3));animation-timing-function:cubic-bezier(.5,0,.9,.6)}
+  100%{transform:translateY(96px) rotate(var(--rot))}
+}
+
+/* 6 — a tight column that only spreads once it is above the chest. */
+.lab-coin6 .coin{animation:c6x 1.7s linear both}
+.lab-coin6 .coin i{animation-name:c6y}
+@keyframes c6x{
+  0%{opacity:1;z-index:1;transform:translateX(calc(var(--sx) * .12)) scale(.55)}
+  14%{z-index:5;transform:translateX(calc(var(--sx) * .16)) scale(1)}
+  55%{transform:translateX(calc(var(--sx) * .3))}
+  100%{opacity:0;transform:translateX(calc(var(--sx) * 1.9 + var(--cx)))}
+}
+@keyframes c6y{
+  0%{transform:translateY(0) rotate(0);animation-timing-function:cubic-bezier(.02,.9,.2,1)}
+  62%{transform:translateY(calc(var(--cy) * 1.5)) rotate(calc(var(--rot) * .7));animation-timing-function:ease-out}
+  100%{transform:translateY(calc(var(--cy) * 1.7)) rotate(var(--rot))}
+}
+
+/* Controls follow you down the page: the grids are long, and an animation that
+   has already finished by the time you scroll to it cannot be judged. */
+.lab-head{position:sticky;top:0;z-index:5;background:#050806;backdrop-filter:blur(6px)}
+.lab-cell{cursor:pointer}
+.lab-cell:hover{border-color:#3d5540}
+.lab-cell figcaption b:after{content:' · click to replay';color:#5c6d60;font-size:9px;font-weight:400;letter-spacing:.04em}

@@ -308,7 +308,7 @@
 .closer-chest{
   --chest-lid-a:#7c3f28;--chest-lid-b:#a05536;--chest-lid-top:#d78d6e;
   --chest-body-a:#6b3623;--chest-body-b:#8b4a30;--chest-band:#e8a17f;
-  --chest-ink:#180d09;--chest-band-glow:rgba(226,141,105,.45);--chest-lock:#f1b796;
+  --chest-ink:#180d09;--chest-band-glow:rgba(226,141,105,.45);--chest-strap:#2a1410;--chest-band-iron:#3a1d16;--chest-lock:#f1b796;
   --chest-glow:rgba(226,141,105,.34);
 }
 .closer-chest .coin i{background:#f1b796;border-color:#2a1811;color:#2a1811}
@@ -326,8 +326,8 @@
 
 /* Empty accounts found: the lid opens and the rent pours out. */
 .has-closers.closer-ready .closer-chest .chest-lid,.closer-demo .closer-chest .chest-lid,.has-closers.closer-closing .closer-chest .chest-lid,.closer-won .closer-chest .chest-lid{animation:chest-lid-open .38s linear .16s both}
-.has-closers.closer-ready .closer-chest .coin,.closer-demo .closer-chest .coin,.has-closers.closer-closing .closer-chest .coin{animation:coin-x 1.25s linear both}
-.closer-won .closer-chest .coin{animation:coin-x 1.1s linear both}
+.has-closers.closer-ready .closer-chest .coin,.closer-demo .closer-chest .coin,.has-closers.closer-closing .closer-chest .coin{animation:coin-x 1.35s linear both}
+.closer-won .closer-chest .coin{animation:coin-x 1.2s linear both}
 .has-closers.closer-ready .closer-chest .chest-glow,.closer-demo .closer-chest .chest-glow{animation:chest-glow-flare .6s ease-out both}
 .closer-won .closer-chest .chest-glow{animation:chest-glow-win 1.1s ease-out both}
 .closer-won .closer-chest{animation:chest-pop .5s cubic-bezier(.34,1.5,.64,1) both}
