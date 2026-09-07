@@ -3,7 +3,7 @@ import { apiJson, preflight } from './shared';
 export const dynamic = 'force-dynamic';
 
 /** Index so the API is discoverable without documentation. */
-export function GET() {
+export function GET(request: Request) {
   return apiJson({
     name: 'Overfunded API',
     version: '1',
@@ -20,7 +20,7 @@ export function GET() {
     ],
     limits: '60 requests per minute per IP.',
     source: 'https://github.com/poshnet/overfunded',
-  }, 200, 3600);
+  }, 200, 3600, request);
 }
 
 export function OPTIONS() {

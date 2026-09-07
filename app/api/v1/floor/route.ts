@@ -18,12 +18,12 @@ export const dynamic = 'force-dynamic';
  * original schedule. Cacheable: it only moves when a SIMD-0437 gate activates.
  */
 export async function GET(request: Request) {
-  if (!withinRateLimit(request)) return apiError('Too many requests. Try again shortly.', 429);
+  if (!withinRateLimit(request)) return apiError('Too many requests. Try again shortly.', 429, request);
 
   const raw = new URL(request.url).searchParams.get('space');
   const space = raw === null ? TOKEN_ACCOUNT_SPACE : Number(raw);
   if (!Number.isInteger(space) || space < 0 || space > 10_485_760) {
-    return apiError('space must be a whole number of bytes between 0 and 10485760.', 400);
+    return apiError('space must be a whole number of bytes between 0 and 10485760.', 400, request);
   }
 
   try {
@@ -41,9 +41,9 @@ export async function GET(request: Request) {
       lamportsPerByte,
       legacyRentLamports: space === TOKEN_ACCOUNT_SPACE ? LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS : null,
       surplusPerAccountLamports: surplusLamports,
-    }, 200, 300);
+    }, 200, 300, request);
   } catch (error) {
-    return apiError(error instanceof Error ? error.message : 'Floor lookup failed.', 502);
+    return apiError(error instanceof Error ? error.message : 'Floor lookup failed.', 502, request);
   }
 }
 

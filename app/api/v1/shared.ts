@@ -97,8 +97,22 @@ export const CORS_HEADERS = {
   'access-control-max-age': '86400',
 };
 
-export function apiJson(body: unknown, status = 200, cacheSeconds = 0) {
-  return new Response(JSON.stringify(body, null, 2), {
+/**
+ * Indented output is for people, not programs. A browser opening the URL gets
+ * something readable; anything else gets the compact form, which on a wallet
+ * with a few thousand accounts is around 30% less to transfer.
+ */
+function wantsPretty(request?: Request) {
+  if (!request) return false;
+  const url = new URL(request.url);
+  const flag = url.searchParams.get('pretty');
+  if (flag !== null) return flag !== '0' && flag !== 'false';
+  return (request.headers.get('accept') || '').includes('text/html');
+}
+
+export function apiJson(body: unknown, status = 200, cacheSeconds = 0, request?: Request) {
+  const pretty = wantsPretty(request);
+  return new Response(pretty ? JSON.stringify(body, null, 2) : JSON.stringify(body), {
     status,
     headers: {
       ...CORS_HEADERS,
@@ -108,8 +122,8 @@ export function apiJson(body: unknown, status = 200, cacheSeconds = 0) {
   });
 }
 
-export function apiError(message: string, status: number) {
-  return apiJson({ error: message }, status);
+export function apiError(message: string, status: number, request?: Request) {
+  return apiJson({ error: message }, status, 0, request);
 }
 
 export function preflight() {

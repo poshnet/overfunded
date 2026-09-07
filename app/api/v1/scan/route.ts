@@ -28,11 +28,11 @@ type ParsedTokenAccount = {
  * it signs nothing and moves nothing.
  */
 export async function GET(request: Request) {
-  if (!withinRateLimit(request)) return apiError('Too many requests. Try again shortly.', 429);
+  if (!withinRateLimit(request)) return apiError('Too many requests. Try again shortly.', 429, request);
 
   const wallet = new URL(request.url).searchParams.get('wallet');
   if (!isValidPubkey(wallet)) {
-    return apiError('Pass ?wallet= with a base58 Solana address.', 400);
+    return apiError('Pass ?wallet= with a base58 Solana address.', 400, request);
   }
 
   try {
@@ -82,9 +82,9 @@ export async function GET(request: Request) {
       totalExcessSol: totalExcessLamports / 1e9,
       legacyRentLamports: LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS,
       accounts,
-    });
+    }, 200, 0, request);
   } catch (error) {
-    return apiError(error instanceof Error ? error.message : 'Scan failed.', 502);
+    return apiError(error instanceof Error ? error.message : 'Scan failed.', 502, request);
   }
 }
 
