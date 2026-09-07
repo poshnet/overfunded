@@ -129,3 +129,72 @@ export function apiError(message: string, status: number, request?: Request) {
 export function preflight() {
   return new Response(null, { status: 204, headers: CORS_HEADERS });
 }
+
+export type ReclaimableAccount = {
+  address: string;
+  dataLength: number;
+  lamports: number;
+  mint: string;
+  program: 'token' | 'token-2022';
+  rentFloorLamports: number;
+  excessLamports: number;
+};
+
+type ParsedTokenAccount = {
+  pubkey: string;
+  account: {
+    lamports: number;
+    data: { parsed?: { info?: { mint?: string; owner?: string; isNative?: boolean } }; space?: number };
+  };
+};
+
+/**
+ * Every token account the wallet owns that sits above the current rent floor.
+ * Shared by the scan and instruction endpoints so they can never disagree about
+ * what is reclaimable.
+ */
+export async function findReclaimable(wallet: string) {
+  const [legacy, token2022] = await Promise.all([
+    rpc<{ value: ParsedTokenAccount[] }>('getTokenAccountsByOwner',
+      [wallet, { programId: TOKEN_PROGRAM_ID }, { encoding: 'jsonParsed', commitment: 'confirmed' }]),
+    rpc<{ value: ParsedTokenAccount[] }>('getTokenAccountsByOwner',
+      [wallet, { programId: TOKEN_2022_PROGRAM_ID }, { encoding: 'jsonParsed', commitment: 'confirmed' }]),
+  ]);
+
+  const candidates = [
+    ...legacy.value.map(entry => ({ entry, program: 'token' as const })),
+    ...token2022.value.map(entry => ({ entry, program: 'token-2022' as const })),
+  ].flatMap(({ entry, program }) => {
+    const info = entry.account.data.parsed?.info;
+    // Wrapped SOL is excluded: its lamports are the token balance, not rent.
+    if (!info?.mint || info.owner !== wallet || info.isNative) return [];
+    return [{
+      address: entry.pubkey,
+      dataLength: entry.account.data.space ?? TOKEN_ACCOUNT_SPACE,
+      lamports: entry.account.lamports,
+      mint: info.mint,
+      program,
+    }];
+  });
+
+  const sizes = [...new Set(candidates.map(candidate => candidate.dataLength))];
+  const floors = new Map(await Promise.all(sizes.map(async size =>
+    [size, await rpc<number>('getMinimumBalanceForRentExemption', [size, { commitment: 'confirmed' }])] as const,
+  )));
+
+  const accounts: ReclaimableAccount[] = candidates.flatMap(candidate => {
+    const rentFloorLamports = floors.get(candidate.dataLength) ?? candidate.lamports;
+    const excessLamports = candidate.lamports - rentFloorLamports;
+    if (excessLamports <= 0) return [];
+    return [{ ...candidate, rentFloorLamports, excessLamports }];
+  }).sort((a, b) => b.excessLamports - a.excessLamports);
+
+  return { scannedCount: candidates.length, accounts };
+}
+
+/** WithdrawExcessLamports is opcode 38 on both token programs. */
+export const WITHDRAW_EXCESS_LAMPORTS_DISCRIMINATOR = 38;
+
+export function base64Byte(value: number) {
+  return btoa(String.fromCharCode(value));
+}

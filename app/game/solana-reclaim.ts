@@ -196,10 +196,50 @@ export type ClosableTokenAccount = {
   rawAmount: string;
   decimals: number;
   uiAmount: string;
+  /**
+   * Present when the mint is a Metaplex NFT whose metadata and master edition
+   * accounts exist and can be closed in the same burn. extraLamports is what
+   * those accounts hold, which is the majority of the rent.
+   */
+  nft?: { metadata: string; masterEdition: string; extraLamports: number };
 };
 
 /** Pro mode charges more because it is doing something irreversible. */
-export const PRO_SERVICE_FEE_PERCENT = 7;
+export const PRO_SERVICE_FEE_PERCENT = 4;
+
+/**
+ * Metaplex token metadata. Burning an NFT through BurnNft (opcode 29) closes its
+ * metadata and master edition accounts as well as the token account, which is
+ * where most of an NFT's rent actually sits — roughly 8.5M lamports against the
+ * token account's 2M. Closing only the token account leaves the rest orphaned
+ * on-chain forever, so pro mode uses the full burn wherever it applies.
+ */
+const METADATA_PROGRAM_ID = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
+const BURN_NFT_DISCRIMINATOR = 29;
+
+function metadataPda(mint: PublicKey) {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('metadata'), METADATA_PROGRAM_ID.toBuffer(), mint.toBuffer()],
+    METADATA_PROGRAM_ID,
+  )[0];
+}
+
+function masterEditionPda(mint: PublicKey) {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('metadata'), METADATA_PROGRAM_ID.toBuffer(), mint.toBuffer(), Buffer.from('edition')],
+    METADATA_PROGRAM_ID,
+  )[0];
+}
+
+/**
+ * Closing an empty account is the one thing every reclaim tool does identically,
+ * so it is the one price that gets compared. Priced just under the competing
+ * flat deduction of (rent - 2,000,000), which works out at ~1.93% on a standard
+ * account and far worse on larger ones. Withdrawal keeps the full rate because
+ * nothing else on Solana offers it.
+ */
+export const CLOSE_SERVICE_FEE_PERCENT = 1.75;
+const CLOSE_SERVICE_FEE_BASIS_POINTS = 175;
 
 export type WalletCloseScan = {
   accounts: ClosableTokenAccount[];
@@ -417,7 +457,7 @@ export async function scanClosableTokenAccounts(
   ];
   const ownerAddress = owner.toBase58();
 
-  const accounts = supported.flatMap(({ entry, program }) => {
+  const accounts: ClosableTokenAccount[] = supported.flatMap(({ entry, program }) => {
     const data = entry.account.data as ParsedAccountData;
     const info = data.parsed?.info as ParsedTokenInfo | undefined;
     const walletCanClose = !info?.closeAuthority || info.closeAuthority === ownerAddress;
@@ -444,6 +484,36 @@ export async function scanClosableTokenAccounts(
       uiAmount: info.tokenAmount?.uiAmountString ?? '0',
     }];
   }).sort((a, b) => b.recoverableLamports - a.recoverableLamports);
+
+  // A single NFT on the legacy Token program is the shape BurnNft handles. Its
+  // metadata and master edition hold several times what the token account does,
+  // so they are priced in before anyone decides what to burn.
+  const nftCandidates = accounts.filter(account => (
+    account.rawAmount === '1' && account.decimals === 0 && account.program === 'token'
+  ));
+  if (nftCandidates.length) {
+    const pdas = nftCandidates.map(account => {
+      const mint = new PublicKey(account.mint);
+      return { metadata: metadataPda(mint), masterEdition: masterEditionPda(mint) };
+    });
+    const infos = await connection.getMultipleAccountsInfo(
+      pdas.flatMap(pda => [pda.metadata, pda.masterEdition]),
+      'confirmed',
+    );
+    nftCandidates.forEach((account, index) => {
+      const metadata = infos[index * 2];
+      const masterEdition = infos[index * 2 + 1];
+      if (!metadata || !masterEdition) return;
+      if (!metadata.owner.equals(METADATA_PROGRAM_ID) || !masterEdition.owner.equals(METADATA_PROGRAM_ID)) return;
+      const extraLamports = metadata.lamports + masterEdition.lamports;
+      account.nft = {
+        metadata: pdas[index].metadata.toBase58(),
+        masterEdition: pdas[index].masterEdition.toBase58(),
+        extraLamports,
+      };
+      account.recoverableLamports += extraLamports;
+    });
+  }
 
   return { accounts, scannedCount: supported.length };
 }
@@ -551,6 +621,30 @@ async function getFreshCloseInstruction(
     : TOKEN_2022_CLOSE_DISCRIMINATOR;
 
   const instructions: TransactionInstruction[] = [];
+
+  // BurnNft does everything in one instruction: burns the token, closes the
+  // token account, and closes the metadata and master edition. Returning it here
+  // means the caller must not also send CloseAccount, so it returns early.
+  if (allowFunded && account.nft && onChainAmount === 1n && account.program === 'token') {
+    const mint = new PublicKey(freshAccount.data.subarray(0, 32));
+    return {
+      recoverableLamports: freshAccount.lamports + account.nft.extraLamports,
+      instructions: [new TransactionInstruction({
+        programId: METADATA_PROGRAM_ID,
+        keys: [
+          { pubkey: new PublicKey(account.nft.metadata), isSigner: false, isWritable: true },
+          { pubkey: authority, isSigner: true, isWritable: true },
+          { pubkey: mint, isSigner: false, isWritable: true },
+          { pubkey: source, isSigner: false, isWritable: true },
+          { pubkey: new PublicKey(account.nft.masterEdition), isSigner: false, isWritable: true },
+          { pubkey: expectedProgram, isSigner: false, isWritable: false },
+        ],
+        data: new Uint8Array([BURN_NFT_DISCRIMINATOR]) as unknown as Buffer,
+      })],
+      instruction: null,
+    };
+  }
+
   if (onChainAmount > 0n) {
     // Burn is opcode 8 on both programs: [account, mint, authority] and a u64.
     const burnData = new Uint8Array(9);
@@ -785,7 +879,7 @@ export async function closeTokenAccounts(
         batches[batchIndex].map(account => getFreshCloseInstruction(account, owner, proMode)),
       );
       const batchRecoveredLamports = freshAccounts.reduce((sum, account) => sum + account.recoverableLamports, 0);
-      const feeBasisPoints = proMode ? PRO_SERVICE_FEE_PERCENT * 100 : SERVICE_FEE_BASIS_POINTS;
+      const feeBasisPoints = proMode ? PRO_SERVICE_FEE_PERCENT * 100 : CLOSE_SERVICE_FEE_BASIS_POINTS;
       const chargeableFeeLamports = Math.floor(
         (batchRecoveredLamports * feeBasisPoints) / 10_000,
       );
@@ -794,7 +888,9 @@ export async function closeTokenAccounts(
 
       // A funded account costs two instructions instead of one, so the budget is
       // sized on what is actually being sent rather than the account count.
-      const closeInstructions = freshAccounts.flatMap(account => [...account.instructions, account.instruction]);
+      const closeInstructions = freshAccounts.flatMap(account => (
+        account.instruction ? [...account.instructions, account.instruction] : account.instructions
+      ));
       const latestBlockhash = await connection.getLatestBlockhash('confirmed');
       const transaction = new Transaction({
         feePayer: owner,
