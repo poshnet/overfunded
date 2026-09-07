@@ -34,25 +34,16 @@ import {
 } from '../game/solana-reclaim';
 
 const COIN_ARCS = [
-  { sx: -46, cx: -30, cy: -122, rot: -80, delay: 0.16 },
-  { sx: 22, cx: 24, cy: -132, rot: 95, delay: 0.19 },
-  { sx: -12, cx: -38, cy: -115, rot: -70, delay: 0.215 },
-  { sx: 52, cx: 26, cy: -128, rot: 110, delay: 0.24 },
-  { sx: -58, cx: -20, cy: -134, rot: -100, delay: 0.265 },
-  { sx: 8, cx: 40, cy: -118, rot: 75, delay: 0.29 },
-  { sx: -30, cx: -34, cy: -130, rot: -115, delay: 0.32 },
-  { sx: 40, cx: 18, cy: -124, rot: 90, delay: 0.345 },
-  { sx: -20, cx: 36, cy: -133, rot: -85, delay: 0.37 },
-  { sx: 58, cx: -30, cy: -120, rot: 105, delay: 0.395 },
-  { sx: -50, cx: 26, cy: -127, rot: -95, delay: 0.42 },
-  { sx: 32, cx: -30, cy: -131, rot: 80, delay: 0.445 },
-  // Stragglers. A few late, lower lobs so the burst tails off instead of
-  // stopping dead the moment the first wave clears the rim.
-  { sx: -36, cx: 20, cy: -124, rot: 70, delay: 0.58 },
-  { sx: 44, cx: -22, cy: -130, rot: -90, delay: 0.72 },
-  { sx: -8, cx: -28, cy: -118, rot: 100, delay: 0.86 },
-  { sx: 26, cx: 30, cy: -127, rot: -75, delay: 1.02 },
-  { sx: -54, cx: 16, cy: -121, rot: 85, delay: 1.24 },
+  { sx: -46, cx: -14, cy: -122, rot: -80, delay: 0.0 },
+  { sx: 22, cx: 12, cy: -132, rot: 95, delay: 0.03 },
+  { sx: -12, cx: -18, cy: -115, rot: -70, delay: 0.055 },
+  { sx: 52, cx: 14, cy: -128, rot: 110, delay: 0.08 },
+  { sx: -58, cx: -10, cy: -134, rot: -100, delay: 0.105 },
+  { sx: 8, cx: 20, cy: -118, rot: 75, delay: 0.13 },
+  { sx: -30, cx: -16, cy: -130, rot: -115, delay: 0.155 },
+  { sx: 40, cx: 8, cy: -124, rot: 90, delay: 0.18 },
+  { sx: -20, cx: 18, cy: -133, rot: -85, delay: 0.205 },
+  { sx: 32, cx: -14, cy: -120, rot: 80, delay: 0.23 },
 ];
 
 type CloserState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'closing' | 'won' | 'error' | 'demo';

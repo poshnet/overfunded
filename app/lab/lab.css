@@ -28,7 +28,7 @@
 
 /* Replay is driven by remounting the chest, so these need no state class. */
 .lab .lab-open .chest-lid{animation:chest-lid-open .38s linear .16s both}
-.lab .lab-open .coin{animation:coin-x 1.25s linear both}
+.lab .lab-open .coin{animation:coin-x 1.35s linear both}
 .lab .lab-open{animation:chest-punch .5s linear both}
 
 /* v2 — deeper dome. Bottom edge stays on the 136px hinge line. */
