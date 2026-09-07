@@ -407,3 +407,29 @@
 .pro-switch{padding:8px 13px;border:1px solid #693037;border-radius:3px;background:#160c09;color:#95666b;font:inherit;font-size:9px;font-weight:900;letter-spacing:.11em;cursor:pointer}
 .pro-switch:hover{border-color:var(--closer-red);color:var(--closer-red)}
 .closer-modebar.is-pro .pro-switch{border-color:var(--closer-red);background:var(--closer-red);color:#1d0e08}
+
+/* Pro mode sits with the results, where the decision is actually made. Burying
+   it in the mode bar meant the one thing people come here for was the one thing
+   they had to go looking for. */
+.pro-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px;padding:12px 14px;border:1px solid #4a2a2f;background:#160c09}
+.pro-bar>div{display:flex;min-width:0;flex-direction:column;gap:5px}
+.pro-bar b{color:#c9a08f;font-size:10px;letter-spacing:.11em}
+.pro-bar span{color:#8a6a63;font-family:Arial,sans-serif;font-size:11px;line-height:1.5}
+.pro-bar>button{flex:none;padding:11px 15px;border:1px solid var(--closer-red);border-radius:3px;background:transparent;color:var(--closer-red);font:inherit;font-size:10px;font-weight:900;letter-spacing:.1em;cursor:pointer}
+.pro-bar>button:hover{background:var(--closer-red);color:#1d0e08}
+.pro-bar>button:disabled{opacity:.5;cursor:default}
+.pro-bar.is-on{border-color:var(--closer-red);background:rgba(226,141,105,.1)}
+.pro-bar.is-on b{color:var(--closer-red)}
+.pro-bar.is-on>button{background:var(--closer-red);color:#1d0e08}
+
+/* Same offer from the dead end, where "nothing found" is usually wrong rather
+   than final: the rent is there, it is just sitting under an NFT. */
+.empty-upsell{display:flex;flex-direction:column;align-items:center;gap:9px;width:100%;margin-top:6px;padding:15px;border:1px solid #4a2a2f;background:#160c09;text-align:center}
+.empty-upsell b{color:#c9a08f;font-size:11px;letter-spacing:.06em}
+.empty-upsell span{max-width:44ch;color:#8a6a63;font-family:Arial,sans-serif;font-size:11px;line-height:1.6}
+.empty-upsell>button{margin-top:3px;padding:12px 18px;border:1px solid var(--closer-red);border-radius:3px;background:var(--closer-red);color:#1d0e08;font:inherit;font-size:10px;font-weight:900;letter-spacing:.1em;cursor:pointer}
+.empty-upsell>button:disabled{opacity:.5;cursor:default}
+@media(max-width:640px){
+  .pro-bar{align-items:flex-start;flex-direction:column;gap:10px}
+  .pro-bar>button{width:100%}
+}

@@ -182,7 +182,24 @@ export function CloserTool() {
     setNotice('Connect a wallet to find empty token accounts on Solana mainnet.');
   }
 
-  async function connectAndScan() {
+  function connectAndScan() {
+    return runScan(proMode);
+  }
+
+  /** Turns pro mode on and immediately rescans with it, so the wider list is one click away. */
+  function enableProAndScan() {
+    setProMode(true);
+    setAccounts([]);
+    return runScan(true);
+  }
+
+  function disableProAndScan() {
+    setProMode(false);
+    setAccounts([]);
+    return runScan(false);
+  }
+
+  async function runScan(pro: boolean) {
     focusTool();
     setScanRun(run => run + 1);
     setNeedsWallet(false);
@@ -210,7 +227,7 @@ export function CloserTool() {
       setConnected(true);
       setState('scanning');
       setNotice('Checking empty SPL Token and Token-2022 accounts on mainnet…');
-      const scan = await scanClosableTokenAccounts(owner, proMode);
+      const scan = await scanClosableTokenAccounts(owner, pro);
       setAccounts(scan.accounts);
       setScannedCount(scan.scannedCount);
       setState('ready');
@@ -350,6 +367,19 @@ export function CloserTool() {
                 <b>NOTHING TO CLEAN UP</b>
                 <p>Checked {scannedCount} supported token account{scannedCount === 1 ? '' : 's'}. None are both empty and closable by this wallet, so there is nothing to remove.</p>
                 <p className="empty-hint">No transaction was signed and no fee was charged.</p>
+                {!proMode && (
+                  <div className="empty-upsell">
+                    <b>Accounts that still hold something were skipped.</b>
+                    <span>
+                      Every token account holds rent, including the ones with a leftover NFT or dust balance
+                      in them. Pro mode lists those too &mdash; you pick which to close, and their balances
+                      are burned to do it.
+                    </span>
+                    <button type="button" onClick={enableProAndScan} disabled={busy}>
+                      LOOK FOR THOSE TOO <span aria-hidden="true">▶</span>
+                    </button>
+                  </div>
+                )}
                 <div className="empty-actions">
                   <button type="button" onClick={connectAndScan} disabled={busy}>SCAN AGAIN ↻</button>
                   <button className="game-demo-link" type="button" onClick={backToOverview}>← BACK</button>
@@ -361,6 +391,21 @@ export function CloserTool() {
                   <div><span>Selected rent</span><b>{formatSol(selectedLamports, 6)} SOL</b></div>
                   <div><span>Est. you receive</span><b>~{formatSol(estimatedReceiveLamports, 6)} SOL</b></div>
                   <div><span>Total fees</span><b>~{formatSol(displayedServiceFee + networkFeeLamports, 6)} SOL</b><em>service + network</em></div>
+                </div>
+                <div className={proMode ? 'pro-bar is-on' : 'pro-bar'}>
+                  <div>
+                    <b>{proMode ? 'PRO MODE ON' : 'PRO MODE OFF'}</b>
+                    <span>
+                      {proMode
+                        ? `Accounts holding tokens are listed. Ticking one burns what is inside. ${PRO_SERVICE_FEE_PERCENT}% fee.`
+                        : `Empty accounts only. Turn this on to also close accounts with an NFT or dust still in them.`}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={proMode ? disableProAndScan : enableProAndScan}
+                    disabled={busy || state === 'won'}
+                  >{proMode ? 'TURN OFF' : 'TURN ON'}</button>
                 </div>
                 <div className="live-account-list">
                   {accounts.length ? accounts.map(account => (
