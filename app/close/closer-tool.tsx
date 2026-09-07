@@ -66,6 +66,10 @@ function buildDemoAccounts(): ClosableTokenAccount[] {
 
 export function CloserTool() {
   const [state, setState] = useState<CloserState>('idle');
+  // Bumped on every scan so the coin elements remount. CSS animations do not
+  // replay when the same class is simply reapplied, which left the coins frozen
+  // at the end of their first run on a second scan.
+  const [scanRun, setScanRun] = useState(0);
   const [wallet, setWallet] = useState('');
   const [accounts, setAccounts] = useState<ClosableTokenAccount[]>([]);
   const [scannedCount, setScannedCount] = useState(0);
@@ -122,6 +126,7 @@ export function CloserTool() {
 
   async function connectAndScan() {
     focusTool();
+    setScanRun(run => run + 1);
     const provider = getWalletProvider();
     if (!provider) {
       setState('error');
@@ -157,6 +162,7 @@ export function CloserTool() {
 
   function playDemo() {
     focusTool();
+    setScanRun(run => run + 1);
     setState('scanning');
     setAccounts([]);
     setSignatures([]);
@@ -252,7 +258,7 @@ export function CloserTool() {
     : state === 'scanning' ? 'SEARCHING FOR EMPTY TOKEN ACCOUNTS…'
       : state === 'closing' ? (progress || 'WAITING FOR APPROVAL…')
         : state === 'won' ? 'RENT RECOVERED'
-          : state === 'demo' ? 'SAMPLE CLEANUP REWARD'
+          : state === 'demo' ? 'CLEANUP REWARD'
           : foundNothing ? 'NO EMPTY TOKEN ACCOUNTS FOUND'
             : accounts.length ? 'READY TO CLOSE' : 'RECLAIM SOL';
 
@@ -345,7 +351,7 @@ export function CloserTool() {
               <div className="chest-body"><i /></div>
               {COIN_ARCS.map((arc, index) => (
                 <span
-                  key={index}
+                  key={`${scanRun}-${index}`}
                   className="coin"
                   style={{
                     '--sx': `${arc.sx}px`,

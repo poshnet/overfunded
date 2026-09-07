@@ -77,11 +77,11 @@
 .quest-connecting .chest-glow,.quest-scanning .chest-glow{animation:chest-glow-search 1.5s ease-in-out infinite}
 .quest-scanning .chest-lid{animation:chest-lid-jitter 1.05s ease-in-out infinite}
 
-.has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.has-loot.quest-reclaiming .chest-lid{animation:chest-lid-open .72s linear both}
+.has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.has-loot.quest-reclaiming .chest-lid{animation:chest-lid-open 1.15s linear both}
 .has-loot.quest-ready .coin,.quest-demo .coin,.has-loot.quest-reclaiming .coin{animation:coin-x 3.2s linear both}
 .has-loot.quest-ready .chest-glow,.quest-demo .chest-glow{animation:chest-glow-flare .6s ease-out both}
 
-.quest-won .chest-lid{animation:chest-lid-open .72s linear both}
+.quest-won .chest-lid{animation:chest-lid-open 1.15s linear both}
 .quest-won .game-chest{animation:chest-pop .5s cubic-bezier(.34,1.5,.64,1) both}
 .quest-won .coin{animation:coin-x 2.8s linear both}
 .quest-won .chest-glow{animation:chest-glow-win 1.1s ease-out both}
@@ -128,7 +128,7 @@
 @media(prefers-reduced-motion:reduce){
   .game-actions button,.game-demo-link{animation:none!important;transition:none!important}
   .game-chest,.chest-lid,.chest-glow,.chest-dust,.coin,.chest-body i{animation:none!important}
-  .has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.quest-won .chest-lid,.has-loot.quest-reclaiming .chest-lid{transform:rotateX(-68deg)}
+  .has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.quest-won .chest-lid,.has-loot.quest-reclaiming .chest-lid{transform:rotateX(-88deg)}
   .no-loot.quest-ready .chest-lid{transform:rotateX(-24deg)}
   .coin{opacity:0!important}
 }
@@ -614,10 +614,9 @@ a.battle-card:hover{opacity:1}
 
 /* Propped open, not flopped over: it never passes vertical. */
 @keyframes chest-lid-open{
-  0%{transform:rotateX(0deg);animation-timing-function:cubic-bezier(.45,0,.75,.3)}
-  18%{transform:rotateX(-11deg);animation-timing-function:cubic-bezier(.2,.62,.3,1)}
-  64%{transform:rotateX(-82deg);animation-timing-function:cubic-bezier(.4,0,.32,1)}
-  100%{transform:rotateX(-68deg)}
+  0%{transform:rotateX(0deg);animation-timing-function:cubic-bezier(.4,0,.7,.25)}
+  22%{transform:rotateX(-14deg);animation-timing-function:cubic-bezier(.18,.62,.28,1)}
+  100%{transform:rotateX(-88deg)}
 }
 
 /* The panel signs itself instead of listing guarantees the page already makes. */
@@ -882,3 +881,11 @@ a.battle-card:hover{opacity:1}
    read where the old needle-thin one vanished. */
 .chest-body i:before{top:6px;width:11px;height:11px;margin-left:-5.5px}
 .chest-body i:after{top:14px;margin-left:-4.5px;border-left-width:4.5px;border-right-width:4.5px;border-top-width:10px}
+
+
+/* A rounder lid. Taller relative to its width, with a near-full vertical radius,
+   so the dome is a real half-barrel instead of a shallow cap. The bottom edge
+   stays at 136px, which is the hinge line, so nothing else has to move. */
+.chest-lid{top:62px;height:74px;border-radius:99px 99px 7px 7px/70px 70px 7px 7px}
+.chest-lid:after{border-radius:15px 15px 0 0}
+.chest-body{border-radius:4px 4px 18px 18px}

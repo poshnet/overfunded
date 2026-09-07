@@ -61,9 +61,14 @@ const COIN_ARCS = [
 
 const DEMO_MINTS = ['USDC', 'BONK', 'JUP', 'PYTH', 'WIF', 'JTO', 'RAY', 'ORCA'];
 
+// Sized so the demo lands near 0.02 SOL at the current floor. The per-account
+// surplus is fixed by the protocol, so a bigger headline number has to come
+// from more accounts rather than from inflating what each one holds.
+const DEMO_ACCOUNT_COUNT = 110;
+
 function buildDemoAccounts(rentFloorLamports: number): ReclaimableAccount[] {
   const excessLamports = Math.max(0, LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS - rentFloorLamports);
-  return Array.from({ length: 20 }, (_, index) => ({
+  return Array.from({ length: DEMO_ACCOUNT_COUNT }, (_, index) => ({
     address: `DemoTokenAccount${String(index + 1).padStart(2, '0')}xRent`,
     dataLength: TOKEN_ACCOUNT_SPACE,
     excessLamports,
@@ -76,6 +81,10 @@ function buildDemoAccounts(rentFloorLamports: number): ReclaimableAccount[] {
 
 export default function GamePrototype() {
   const [quest, setQuest] = useState<QuestState>('idle');
+  // Bumped on every scan so the coin elements remount. CSS animations do not
+  // replay when the same class is simply reapplied, which left the coins frozen
+  // at the end of their first run on a second scan.
+  const [scanRun, setScanRun] = useState(0);
   const [wallet, setWallet] = useState('');
   const [accounts, setAccounts] = useState<ReclaimableAccount[]>([]);
   const [notice, setNotice] = useState('Connect a wallet to scan live Solana mainnet data.');
@@ -188,6 +197,7 @@ export default function GamePrototype() {
 
   async function connectAndScan() {
     focusQuest();
+    setScanRun(run => run + 1);
     const provider = getWalletProvider();
     if (!provider) {
       setQuest('error');
@@ -223,6 +233,7 @@ export default function GamePrototype() {
 
   function playDemo() {
     focusQuest();
+    setScanRun(run => run + 1);
     setQuest('scanning');
     setNotice('Running a sample scan—no wallet or network request is being used.');
     setSignatures([]);
@@ -234,7 +245,7 @@ export default function GamePrototype() {
       setAccounts(demoAccounts);
       setScannedCount(demoAccounts.length);
       setQuest('demo');
-      setNotice('Demo result: 20 standard token accounts funded at the legacy rent floor. Connect a wallet to scan live mainnet SOL.');
+      setNotice(`Demo result: ${DEMO_ACCOUNT_COUNT} standard token accounts funded at the legacy rent floor. Connect a wallet to scan live mainnet SOL.`);
     }, 900);
   }
 
@@ -300,7 +311,7 @@ export default function GamePrototype() {
     : quest === 'scanning' ? 'SEARCHING TOKEN ACCOUNTS…'
       : quest === 'reclaiming' ? (progress || 'WAITING FOR APPROVAL…')
         : quest === 'won' ? 'RECOVERY CONFIRMED'
-          : quest === 'demo' ? 'SAMPLE TREASURE FOUND'
+          : quest === 'demo' ? 'TREASURE FOUND'
             : quest === 'ready' && accounts.length === 0 ? 'ALREADY AT THE RENT FLOOR'
               : quest === 'ready' ? 'TREASURE FOUND' : 'RECLAIM SOL';
   // '?' only survives while the answer is genuinely unknown. Once a scan has
@@ -452,7 +463,7 @@ export default function GamePrototype() {
           <div className="game-chest-frame">
             <div className="game-chest" aria-hidden="true"><div className="chest-glow" /><div className="chest-dust" /><div className="chest-lid" /><div className="chest-body"><i /></div>{COIN_ARCS.map((arc, index) => (
               <span
-                key={index}
+                key={`${scanRun}-${index}`}
                 className="coin"
                 style={{
                   '--sx': `${arc.sx}px`,
