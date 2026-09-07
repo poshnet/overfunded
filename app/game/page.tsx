@@ -7,6 +7,8 @@ import {
   estimatedNetworkFeeLamports,
   formatSol,
   getCurrentRentFloorLamports,
+  isMobileBrowser,
+  phantomBrowseLink,
   getRememberedWalletAddress,
   getTreasuryActivity,
   activeStageIndex,
@@ -45,18 +47,18 @@ type QuestState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'reclaiming' | 
 // height, where it falls to, spin and start offset. Fixed values keep the
 // server and client markup identical.
 const COIN_ARCS = [
-  { sx: -46, cx: -14, cy: -122, rot: -80, delay: 0.0 },
-  { sx: 22, cx: 10, cy: -132, rot: 95, delay: 0.25 },
-  { sx: -12, cx: -20, cy: -115, rot: -70, delay: 0.5 },
-  { sx: 52, cx: 16, cy: -128, rot: 110, delay: 0.75 },
-  { sx: -58, cx: -8, cy: -134, rot: -100, delay: 1.0 },
-  { sx: 8, cx: 22, cy: -118, rot: 75, delay: 1.25 },
-  { sx: -30, cx: -18, cy: -130, rot: -115, delay: 1.5 },
-  { sx: 40, cx: 6, cy: -124, rot: 90, delay: 1.75 },
-  { sx: -20, cx: 20, cy: -133, rot: -85, delay: 2.0 },
-  { sx: 58, cx: -24, cy: -120, rot: 105, delay: 2.25 },
-  { sx: -50, cx: 12, cy: -127, rot: -95, delay: 2.5 },
-  { sx: 32, cx: -16, cy: -131, rot: 80, delay: 2.75 },
+  { sx: -46, cx: -30, cy: -122, rot: -80, delay: 0.0 },
+  { sx: 22, cx: 24, cy: -132, rot: 95, delay: 0.03 },
+  { sx: -12, cx: -38, cy: -115, rot: -70, delay: 0.055 },
+  { sx: 52, cx: 26, cy: -128, rot: 110, delay: 0.08 },
+  { sx: -58, cx: -20, cy: -134, rot: -100, delay: 0.105 },
+  { sx: 8, cx: 40, cy: -118, rot: 75, delay: 0.13 },
+  { sx: -30, cx: -34, cy: -130, rot: -115, delay: 0.16 },
+  { sx: 40, cx: 18, cy: -124, rot: 90, delay: 0.185 },
+  { sx: -20, cx: 36, cy: -133, rot: -85, delay: 0.21 },
+  { sx: 58, cx: -30, cy: -120, rot: 105, delay: 0.235 },
+  { sx: -50, cx: 26, cy: -127, rot: -95, delay: 0.26 },
+  { sx: 32, cx: -30, cy: -131, rot: 80, delay: 0.285 },
 ];
 
 const DEMO_MINTS = ['USDC', 'BONK', 'JUP', 'PYTH', 'WIF', 'JTO', 'RAY', 'ORCA'];
@@ -85,6 +87,12 @@ export default function GamePrototype() {
   // replay when the same class is simply reapplied, which left the coins frozen
   // at the end of their first run on a second scan.
   const [scanRun, setScanRun] = useState(0);
+  // Only offer to disconnect when this session actually connected. A trusted
+  // wallet exposes a publicKey on load without any handshake, which turned the
+  // nav button into a disconnect prompt for people who had not connected yet.
+  const [connected, setConnected] = useState(false);
+  // Set when no injected provider exists at all, which is every in-app browser.
+  const [needsWallet, setNeedsWallet] = useState(false);
   const [wallet, setWallet] = useState('');
   const [accounts, setAccounts] = useState<ReclaimableAccount[]>([]);
   const [notice, setNotice] = useState('Connect a wallet to scan live Solana mainnet data.');
@@ -101,6 +109,8 @@ export default function GamePrototype() {
     const syncWallet = window.setTimeout(() => {
       const remembered = getRememberedWalletAddress();
       if (remembered) setWallet(remembered);
+      const provider = getWalletProvider();
+      if (provider?.isConnected && provider.publicKey) setConnected(true);
     }, 0);
     return () => window.clearTimeout(syncWallet);
   }, []);
@@ -185,6 +195,7 @@ export default function GamePrototype() {
       // Clearing local state still signs the visitor out of this site.
     }
     forgetWalletAddress();
+    setConnected(false);
     setWallet('');
     setAccounts([]);
     setScannedCount(0);
@@ -198,10 +209,14 @@ export default function GamePrototype() {
   async function connectAndScan() {
     focusQuest();
     setScanRun(run => run + 1);
+    setNeedsWallet(false);
     const provider = getWalletProvider();
     if (!provider) {
       setQuest('error');
-      setNotice('No compatible Solana browser wallet was detected. Install Phantom or Solflare, or use the safe demo.');
+      setNeedsWallet(true);
+      setNotice(isMobileBrowser()
+        ? 'This browser has no Solana wallet. Reopen the page inside Phantom to connect — links opened from Twitter or Telegram cannot reach a wallet.'
+        : 'No compatible Solana browser wallet was detected. Install Phantom, Solflare or Backpack, or use the safe demo.');
       return;
     }
 
@@ -216,6 +231,7 @@ export default function GamePrototype() {
       const owner = new PublicKey(response.publicKey.toString());
       setWallet(owner.toBase58());
       rememberWalletAddress(owner.toBase58());
+      setConnected(true);
       setQuest('scanning');
       setNotice('Reading Token Program and Token-2022 accounts from mainnet…');
       const scan = await scanReclaimableAccounts(owner);
@@ -346,7 +362,7 @@ export default function GamePrototype() {
       <nav className="game-nav">
         <a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a>
         <ToolToggle mode="reclaim" />
-        <button type="button" onClick={wallet ? disconnectWallet : connectAndScan} disabled={busy} title={wallet ? 'Disconnect this wallet' : undefined}>{wallet ? shortenAddress(wallet) : busy ? 'SCANNING…' : 'CONNECT WALLET'} <span aria-hidden="true">{wallet ? '×' : '+'}</span></button>
+        <button type="button" onClick={connected ? disconnectWallet : connectAndScan} disabled={busy} title={connected ? 'Disconnect this wallet' : undefined}>{connected ? shortenAddress(wallet) : busy ? 'SCANNING…' : 'CONNECT WALLET'} <span aria-hidden="true">{connected ? '×' : '+'}</span></button>
       </nav>
 
       <section className="game-hero" id="quest">
@@ -453,6 +469,11 @@ export default function GamePrototype() {
                 <a className="game-text-link verify-link" href={SOURCE_URL} target="_blank" rel="noreferrer">VERIFY THE CODE <span aria-hidden="true">↗</span></a>
             </div>
             {quest === 'error' && <p className="live-notice error">{notice}</p>}
+            {needsWallet && (
+              <a className="wallet-deeplink" href={phantomBrowseLink(`${SITE_URL}`)} target="_blank" rel="noreferrer">
+                OPEN IN PHANTOM <span aria-hidden="true">→</span>
+              </a>
+            )}
             <div className="game-warning"><i>!</i><div><b>KEEP-OPEN MODE NEVER DELETES TOKENS</b><span>No tokens or token accounts are deleted. Balances and account addresses stay intact.</span></div></div>
           </div>
         )}

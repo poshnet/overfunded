@@ -160,6 +160,8 @@ type WalletWindow = Window & {
   solana?: WalletProvider;
   phantom?: { solana?: WalletProvider };
   solflare?: WalletProvider;
+  backpack?: WalletProvider;
+  coinbaseSolana?: WalletProvider;
 };
 
 export type ReclaimableAccount = {
@@ -203,10 +205,48 @@ type ParsedTokenInfo = {
   tokenAmount?: { amount?: string };
 };
 
+/**
+ * Returns a provider that can actually be connected to.
+ *
+ * window.solana is contested ground: several extensions inject partial stubs
+ * onto it, and when two EVM wallets fight over the page the object that ends up
+ * there may have no connect() at all. Taking it on faith threw a TypeError the
+ * moment someone pressed the button, so every candidate is checked for a
+ * callable connect and the wallets that own their own namespace come first.
+ */
 export function getWalletProvider(): WalletProvider | null {
   if (typeof window === 'undefined') return null;
   const walletWindow = window as WalletWindow;
-  return walletWindow.phantom?.solana || walletWindow.solana || walletWindow.solflare || null;
+  const candidates = [
+    walletWindow.phantom?.solana,
+    walletWindow.solflare,
+    walletWindow.backpack,
+    walletWindow.coinbaseSolana,
+    walletWindow.solana,
+  ];
+  for (const candidate of candidates) {
+    if (candidate && typeof candidate.connect === 'function') return candidate;
+  }
+  return null;
+}
+
+/** Phones and tablets, where a wallet is an app rather than a browser extension. */
+export function isMobileBrowser() {
+  if (typeof navigator === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+}
+
+/**
+ * Reopens this page inside Phantom's own browser.
+ *
+ * Someone arriving from a link in the Twitter or Telegram app is inside that
+ * app's webview, which injects no wallet provider whatsoever — telling them to
+ * "install Phantom" is useless there because the extension model does not
+ * exist. This deeplink is the only route from that webview to a wallet.
+ */
+export function phantomBrowseLink(url: string) {
+  const target = encodeURIComponent(url);
+  return `https://phantom.app/ul/browse/${target}?ref=${target}`;
 }
 
 export function rememberWalletAddress(address: string) {

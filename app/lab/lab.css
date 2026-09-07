@@ -1,0 +1,70 @@
+/* Chest workbench. The chest rules live in game-sections.css and are global, so
+   every variant here inherits the real geometry and only overrides what it is
+   testing. box-sizing matters: the chest measurements assume border-box, which
+   normally comes from .game-shell and does not apply on this page. */
+.lab{min-height:100vh;padding:38px clamp(18px,4vw,54px) 80px;background:#050806;color:#e6efe2;font-family:var(--font-geist-mono),monospace}
+.lab *{box-sizing:border-box}
+
+.lab-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px;padding-bottom:26px;border-bottom:1px solid #263528}
+.lab-head small{color:#6f8574;font-size:9px;letter-spacing:.16em}
+.lab-head h1{margin:8px 0 6px;font-family:Arial,sans-serif;font-size:34px;letter-spacing:-.03em}
+.lab-head p{margin:0;color:#829087;font-family:Arial,sans-serif;font-size:13px}
+.lab-controls{display:flex;flex-wrap:wrap;gap:10px}
+.lab-controls button{padding:12px 16px;border:1px solid #3a4d34;border-radius:3px;background:#0d130e;color:#b9cbb1;font:inherit;font-size:10px;font-weight:900;letter-spacing:.1em;cursor:pointer}
+.lab-controls button.on{border-color:#aaff3e;color:#aaff3e}
+
+.lab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px;margin-top:30px}
+.lab-cell{margin:0;padding:16px;border:1px solid #2b3a2e;background:linear-gradient(180deg,rgba(20,41,23,.5),rgba(8,14,9,.9));
+  --g-lime:#aaff3e;--g-gold:#ffe24a;--chest-ink:#09100a;--chest-lid-a:#3d6a29;--chest-lid-b:#4d8531;
+  --chest-lid-top:#79b940;--chest-body-a:#345b25;--chest-body-b:#44752d;--chest-band:#91d43e;
+  --chest-glow:rgba(170,255,62,.32);--chest-lock:#ffe24a}
+.lab-stage{position:relative;height:190px;overflow:hidden}
+.lab .game-chest{position:absolute;left:50%;bottom:0;scale:.78;margin:0 0 0 -130px;transform:none;animation:none}
+.lab-big .lab-stage{height:280px}
+.lab-big .game-chest{scale:1.12}
+.lab-cell figcaption{display:flex;flex-direction:column;gap:5px;margin-top:10px;padding-top:10px;border-top:1px solid #243126}
+.lab-cell figcaption b{color:#dfe8d8;font-size:11px;letter-spacing:.1em}
+.lab-cell figcaption span{color:#75837a;font-family:Arial,sans-serif;font-size:11px}
+
+/* Replay is driven by remounting the chest, so these need no state class. */
+.lab .lab-open .chest-lid{animation:chest-lid-open .42s linear both}
+.lab .lab-open .coin{animation:coin-x 1.25s linear both}
+
+/* v2 — deeper dome. Bottom edge stays on the 136px hinge line. */
+.lab-v2 .chest-lid{top:52px;height:84px;border-radius:99px 99px 8px 8px/80px 80px 8px 8px}
+
+/* v3 — crate. Flat top and pronounced plank seams instead of a curve. */
+.lab-v3 .chest-lid{top:74px;height:62px;border-radius:9px 9px 4px 4px}
+.lab-v3 .chest-lid:after{border-radius:4px 4px 0 0}
+.lab-v3 .chest-body{border-radius:4px}
+.lab-v3 .chest-lid,.lab-v3 .chest-body{background-image:
+  repeating-linear-gradient(90deg,rgba(0,0,0,.34) 0 3px,transparent 3px 30px),
+  linear-gradient(180deg,rgba(255,255,255,.12),transparent 62%),
+  repeating-linear-gradient(90deg,var(--chest-body-a) 0 30px,var(--chest-body-b) 30px 60px)}
+
+/* v4 — squat. Wider and lower, more sea-chest than jewellery box. */
+.lab-v4 .chest-lid{left:16px;width:228px;top:78px;height:58px;border-radius:114px 114px 6px 6px/54px 54px 6px 6px}
+.lab-v4 .chest-body{left:22px;width:216px;top:130px;height:78px}
+
+/* v5 — iron-banded. Two vertical straps drawn as background layers. */
+.lab-v5 .chest-lid{background:
+  linear-gradient(#1b2417,#1b2417) 24px 0/13px 100% no-repeat,
+  linear-gradient(#1b2417,#1b2417) calc(100% - 37px) 0/13px 100% no-repeat,
+  linear-gradient(90deg,rgba(0,0,0,.36),transparent 19%,transparent 81%,rgba(0,0,0,.36)),
+  linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.28) 25%,rgba(255,255,255,.03) 56%,rgba(0,0,0,.12)),
+  repeating-linear-gradient(90deg,var(--chest-lid-a) 0 25px,var(--chest-lid-b) 25px 50px)}
+.lab-v5 .chest-body{background:
+  linear-gradient(#1b2417,#1b2417) 20px 0/13px 100% no-repeat,
+  linear-gradient(#1b2417,#1b2417) calc(100% - 33px) 0/13px 100% no-repeat,
+  linear-gradient(90deg,rgba(0,0,0,.32),transparent 15%,transparent 85%,rgba(0,0,0,.32)),
+  linear-gradient(180deg,rgba(0,0,0,.14),rgba(0,0,0,.34)),
+  repeating-linear-gradient(90deg,var(--chest-body-a) 0 26px,var(--chest-body-b) 26px 52px)}
+
+/* v6 — arcade. Flat colour, hard edges, no gradients or blur. */
+.lab-v6 .chest-lid{border-width:10px;border-radius:62px 62px 0 0/46px 46px 0 0;background:var(--chest-lid-b);box-shadow:0 -6px 0 var(--chest-lid-top)}
+.lab-v6 .chest-lid:before,.lab-v6 .chest-lid:after{display:none}
+.lab-v6 .chest-body{border-width:10px;border-radius:0;background:var(--chest-body-b);box-shadow:0 8px 0 #040704}
+.lab-v6 .chest-body:after{display:none}
+.lab-v6 .chest-glow{filter:none;opacity:.3}
+.lab-v6 .chest-body i{border-radius:0;border-width:6px;background:var(--g-gold);box-shadow:none}
+.lab-v6 .chest-body i:after{display:none}

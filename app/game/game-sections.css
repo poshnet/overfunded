@@ -73,17 +73,17 @@
 .quest-idle .chest-glow{animation:chest-glow-idle 3.2s ease-in-out infinite}
 .quest-idle .chest-body i{animation:chest-glint 4.2s ease-in-out infinite}
 
-.quest-connecting .game-chest,.quest-scanning .game-chest{animation:chest-rattle .62s ease-in-out infinite}
-.quest-connecting .chest-glow,.quest-scanning .chest-glow{animation:chest-glow-search 1.5s ease-in-out infinite}
+.quest-connecting .game-chest,.quest-scanning .game-chest{animation:chest-rattle .34s ease-in-out infinite}
+.quest-connecting .chest-glow,.quest-scanning .chest-glow{animation:chest-glow-search .9s ease-in-out infinite}
 .quest-scanning .chest-lid{animation:chest-lid-jitter 1.05s ease-in-out infinite}
 
-.has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.has-loot.quest-reclaiming .chest-lid{animation:chest-lid-open 1.15s linear both}
-.has-loot.quest-ready .coin,.quest-demo .coin,.has-loot.quest-reclaiming .coin{animation:coin-x 3.2s linear both}
+.has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.has-loot.quest-reclaiming .chest-lid{animation:chest-lid-open .42s linear both}
+.has-loot.quest-ready .coin,.quest-demo .coin,.has-loot.quest-reclaiming .coin{animation:coin-x 1.25s linear both}
 .has-loot.quest-ready .chest-glow,.quest-demo .chest-glow{animation:chest-glow-flare .6s ease-out both}
 
-.quest-won .chest-lid{animation:chest-lid-open 1.15s linear both}
+.quest-won .chest-lid{animation:chest-lid-open .42s linear both}
 .quest-won .game-chest{animation:chest-pop .5s cubic-bezier(.34,1.5,.64,1) both}
-.quest-won .coin{animation:coin-x 2.8s linear both}
+.quest-won .coin{animation:coin-x 1.1s linear both}
 .quest-won .chest-glow{animation:chest-glow-win 1.1s ease-out both}
 
 
@@ -128,7 +128,7 @@
 @media(prefers-reduced-motion:reduce){
   .game-actions button,.game-demo-link{animation:none!important;transition:none!important}
   .game-chest,.chest-lid,.chest-glow,.chest-dust,.coin,.chest-body i{animation:none!important}
-  .has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.quest-won .chest-lid,.has-loot.quest-reclaiming .chest-lid{transform:rotateX(-88deg)}
+  .has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.quest-won .chest-lid,.has-loot.quest-reclaiming .chest-lid{transform:rotateX(-87deg)}
   .no-loot.quest-ready .chest-lid{transform:rotateX(-24deg)}
   .coin{opacity:0!important}
 }
@@ -567,14 +567,14 @@ a.battle-card:hover{opacity:1}
 /* Coins are spat out of the mouth, then drift upward and fade. No corner to
    aim at — they spread both ways and disappear before they reach anything. */
 @keyframes coin-x{
-  0%{opacity:1;z-index:1;transform:translateX(var(--sx));animation-timing-function:ease-in-out}
-  14%{z-index:5;transform:translateX(calc(var(--sx) + var(--cx) * .3));animation-timing-function:ease-in-out}
-  44%{transform:translateX(calc(var(--sx) + var(--cx) * -.15));animation-timing-function:ease-in-out}
-  72%{opacity:1;transform:translateX(calc(var(--sx) + var(--cx) * .75));animation-timing-function:ease-in-out}
+  0%{opacity:1;z-index:1;transform:translateX(var(--sx)) scale(.55);animation-timing-function:cubic-bezier(.05,.9,.2,1)}
+  14%{z-index:5;transform:translateX(calc(var(--sx) + var(--cx) * .6)) scale(1.15);animation-timing-function:cubic-bezier(.3,.6,.4,1)}
+  34%{transform:translateX(calc(var(--sx) + var(--cx) * .88)) scale(1)}
+  72%{opacity:1;transform:translateX(calc(var(--sx) + var(--cx) * .98))}
   100%{opacity:0;z-index:5;transform:translateX(calc(var(--sx) + var(--cx)))}
 }
 @keyframes coin-y{
-  0%{transform:translateY(0) rotate(0deg);animation-timing-function:cubic-bezier(.32,.5,.5,1)}
+  0%{transform:translateY(0) rotate(0deg);animation-timing-function:cubic-bezier(.04,.86,.22,1)}
   100%{transform:translateY(var(--cy)) rotate(var(--rot))}
 }
 /* A lid on a hinge: it swings back off the rim, overshoots slightly, settles. */
@@ -614,9 +614,8 @@ a.battle-card:hover{opacity:1}
 
 /* Propped open, not flopped over: it never passes vertical. */
 @keyframes chest-lid-open{
-  0%{transform:rotateX(0deg);animation-timing-function:cubic-bezier(.4,0,.7,.25)}
-  22%{transform:rotateX(-14deg);animation-timing-function:cubic-bezier(.18,.62,.28,1)}
-  100%{transform:rotateX(-88deg)}
+  0%{transform:rotateX(0deg);animation-timing-function:cubic-bezier(.1,.88,.24,1)}
+  100%{transform:rotateX(-87deg)}
 }
 
 /* The panel signs itself instead of listing guarantees the page already makes. */
@@ -889,3 +888,21 @@ a.battle-card:hover{opacity:1}
 .chest-lid{top:62px;height:74px;border-radius:99px 99px 7px 7px/70px 70px 7px 7px}
 .chest-lid:after{border-radius:15px 15px 0 0}
 .chest-body{border-radius:4px 4px 18px 18px}
+
+
+/* The chest itself takes the hit when the lid goes. A squash on the way down
+   and a small rebound is what makes the click feel answered; without it the
+   lid opening reads as something the page decided to do on its own. */
+@keyframes chest-punch{
+  0%{transform:scale(1,1) translateY(0)}
+  22%{transform:scale(1.09,.93) translateY(2px)}
+  52%{transform:scale(.97,1.05) translateY(-4px)}
+  100%{transform:scale(1,1) translateY(0)}
+}
+.has-loot.quest-ready .game-chest,.quest-demo .game-chest{animation:chest-punch .38s cubic-bezier(.2,1.4,.4,1) both}
+
+/* The way out of an in-app browser. For anyone arriving from a link inside
+   Twitter or Telegram this is the only route to a wallet at all, so it is the
+   primary action rather than a footnote. */
+.wallet-deeplink{display:inline-flex;align-items:center;gap:10px;margin-top:12px;padding:14px 20px;border:1px solid var(--btn-edge,#dfffaf);border-radius:3px;background:var(--g-lime);color:#071008;font-size:11px;font-weight:950;letter-spacing:.1em;text-decoration:none;box-shadow:4px 4px 0 var(--btn-shadow,#31511e);transition:transform .12s ease,box-shadow .12s ease}
+.wallet-deeplink:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--btn-shadow,#31511e)}

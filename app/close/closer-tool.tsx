@@ -17,6 +17,8 @@ import {
   estimatedNetworkFeeLamports,
   formatSol,
   getWalletProvider,
+  isMobileBrowser,
+  phantomBrowseLink,
   getRememberedWalletAddress,
   LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS,
   explainScanError,
@@ -30,18 +32,18 @@ import {
 } from '../game/solana-reclaim';
 
 const COIN_ARCS = [
-  { sx: -46, cx: -14, cy: -122, rot: -80, delay: 0.0 },
-  { sx: 22, cx: 10, cy: -132, rot: 95, delay: 0.25 },
-  { sx: -12, cx: -20, cy: -115, rot: -70, delay: 0.5 },
-  { sx: 52, cx: 16, cy: -128, rot: 110, delay: 0.75 },
-  { sx: -58, cx: -8, cy: -134, rot: -100, delay: 1.0 },
-  { sx: 8, cx: 22, cy: -118, rot: 75, delay: 1.25 },
-  { sx: -30, cx: -18, cy: -130, rot: -115, delay: 1.5 },
-  { sx: 40, cx: 6, cy: -124, rot: 90, delay: 1.75 },
-  { sx: -20, cx: 20, cy: -133, rot: -85, delay: 2.0 },
-  { sx: 58, cx: -24, cy: -120, rot: 105, delay: 2.25 },
-  { sx: -50, cx: 12, cy: -127, rot: -95, delay: 2.5 },
-  { sx: 32, cx: -16, cy: -131, rot: 80, delay: 2.75 },
+  { sx: -46, cx: -30, cy: -122, rot: -80, delay: 0.0 },
+  { sx: 22, cx: 24, cy: -132, rot: 95, delay: 0.03 },
+  { sx: -12, cx: -38, cy: -115, rot: -70, delay: 0.055 },
+  { sx: 52, cx: 26, cy: -128, rot: 110, delay: 0.08 },
+  { sx: -58, cx: -20, cy: -134, rot: -100, delay: 0.105 },
+  { sx: 8, cx: 40, cy: -118, rot: 75, delay: 0.13 },
+  { sx: -30, cx: -34, cy: -130, rot: -115, delay: 0.16 },
+  { sx: 40, cx: 18, cy: -124, rot: 90, delay: 0.185 },
+  { sx: -20, cx: 36, cy: -133, rot: -85, delay: 0.21 },
+  { sx: 58, cx: -30, cy: -120, rot: 105, delay: 0.235 },
+  { sx: -50, cx: 26, cy: -127, rot: -95, delay: 0.26 },
+  { sx: 32, cx: -30, cy: -131, rot: 80, delay: 0.285 },
 ];
 
 type CloserState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'closing' | 'won' | 'error' | 'demo';
@@ -70,6 +72,12 @@ export function CloserTool() {
   // replay when the same class is simply reapplied, which left the coins frozen
   // at the end of their first run on a second scan.
   const [scanRun, setScanRun] = useState(0);
+  // Only offer to disconnect when this session actually connected. A trusted
+  // wallet exposes a publicKey on load without any handshake, which turned the
+  // nav button into a disconnect prompt for people who had not connected yet.
+  const [connected, setConnected] = useState(false);
+  // Set when no injected provider exists at all, which is every in-app browser.
+  const [needsWallet, setNeedsWallet] = useState(false);
   const [wallet, setWallet] = useState('');
   const [accounts, setAccounts] = useState<ClosableTokenAccount[]>([]);
   const [scannedCount, setScannedCount] = useState(0);
@@ -82,6 +90,8 @@ export function CloserTool() {
     const syncWallet = window.setTimeout(() => {
       const remembered = getRememberedWalletAddress();
       if (remembered) setWallet(remembered);
+      const provider = getWalletProvider();
+      if (provider?.isConnected && provider.publicKey) setConnected(true);
     }, 0);
     return () => window.clearTimeout(syncWallet);
   }, []);
@@ -114,6 +124,7 @@ export function CloserTool() {
       // Clearing local state still signs the visitor out of this site.
     }
     forgetWalletAddress();
+    setConnected(false);
     setWallet('');
     setAccounts([]);
     setScannedCount(0);
@@ -127,10 +138,14 @@ export function CloserTool() {
   async function connectAndScan() {
     focusTool();
     setScanRun(run => run + 1);
+    setNeedsWallet(false);
     const provider = getWalletProvider();
     if (!provider) {
       setState('error');
-      setNotice('No compatible Solana browser wallet was detected. Install Phantom or Solflare and try again.');
+      setNeedsWallet(true);
+      setNotice(isMobileBrowser()
+        ? 'This browser has no Solana wallet. Reopen the page inside Phantom to connect — links opened from Twitter or Telegram cannot reach a wallet.'
+        : 'No compatible Solana browser wallet was detected. Install Phantom, Solflare or Backpack, or use the safe demo.');
       return;
     }
 
@@ -145,6 +160,7 @@ export function CloserTool() {
       const owner = new PublicKey(response.publicKey.toString());
       setWallet(owner.toBase58());
       rememberWalletAddress(owner.toBase58());
+      setConnected(true);
       setState('scanning');
       setNotice('Checking empty SPL Token and Token-2022 accounts on mainnet…');
       const scan = await scanClosableTokenAccounts(owner);
@@ -269,7 +285,7 @@ export function CloserTool() {
       <nav className="game-nav">
         <a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a>
         <ToolToggle mode="close" />
-        <button type="button" onClick={wallet ? disconnectWallet : connectAndScan} disabled={busy} title={wallet ? 'Disconnect this wallet' : undefined}>{wallet ? shortenAddress(wallet) : busy ? 'SCANNING…' : 'CONNECT WALLET'} <span aria-hidden="true">{wallet ? '×' : '+'}</span></button>
+        <button type="button" onClick={connected ? disconnectWallet : connectAndScan} disabled={busy} title={connected ? 'Disconnect this wallet' : undefined}>{connected ? shortenAddress(wallet) : busy ? 'SCANNING…' : 'CONNECT WALLET'} <span aria-hidden="true">{connected ? '×' : '+'}</span></button>
       </nav>
 
       <section className="closer-hero" id="token-closer">
@@ -329,7 +345,7 @@ export function CloserTool() {
         ) : (
           <div className="closer-copy">
             <h1>Dead accounts.<br /><em>Live SOL.</em></h1>
-            <p className="hero-lead">Close zero-balance Solana token accounts you no longer need and return their <strong>full rent deposits</strong> to your wallet. <a className="lead-more" href="#how-it-works">Learn more <span aria-hidden="true">→</span></a></p>
+            <p className="hero-lead">Sell a token and its account stays behind &mdash; empty, but still holding the SOL you locked up to open it. Clear out those leftovers and get the <strong>full deposit</strong> back. Your wallet address is never touched. <a className="lead-more" href="#how-it-works">Learn more <span aria-hidden="true">→</span></a></p>
             <div className="closer-rules">
               <span><b>0</b> TOKEN BALANCE REQUIRED</span>
               <span><b>✓</b> YOU REVIEW EVERY ADDRESS</span>
@@ -337,6 +353,11 @@ export function CloserTool() {
             </div>
             <div className="game-actions"><button type="button" onClick={connectAndScan} disabled={busy}>CONNECT + FIND EMPTY ACCOUNTS ▶</button><button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button><a className="game-text-link verify-link" href={SOURCE_URL} target="_blank" rel="noreferrer">VERIFY THE CODE <span aria-hidden="true">↗</span></a></div>
             {state === 'error' && <p className="live-notice error">{notice}</p>}
+            {needsWallet && (
+              <a className="wallet-deeplink" href={phantomBrowseLink(`${SITE_URL}/close`)} target="_blank" rel="noreferrer">
+                OPEN IN PHANTOM <span aria-hidden="true">→</span>
+              </a>
+            )}
             <div className="closer-warning"><i>!</i><div><b>DESTRUCTIVE: THIS MODE CLOSES EMPTY TOKEN ACCOUNTS</b><span>Selected empty token-account addresses are permanently deleted. Tokens are never burned, and your wallet is never closed.</span></div></div>
           </div>
         )}
