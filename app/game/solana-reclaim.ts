@@ -151,6 +151,7 @@ export type WalletProvider = {
   isConnected?: boolean;
   publicKey?: { toString(): string };
   connect(): Promise<{ publicKey: { toString(): string } }>;
+  disconnect?: () => Promise<void>;
   signTransaction?: (transaction: Transaction) => Promise<Transaction>;
   signAndSendTransaction?: (transaction: Transaction) => Promise<{ signature: string } | string>;
 };
@@ -213,10 +214,35 @@ export function rememberWalletAddress(address: string) {
   window.sessionStorage.setItem(WALLET_SESSION_KEY, address);
 }
 
+/** Clears the remembered wallet so a different one can be connected. */
+export function forgetWalletAddress() {
+  if (typeof window === 'undefined') return;
+  window.sessionStorage.removeItem(WALLET_SESSION_KEY);
+}
+
 export function getRememberedWalletAddress() {
   if (typeof window === 'undefined') return '';
   const providerAddress = getWalletProvider()?.publicKey?.toString();
   return providerAddress || window.sessionStorage.getItem(WALLET_SESSION_KEY) || '';
+}
+
+/**
+ * Turns a transport failure into something a visitor can act on. Upstream rate
+ * limiting is by far the most common one under load, and a raw "unexpected
+ * error" gives no hint that waiting a moment and retrying actually works.
+ */
+export function explainScanError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error ?? '');
+  if (/429|too many requests|rate.?limit|-32005/i.test(message)) {
+    return 'Solana RPC is rate limiting us right now — too many people scanning at once. Wait a few seconds and scan again.';
+  }
+  if (/user rejected|rejected the request|declined|user denied/i.test(message)) {
+    return 'Wallet permission was declined, so nothing was scanned.';
+  }
+  if (/failed to fetch|networkerror|network request|timeout|timed out|50[234]/i.test(message)) {
+    return 'Could not reach Solana mainnet just now. Check your connection and scan again.';
+  }
+  return message || 'The wallet scan was cancelled or could not complete.';
 }
 
 export function shortenAddress(value: string, size = 4) {

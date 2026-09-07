@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import './closer.css';
 
 export const metadata: Metadata = {
   title: 'Close Empty Solana Token Accounts & Reclaim Rent',
@@ -12,10 +11,10 @@ export const metadata: Metadata = {
     'recover Solana rent',
     'Token-2022 account closer',
   ],
-  alternates: { canonical: '/close-token-accounts' },
+  alternates: { canonical: '/close' },
   openGraph: {
     type: 'website',
-    url: '/close-token-accounts',
+    url: '/close',
     title: 'Close Empty Solana Token Accounts & Reclaim Rent',
     description: 'A transparent Solana token account closer for zero-balance SPL Token and Token-2022 accounts.',
     images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Overfunded — Solana rent tools' }],

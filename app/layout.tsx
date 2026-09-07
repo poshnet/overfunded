@@ -4,6 +4,7 @@ import { SITE_NAME, SITE_URL, TWITTER_HANDLE } from './site-config';
 import './globals.css';
 import './game/game.css';
 import './game/game-sections.css';
+import './close/closer.css';
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',

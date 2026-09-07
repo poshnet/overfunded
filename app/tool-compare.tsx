@@ -4,7 +4,7 @@ type Tool = 'reclaim' | 'close';
 
 const CARDS = {
   close: {
-    href: '/close-token-accounts',
+    href: '/close',
     className: 'battle-card enemy',
     owner: 'ACCOUNT CLOSER',
     move: 'DESTRUCTIVE MOVE',

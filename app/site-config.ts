@@ -22,7 +22,7 @@ export const SOURCE_URL = 'https://github.com/poshnet/overfunded';
  * appears above the nav on every tool page. While it is empty the bar renders
  * nothing at all, so this can ship before the coin exists.
  */
-const COIN_MINT_FALLBACK = '';
+const COIN_MINT_FALLBACK = 'E8gH6ehJqBdJycUyxrMFUkkYiuhEseES8kC6FzYspump';
 
 export const COIN_MINT = (process.env.NEXT_PUBLIC_COIN_MINT || COIN_MINT_FALLBACK).trim();
 export const COIN_TICKER = 'OVERFUNDED';

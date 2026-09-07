@@ -7,18 +7,73 @@
  * Read per request rather than at module load so a rotated secret takes effect
  * without a redeploy.
  */
-const PUBLIC_FALLBACK_RPC = 'https://public.rpc.solanavibestation.com';
+// Verified reachable and willing to serve jsonParsed getTokenAccountsByOwner.
+// Both throttle hard — they are a safety net, never a plan.
+const PUBLIC_FALLBACK_RPCS = [
+  'https://public.rpc.solanavibestation.com',
+  'https://api.mainnet-beta.solana.com',
+];
 
-function upstreamRpcUrl() {
+function upstreamPool(): string[] {
   const configured = process.env.SOLANA_RPC_URL?.trim();
-  if (!configured) return PUBLIC_FALLBACK_RPC;
+  if (!configured) return PUBLIC_FALLBACK_RPCS;
   try {
     const url = new URL(configured);
-    if (url.protocol !== 'https:') return PUBLIC_FALLBACK_RPC;
-    return url.toString();
+    if (url.protocol !== 'https:') return PUBLIC_FALLBACK_RPCS;
+    // The paid provider is tried first; the public endpoints only catch its
+    // failures rather than sharing the load.
+    return [url.toString(), ...PUBLIC_FALLBACK_RPCS];
   } catch {
-    return PUBLIC_FALLBACK_RPC;
+    return PUBLIC_FALLBACK_RPCS;
   }
+}
+
+/**
+ * Answers that are the same for every visitor: the rent floor for a given
+ * account size, and the treasury's balance and signature history. Uncached,
+ * a hundred people opening the page at once becomes a few hundred upstream
+ * calls for three distinct answers, which is precisely what a free RPC rejects.
+ *
+ * Nothing wallet-specific is cached. Account reads taken immediately before
+ * signing must stay live, so getAccountInfo and getTokenAccountsByOwner are
+ * deliberately absent.
+ */
+const SHARED_METHOD_TTL_MS: Record<string, number> = {
+  getMinimumBalanceForRentExemption: 300_000,
+  getSignaturesForAddress: 60_000,
+  getBalance: 30_000,
+};
+const SHARED_CACHE_MAX_ENTRIES = 500;
+const sharedCache = new Map<string, { expiresAt: number; result: unknown }>();
+
+function cacheKeyFor(item: RpcRequest) {
+  const method = item?.method;
+  if (typeof method !== 'string' || !(method in SHARED_METHOD_TTL_MS)) return null;
+  return { key: `${method}:${JSON.stringify(item.params ?? [])}`, ttl: SHARED_METHOD_TTL_MS[method] };
+}
+
+/**
+ * Tries each endpoint in turn. A 429 or a 5xx means that provider is refusing
+ * us rather than that the request is wrong, so the next one gets a chance;
+ * any other 4xx is the caller's fault and is returned as-is.
+ */
+async function fetchUpstream(body: string): Promise<Response | null> {
+  let lastRefusal: Response | null = null;
+  for (const endpoint of upstreamPool()) {
+    try {
+      const upstream = await fetch(endpoint, {
+        method: 'POST',
+        headers: { accept: 'application/json', 'content-type': 'application/json' },
+        body,
+      });
+      if (upstream.ok) return upstream;
+      if (upstream.status !== 429 && upstream.status < 500) return upstream;
+      lastRefusal = upstream;
+    } catch {
+      // Network failure against this endpoint; fall through to the next.
+    }
+  }
+  return lastRefusal;
 }
 
 const ALLOWED_METHODS = new Set([
@@ -120,17 +175,39 @@ export async function POST(request: Request) {
   ));
   if (rejected) return errorResponse(rejected.id, -32601, 'RPC method is not available through this relay.');
 
+  // Shared-answer reads are served from memory where possible. This is what
+  // stops a traffic spike becoming one upstream call per visitor.
+  const single = Array.isArray(payload) ? null : payload;
+  const cacheable = single ? cacheKeyFor(single) : null;
+  if (cacheable) {
+    const hit = sharedCache.get(cacheable.key);
+    if (hit && hit.expiresAt > Date.now()) {
+      return new Response(JSON.stringify({ jsonrpc: '2.0', result: hit.result, id: single?.id ?? null }), {
+        headers: { 'cache-control': 'no-store', 'content-type': 'application/json' },
+      });
+    }
+  }
+
   try {
-    const upstream = await fetch(upstreamRpcUrl(), {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+    const upstream = await fetchUpstream(JSON.stringify(payload));
+    if (!upstream) {
+      return errorResponse(null, -32000, 'Solana RPC is temporarily unavailable.', 502);
+    }
 
     const body = await upstream.text();
+
+    if (cacheable && upstream.ok) {
+      try {
+        const parsed = JSON.parse(body) as { result?: unknown; error?: unknown };
+        if (parsed && parsed.error === undefined && parsed.result !== undefined) {
+          if (sharedCache.size > SHARED_CACHE_MAX_ENTRIES) sharedCache.clear();
+          sharedCache.set(cacheable.key, { expiresAt: Date.now() + cacheable.ttl, result: parsed.result });
+        }
+      } catch {
+        // A success body we cannot parse is passed through, just never cached.
+      }
+    }
+
     return new Response(body, {
       status: upstream.status,
       headers: {

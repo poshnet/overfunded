@@ -1,1 +1,5 @@
-export { default } from './game/page';
+import { ToolSurface } from './tool-surface';
+
+export default function HomePage() {
+  return <ToolSurface initial="reclaim" />;
+}

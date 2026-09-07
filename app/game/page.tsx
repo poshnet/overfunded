@@ -20,6 +20,8 @@ import {
   stageState,
   stageReductionPercent,
   reclaimAccounts,
+  explainScanError,
+  forgetWalletAddress,
   rememberWalletAddress,
   scanReclaimableAccounts,
   SERVICE_FEE_PERCENT,
@@ -43,18 +45,18 @@ type QuestState = 'idle' | 'connecting' | 'scanning' | 'ready' | 'reclaiming' | 
 // height, where it falls to, spin and start offset. Fixed values keep the
 // server and client markup identical.
 const COIN_ARCS = [
-  { cx: -44, cy: -158, rot: -260, delay: 0.0 },
-  { cx: -14, cy: -186, rot: 300, delay: 0.07 },
-  { cx: 22, cy: -146, rot: -320, delay: 0.14 },
-  { cx: 52, cy: -172, rot: 280, delay: 0.21 },
-  { cx: -64, cy: -132, rot: 340, delay: 0.28 },
-  { cx: 8, cy: -206, rot: -240, delay: 0.35 },
-  { cx: 40, cy: -192, rot: 360, delay: 0.42 },
-  { cx: -30, cy: -166, rot: -300, delay: 0.49 },
-  { cx: 66, cy: -140, rot: 260, delay: 0.56 },
-  { cx: -52, cy: -198, rot: 320, delay: 0.63 },
-  { cx: 30, cy: -124, rot: -280, delay: 0.7 },
-  { cx: -6, cy: -152, rot: 300, delay: 0.77 },
+  { sx: -46, cx: -14, cy: -122, rot: -80, delay: 0.0 },
+  { sx: 22, cx: 10, cy: -132, rot: 95, delay: 0.25 },
+  { sx: -12, cx: -20, cy: -115, rot: -70, delay: 0.5 },
+  { sx: 52, cx: 16, cy: -128, rot: 110, delay: 0.75 },
+  { sx: -58, cx: -8, cy: -134, rot: -100, delay: 1.0 },
+  { sx: 8, cx: 22, cy: -118, rot: 75, delay: 1.25 },
+  { sx: -30, cx: -18, cy: -130, rot: -115, delay: 1.5 },
+  { sx: 40, cx: 6, cy: -124, rot: 90, delay: 1.75 },
+  { sx: -20, cx: 20, cy: -133, rot: -85, delay: 2.0 },
+  { sx: 58, cx: -24, cy: -120, rot: 105, delay: 2.25 },
+  { sx: -50, cx: 12, cy: -127, rot: -95, delay: 2.5 },
+  { sx: 32, cx: -16, cy: -131, rot: 80, delay: 2.75 },
 ];
 
 const DEMO_MINTS = ['USDC', 'BONK', 'JUP', 'PYTH', 'WIF', 'JTO', 'RAY', 'ORCA'];
@@ -163,6 +165,27 @@ export default function GamePrototype() {
     hero.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   }
 
+  // People routinely hold several wallets, so the nav address doubles as a
+  // sign-out. Confirm first: a stray click here would otherwise drop a scan.
+  async function disconnectWallet() {
+    if (!window.confirm(`Disconnect ${shortenAddress(wallet)}?\n\nYou can connect a different wallet straight after.`)) return;
+    try {
+      await getWalletProvider()?.disconnect?.();
+    } catch {
+      // Not every wallet exposes disconnect, and some reject it while locked.
+      // Clearing local state still signs the visitor out of this site.
+    }
+    forgetWalletAddress();
+    setWallet('');
+    setAccounts([]);
+    setScannedCount(0);
+    setSignatures([]);
+    setChargedFeeLamports(0);
+    setProgress('');
+    setQuest('idle');
+    setNotice('Connect a wallet to scan live Solana mainnet data.');
+  }
+
   async function connectAndScan() {
     focusQuest();
     const provider = getWalletProvider();
@@ -194,7 +217,7 @@ export default function GamePrototype() {
         : 'Scan complete. Nothing in this wallet is above the current rent floor.');
     } catch (error) {
       setQuest('error');
-      setNotice(error instanceof Error ? error.message : 'The wallet scan was cancelled or could not complete.');
+      setNotice(explainScanError(error));
     }
   }
 
@@ -279,7 +302,7 @@ export default function GamePrototype() {
         : quest === 'won' ? 'RECOVERY CONFIRMED'
           : quest === 'demo' ? 'SAMPLE TREASURE FOUND'
             : quest === 'ready' && accounts.length === 0 ? 'ALREADY AT THE RENT FLOOR'
-              : quest === 'ready' ? 'TREASURE FOUND' : 'UNCLAIMED SOL';
+              : quest === 'ready' ? 'TREASURE FOUND' : 'RECLAIM SOL';
   // '?' only survives while the answer is genuinely unknown. Once a scan has
   // finished the figure is known, even when it is zero.
   const amountMode: AmountMode = busy ? 'scanning'
@@ -312,7 +335,7 @@ export default function GamePrototype() {
       <nav className="game-nav">
         <a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a>
         <ToolToggle mode="reclaim" />
-        <button type="button" onClick={connectAndScan} disabled={busy}>{wallet ? shortenAddress(wallet) : busy ? 'SCANNING…' : 'CONNECT WALLET'} <span>+</span></button>
+        <button type="button" onClick={wallet ? disconnectWallet : connectAndScan} disabled={busy} title={wallet ? 'Disconnect this wallet' : undefined}>{wallet ? shortenAddress(wallet) : busy ? 'SCANNING…' : 'CONNECT WALLET'} <span aria-hidden="true">{wallet ? '×' : '+'}</span></button>
       </nav>
 
       <section className="game-hero" id="quest">
@@ -329,7 +352,7 @@ export default function GamePrototype() {
 
             {foundNothing ? (
               <div className="inventory-empty">
-                <i aria-hidden="true">∅</i>
+                <i aria-hidden="true">✓</i>
                 <b>NOTHING TO RECLAIM</b>
                 <p>
                   {scannedCount === 0
@@ -432,6 +455,7 @@ export default function GamePrototype() {
                 key={index}
                 className="coin"
                 style={{
+                  '--sx': `${arc.sx}px`,
                   '--cx': `${arc.cx}px`,
                   '--cy': `${arc.cy}px`,
                   '--rot': `${arc.rot}deg`,
@@ -500,13 +524,15 @@ export default function GamePrototype() {
           <div className="reduction-bars">
             <div className="reduction-bar">
               <span>ORIGINAL FLOOR</span>
-              <i><em className="bar-old" style={{ width: '100%' }} /></i>
+              <i className="reduction-split">
+                <em className="bar-old" style={{ width: `${newFloorBarWidth}%` }} />
+                <em className="bar-new" style={{ width: `${100 - newFloorBarWidth}%` }} />
+              </i>
               <b>{formatSol(LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS, 8)} SOL</b>
             </div>
-            <div className="reduction-bar">
-              <span>CURRENT FLOOR</span>
-              <i><em className="bar-new" style={{ width: `${newFloorBarWidth}%` }} /></i>
-              <b>{liveFloorLamports === null ? '—' : `${formatSol(liveFloorLamports, 8)} SOL`}</b>
+            <div className="reduction-key">
+              <span className="key-old">STILL RENT<b>{liveFloorLamports === null ? '—' : `${formatSol(liveFloorLamports, 8)} SOL`}</b></span>
+              <span className="key-new">YOURS TO RECLAIM<b>{perAccountUnlockedLamports === null ? '—' : `${formatSol(perAccountUnlockedLamports, 8)} SOL`}</b></span>
             </div>
           </div>
 
@@ -592,7 +618,7 @@ export default function GamePrototype() {
           <a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">PUBLISHED BY SOLANA ↗</a>
         </div>
         <div className="ledger-screen">
-          <span>SOL SAVED FOR USERS</span>
+          <span className="ledger-live">SOL SAVED FOR USERS<b className={treasury === null ? 'pending' : ''}>{treasury === null ? 'READING…' : 'LIVE'}</b></span>
           <strong>{treasury === null ? '—' : formatSol(treasury.reclaimedLamports, 4)}<em>{treasury === null ? 'reading mainnet' : `${formatSol(treasury.feesCollectedLamports, 4)} SOL in fees`}</em></strong>
           <p>Derived from what the fee wallet has actually received: the fee is {SERVICE_FEE_PERCENT}% of each recovery, so the surplus that reached wallets is twenty times it.</p>
           <a href={`https://solscan.io/account/${TREASURY_ADDRESS}`} target="_blank" rel="noreferrer">VERIFY ON SOLSCAN ↗</a>

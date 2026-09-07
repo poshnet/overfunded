@@ -37,17 +37,28 @@ export function ScrollReveal() {
     nodes.forEach(node => node.setAttribute('data-reveal', ''));
     root.classList.add('reveal-ready');
 
+    const reveal = (node: Element) => {
+      node.classList.add('revealed');
+      observer.unobserve(node);
+    };
+
+    // threshold 0 so a single visible pixel is enough. A ratio-based threshold
+    // is unreliable for sections far taller than the viewport, which is how the
+    // ledger could sit at opacity 0 and never come back.
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('revealed');
-        observer.unobserve(entry.target);
+        if (entry.isIntersecting || entry.boundingClientRect.top < window.innerHeight) reveal(entry.target);
       });
-    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.04 });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0 });
 
     nodes.forEach(node => observer.observe(node));
 
+    // Last resort. Whatever happens above, no section stays invisible: after a
+    // few seconds anything still hidden is shown, animation or not.
+    const safetySweep = window.setTimeout(() => nodes.forEach(reveal), 4000);
+
     return () => {
+      window.clearTimeout(safetySweep);
       observer.disconnect();
       root.classList.remove('reveal-ready');
       nodes.forEach(node => {
