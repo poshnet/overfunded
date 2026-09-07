@@ -38,6 +38,7 @@ import { ToolCompare } from '../tool-compare';
 import { TokenPortrait } from '../token-portrait';
 import { BrandMark } from '../brand-mark';
 import { ToolToggle } from './tool-toggle';
+import { useIntro } from '../tool-mode';
 import { CoinBar } from '../coin-bar';
 import { ScrollReveal } from '../scroll-reveal';
 
@@ -61,11 +62,11 @@ const COIN_ARCS = [
   { sx: 32, cx: -30, cy: -131, rot: 80, delay: 0.445 },
   // Stragglers. A few late, lower lobs so the burst tails off instead of
   // stopping dead the moment the first wave clears the rim.
-  { sx: -36, cx: 20, cy: -104, rot: 70, delay: 0.58 },
-  { sx: 44, cx: -22, cy: -112, rot: -90, delay: 0.72 },
-  { sx: -8, cx: -28, cy: -98, rot: 100, delay: 0.86 },
-  { sx: 26, cx: 30, cy: -108, rot: -75, delay: 1.02 },
-  { sx: -54, cx: 16, cy: -101, rot: 85, delay: 1.24 },
+  { sx: -36, cx: 20, cy: -124, rot: 70, delay: 0.58 },
+  { sx: 44, cx: -22, cy: -130, rot: -90, delay: 0.72 },
+  { sx: -8, cx: -28, cy: -118, rot: 100, delay: 0.86 },
+  { sx: 26, cx: 30, cy: -127, rot: -75, delay: 1.02 },
+  { sx: -54, cx: 16, cy: -121, rot: 85, delay: 1.24 },
 ];
 
 const DEMO_MINTS = ['USDC', 'BONK', 'JUP', 'PYTH', 'WIF', 'JTO', 'RAY', 'ORCA'];
@@ -102,7 +103,7 @@ export default function GamePrototype() {
   const [needsWallet, setNeedsWallet] = useState(false);
   // One claim plays as the page opens, so a first-time visitor sees what the
   // tool does before reading a word or touching anything.
-  const [attract, setAttract] = useState(true);
+  const [attract, setAttract] = useState(useIntro());
   const [wallet, setWallet] = useState('');
   const [accounts, setAccounts] = useState<ReclaimableAccount[]>([]);
   const [notice, setNotice] = useState('Connect a wallet to scan live Solana mainnet data.');
