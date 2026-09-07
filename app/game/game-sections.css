@@ -906,3 +906,19 @@ a.battle-card:hover{opacity:1}
    primary action rather than a footnote. */
 .wallet-deeplink{display:inline-flex;align-items:center;gap:10px;margin-top:12px;padding:14px 20px;border:1px solid var(--btn-edge,#dfffaf);border-radius:3px;background:var(--g-lime);color:#071008;font-size:11px;font-weight:950;letter-spacing:.1em;text-decoration:none;box-shadow:4px 4px 0 var(--btn-shadow,#31511e);transition:transform .12s ease,box-shadow .12s ease}
 .wallet-deeplink:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--btn-shadow,#31511e)}
+
+/* Attract loop. The chest performs one full claim as the page opens, then
+   closes and hands back to the idle breathing. This is what a first-time
+   visitor sees before they read anything, so it runs on load rather than
+   waiting for a click. Scoped to the idle state so it can never collide with a
+   real scan, and the reduced-motion block above already silences it. */
+@keyframes chest-attract-lid{
+  0%{transform:rotateX(0deg);animation-timing-function:cubic-bezier(.1,.88,.24,1)}
+  16%{transform:rotateX(-87deg)}
+  62%{transform:rotateX(-87deg);animation-timing-function:cubic-bezier(.45,0,.5,1)}
+  100%{transform:rotateX(0deg)}
+}
+.quest-idle.chest-attract .chest-lid,.closer-idle.chest-attract .chest-lid{animation:chest-attract-lid 2.6s linear both}
+.quest-idle.chest-attract .coin,.closer-idle.chest-attract .coin{animation:coin-x 1.25s linear both}
+.quest-idle.chest-attract .chest-glow,.closer-idle.chest-attract .chest-glow{animation:chest-glow-flare .6s ease-out both}
+.quest-idle.chest-attract .game-chest,.closer-idle.chest-attract .game-chest{animation:chest-punch .38s cubic-bezier(.2,1.4,.4,1) both}

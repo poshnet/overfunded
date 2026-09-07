@@ -93,6 +93,9 @@ export default function GamePrototype() {
   const [connected, setConnected] = useState(false);
   // Set when no injected provider exists at all, which is every in-app browser.
   const [needsWallet, setNeedsWallet] = useState(false);
+  // One claim plays as the page opens, so a first-time visitor sees what the
+  // tool does before reading a word or touching anything.
+  const [attract, setAttract] = useState(true);
   const [wallet, setWallet] = useState('');
   const [accounts, setAccounts] = useState<ReclaimableAccount[]>([]);
   const [notice, setNotice] = useState('Connect a wallet to scan live Solana mainnet data.');
@@ -113,6 +116,14 @@ export default function GamePrototype() {
       if (provider?.isConnected && provider.publicKey) setConnected(true);
     }, 0);
     return () => window.clearTimeout(syncWallet);
+  }, []);
+
+  // Starts on so the very first paint already carries the class; the effect only
+  // clears it. Reduced motion is handled in CSS, where every chest animation is
+  // silenced outright, so no media query is needed here.
+  useEffect(() => {
+    const settle = window.setTimeout(() => setAttract(false), 2700);
+    return () => window.clearTimeout(settle);
   }, []);
 
   // Read the cluster's own rent-exempt minimum so the reduction section quotes a
@@ -356,7 +367,7 @@ export default function GamePrototype() {
             };
 
   return (
-    <main className={`game-shell quest-${quest} ${accounts.length ? 'has-loot' : 'no-loot'}`}>
+    <main className={`game-shell quest-${quest} ${accounts.length ? 'has-loot' : 'no-loot'}${attract ? ' chest-attract' : ''}`}>
       <CoinBar />
       <ScrollReveal />
       <nav className="game-nav">

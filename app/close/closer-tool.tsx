@@ -78,6 +78,9 @@ export function CloserTool() {
   const [connected, setConnected] = useState(false);
   // Set when no injected provider exists at all, which is every in-app browser.
   const [needsWallet, setNeedsWallet] = useState(false);
+  // One claim plays as the page opens, so a first-time visitor sees what the
+  // tool does before reading a word or touching anything.
+  const [attract, setAttract] = useState(true);
   const [wallet, setWallet] = useState('');
   const [accounts, setAccounts] = useState<ClosableTokenAccount[]>([]);
   const [scannedCount, setScannedCount] = useState(0);
@@ -94,6 +97,14 @@ export function CloserTool() {
       if (provider?.isConnected && provider.publicKey) setConnected(true);
     }, 0);
     return () => window.clearTimeout(syncWallet);
+  }, []);
+
+  // Starts on so the very first paint already carries the class; the effect only
+  // clears it. Reduced motion is handled in CSS, where every chest animation is
+  // silenced outright, so no media query is needed here.
+  useEffect(() => {
+    const settle = window.setTimeout(() => setAttract(false), 2700);
+    return () => window.clearTimeout(settle);
   }, []);
 
   const selectedAccounts = useMemo(() => accounts.filter(account => account.selected), [accounts]);
@@ -279,7 +290,7 @@ export function CloserTool() {
             : accounts.length ? 'READY TO CLOSE' : 'RECLAIM SOL';
 
   return (
-    <main className={`game-shell closer-shell closer-${state} ${accounts.length ? 'has-closers' : 'no-closers'}`}>
+    <main className={`game-shell closer-shell closer-${state} ${accounts.length ? 'has-closers' : 'no-closers'}${attract ? ' chest-attract' : ''}`}>
       <CoinBar />
       <ScrollReveal />
       <nav className="game-nav">
@@ -345,7 +356,7 @@ export function CloserTool() {
         ) : (
           <div className="closer-copy">
             <h1>Dead accounts.<br /><em>Live SOL.</em></h1>
-            <p className="hero-lead">Sell a token and its account stays behind &mdash; empty, but still holding the SOL you locked up to open it. Clear out those leftovers and get the <strong>full deposit</strong> back. Your wallet address is never touched. <a className="lead-more" href="#how-it-works">Learn more <span aria-hidden="true">→</span></a></p>
+            <p className="hero-lead">There&rsquo;s SOL trapped in every token you&rsquo;ve already sold. Each account cost a deposit to open, and selling the token never gave it back. Reclaim <strong>every lamport</strong> from all of them at once &mdash; only the empty shells are removed, your wallet and your tokens stay exactly as they are. <a className="lead-more" href="#how-it-works">Learn more <span aria-hidden="true">→</span></a></p>
             <div className="closer-rules">
               <span><b>0</b> TOKEN BALANCE REQUIRED</span>
               <span><b>✓</b> YOU REVIEW EVERY ADDRESS</span>
