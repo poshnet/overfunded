@@ -433,3 +433,19 @@
   .pro-bar{align-items:flex-start;flex-direction:column;gap:10px}
   .pro-bar>button{width:100%}
 }
+
+/* Dust controls. Bulk selection is the whole reason people reach for an
+   incinerator, so it lives one row under the pro switch rather than being
+   something to hunt for. */
+.dust-bar{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-bottom:12px;padding:10px 12px;border:1px solid #3a2226;background:#120908}
+.dust-bar span{flex:1;min-width:150px;color:#8a6a63;font-family:Arial,sans-serif;font-size:11px}
+.dust-bar button{padding:9px 12px;border:1px solid #693037;border-radius:3px;background:transparent;color:#c9a08f;font:inherit;font-size:9px;font-weight:900;letter-spacing:.09em;cursor:pointer}
+.dust-bar button:hover:not(:disabled){border-color:var(--closer-red);color:var(--closer-red)}
+.dust-bar button.on{border-color:var(--closer-red);background:var(--closer-red);color:#1d0e08}
+.dust-bar button:disabled{opacity:.45;cursor:default}
+@media(max-width:640px){
+  .dust-bar span{flex:none;width:100%;order:-1}
+  .dust-bar button{flex:1}
+}
+.dust-limits{display:flex;gap:5px}
+.dust-limits button{padding:8px 10px;font-size:9px}

@@ -94,6 +94,14 @@ export function CloserTool() {
   // burns what is inside, permanently, so it is opt-in and nothing in it is ever
   // pre-selected.
   const [proMode, setProMode] = useState(false);
+  // Dust view: fungible leftovers only. An NFT is exactly 1 with zero decimals,
+  // so "less than one" excludes them for free and leaves the balances that are
+  // almost certainly worthless.
+  const [dustOnly, setDustOnly] = useState(false);
+  // USD price per mint. null means unknown, which is deliberately not the same
+  // as zero: a token we cannot price is never treated as dust.
+  const [prices, setPrices] = useState<Record<string, number | null>>({});
+  const [dustLimit, setDustLimit] = useState(0.1);
   // One claim plays as the page opens, so a first-time visitor sees what the
   // tool does before reading a word or touching anything.
   const introAllowed = useIntro();
@@ -141,6 +149,36 @@ export function CloserTool() {
     };
   }, [introAllowed]);
 
+  function valueLabel(account: ClosableTokenAccount) {
+    const value = usdValue(account);
+    if (value === null) return 'value unknown';
+    if (value < 0.01) return '< $0.01';
+    return `≈ $${value.toFixed(2)}`;
+  }
+
+  function usdValue(account: ClosableTokenAccount) {
+    const price = prices[account.mint];
+    if (typeof price !== 'number') return null;
+    return Number(account.uiAmount) * price;
+  }
+
+  /**
+   * Dust is decided on value, never on quantity. Half a token sounds negligible
+   * until the token is wrapped BTC, so an unpriced mint is excluded outright and
+   * an NFT is excluded twice over: it is worth 1 unit and rarely has a price.
+   */
+  function isDust(account: ClosableTokenAccount) {
+    if (account.rawAmount === '0' || account.nft) return false;
+    const value = usdValue(account);
+    return value !== null && value < dustLimit;
+  }
+  const visibleAccounts = useMemo(
+    () => (proMode && dustOnly ? accounts.filter(isDust) : accounts),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [accounts, proMode, dustOnly, prices, dustLimit],
+  );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const dustCount = useMemo(() => accounts.filter(isDust).length, [accounts, prices, dustLimit]);
   const selectedAccounts = useMemo(() => accounts.filter(account => account.selected), [accounts]);
   const selectedLamports = useMemo(
     () => selectedAccounts.reduce((sum, account) => sum + account.recoverableLamports, 0),
@@ -180,6 +218,20 @@ export function CloserTool() {
     setProgress('');
     setState('idle');
     setNotice('Connect a wallet to find empty token accounts on Solana mainnet.');
+  }
+
+  /** Prices are advisory: a failure leaves everything unpriced, which is the safe state. */
+  async function loadPrices(list: ClosableTokenAccount[]) {
+    const mints = [...new Set(list.filter(account => account.rawAmount !== '0').map(account => account.mint))];
+    if (!mints.length) return;
+    try {
+      const response = await fetch(`/api/v1/prices?mints=${mints.slice(0, 100).join(',')}`);
+      if (!response.ok) return;
+      const payload = await response.json() as { prices?: Record<string, number | null> };
+      if (payload.prices) setPrices(payload.prices);
+    } catch {
+      // Leave prices empty. Nothing becomes dust, so nothing gets bulk-selected.
+    }
   }
 
   function connectAndScan() {
@@ -230,6 +282,7 @@ export function CloserTool() {
       const scan = await scanClosableTokenAccounts(owner, pro);
       setAccounts(scan.accounts);
       setScannedCount(scan.scannedCount);
+      if (pro) void loadPrices(scan.accounts);
       setState('ready');
       setNotice(scan.accounts.length
         ? `Found ${scan.accounts.length} empty token account${scan.accounts.length === 1 ? '' : 's'} you can close. Review every address before approving.`
@@ -265,6 +318,25 @@ export function CloserTool() {
     setSignatures([]);
     setProgress('');
     setNotice('Connect a wallet to find empty token accounts on Solana mainnet.');
+  }
+
+  /**
+   * Anything filtered out of view is also deselected. Closing something the
+   * visitor cannot see would be indefensible when the action is irreversible.
+   */
+  function toggleDustOnly() {
+    const next = !dustOnly;
+    setDustOnly(next);
+    if (next) setAccounts(current => current.map(account => (
+      isDust(account) ? account : { ...account, selected: false }
+    )));
+  }
+
+  function selectAllVisible(selected: boolean) {
+    const shown = new Set(visibleAccounts.map(account => account.address));
+    setAccounts(current => current.map(account => (
+      shown.has(account.address) ? { ...account, selected } : account
+    )));
   }
 
   function toggleAccount(address: string) {
@@ -407,13 +479,48 @@ export function CloserTool() {
                     disabled={busy || state === 'won'}
                   >{proMode ? 'TURN OFF' : 'TURN ON'}</button>
                 </div>
+                {proMode && (
+                  <div className="dust-bar">
+                    <button
+                      type="button"
+                      className={dustOnly ? 'on' : ''}
+                      onClick={toggleDustOnly}
+                      disabled={busy || state === 'won'}
+                    >{dustOnly ? `DUST ONLY · ${dustCount}` : `SHOW DUST ONLY (${dustCount})`}</button>
+                    <span>
+                      Worth under ${dustLimit.toFixed(2)}. Priced live &mdash; anything we cannot price,
+                      and every NFT, stays out of this list.
+                    </span>
+                    <div className="dust-limits">
+                      {[0.01, 0.1, 1].map(limit => (
+                        <button
+                          key={limit}
+                          type="button"
+                          className={dustLimit === limit ? 'on' : ''}
+                          onClick={() => { setDustLimit(limit); selectAllVisible(false); }}
+                          disabled={busy || state === 'won'}
+                        >${limit.toFixed(2)}</button>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => selectAllVisible(true)}
+                      disabled={busy || state === 'won' || !visibleAccounts.length}
+                    >SELECT ALL {visibleAccounts.length}</button>
+                    <button
+                      type="button"
+                      onClick={() => selectAllVisible(false)}
+                      disabled={busy || state === 'won'}
+                    >CLEAR</button>
+                  </div>
+                )}
                 <div className="live-account-list">
-                  {accounts.length ? accounts.map(account => (
+                  {visibleAccounts.length ? visibleAccounts.map(account => (
                     <label key={account.address} className={account.selected ? 'selected' : ''}>
                       <input type="checkbox" checked={account.selected} onChange={() => toggleAccount(account.address)} disabled={busy || state === 'won'} />
                       <i>{account.selected ? '✓' : ''}</i>
                       <TokenPortrait mint={account.mint} />
-                      <span><b>{account.rawAmount === '0' ? (account.program === 'token-2022' ? 'Empty Token-2022 account' : 'Empty token account') : account.nft ? 'NFT — burned, metadata and edition closed too' : `HOLDS ${account.uiAmount} — will be burned`}</b><small>{shortenAddress(account.address, 6)} · token mint {shortenAddress(account.mint, 4)} is not deleted</small></span>
+                      <span><b>{account.rawAmount === '0' ? (account.program === 'token-2022' ? 'Empty Token-2022 account' : 'Empty token account') : account.nft ? 'NFT — burned, metadata and edition closed too' : `HOLDS ${account.uiAmount} · ${valueLabel(account)} — will be burned`}</b><small>{shortenAddress(account.address, 6)} · token mint {shortenAddress(account.mint, 4)} is not deleted</small></span>
                       <strong>+{formatSol(account.recoverableLamports, 6)} SOL</strong>
                     </label>
                   )) : (
