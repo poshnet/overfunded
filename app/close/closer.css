@@ -398,3 +398,12 @@
 /* Same action, warm theme. */
 .closer-shell .wallet-deeplink{border-color:#f0b49a;background:var(--closer-red);color:#1d0e08;box-shadow:4px 4px 0 #6d2f22}
 .closer-shell .wallet-deeplink:hover{box-shadow:6px 6px 0 #6d2f22}
+
+/* Pro mode. The bar turns red because in this mode the tool destroys token
+   balances, and the claim it normally makes — that nothing is ever burned — is
+   no longer true. */
+.closer-modebar.is-pro{border-color:var(--closer-red);background:rgba(226,141,105,.08)}
+.closer-modebar.is-pro>span,.closer-modebar.is-pro>b{color:var(--closer-red)}
+.pro-switch{padding:8px 13px;border:1px solid #693037;border-radius:3px;background:#160c09;color:#95666b;font:inherit;font-size:9px;font-weight:900;letter-spacing:.11em;cursor:pointer}
+.pro-switch:hover{border-color:var(--closer-red);color:var(--closer-red)}
+.closer-modebar.is-pro .pro-switch{border-color:var(--closer-red);background:var(--closer-red);color:#1d0e08}

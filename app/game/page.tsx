@@ -754,7 +754,7 @@ export default function GamePrototype() {
         ]) }}
       />
 
-      <footer className="game-footer"><a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/blog">Blog</a><a href="/solana-rent-reduction">How the cut works</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">Solana&rsquo;s rollout</a><a href="/legal/risk">Risk</a><a href="/legal/terms">Terms</a><a href="/legal/privacy">Privacy</a></div></footer>
+      <footer className="game-footer"><a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/api/v1">API</a><a href="/blog">Blog</a><a href="/solana-rent-reduction">How the cut works</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">Solana&rsquo;s rollout</a><a href="/legal/risk">Risk</a><a href="/legal/terms">Terms</a><a href="/legal/privacy">Privacy</a></div></footer>
     </main>
   );
 }

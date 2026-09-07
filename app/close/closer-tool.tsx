@@ -25,6 +25,7 @@ import {
   explainScanError,
   forgetWalletAddress,
   rememberWalletAddress,
+  PRO_SERVICE_FEE_PERCENT,
   scanClosableTokenAccounts,
   SERVICE_FEE_PERCENT,
   shortenAddress,
@@ -69,6 +70,9 @@ function buildDemoAccounts(): ClosableTokenAccount[] {
     mint: DEMO_MINTS[index % DEMO_MINTS.length],
     program: index === 3 || index === 7 ? 'token-2022' as const : 'token' as const,
     recoverableLamports: LEGACY_TOKEN_ACCOUNT_RENT_LAMPORTS,
+    rawAmount: '0',
+    decimals: 0,
+    uiAmount: '0',
     selected: true,
   }));
 }
@@ -86,6 +90,10 @@ export function CloserTool() {
   const [connected, setConnected] = useState(false);
   // Set when no injected provider exists at all, which is every in-app browser.
   const [needsWallet, setNeedsWallet] = useState(false);
+  // Pro mode also lists accounts that still hold something. Closing one of those
+  // burns what is inside, permanently, so it is opt-in and nothing in it is ever
+  // pre-selected.
+  const [proMode, setProMode] = useState(false);
   // One claim plays as the page opens, so a first-time visitor sees what the
   // tool does before reading a word or touching anything.
   const introAllowed = useIntro();
@@ -138,7 +146,9 @@ export function CloserTool() {
     () => selectedAccounts.reduce((sum, account) => sum + account.recoverableLamports, 0),
     [selectedAccounts],
   );
-  const serviceFeeLamports = calculateServiceFeeLamports(selectedLamports);
+  const serviceFeeLamports = proMode
+    ? Math.floor((selectedLamports * PRO_SERVICE_FEE_PERCENT * 100) / 10_000)
+    : calculateServiceFeeLamports(selectedLamports);
   const networkFeeLamports = estimatedNetworkFeeLamports(selectedAccounts.length);
   const estimatedReceiveLamports = Math.max(0, selectedLamports - serviceFeeLamports - networkFeeLamports);
   const displayedServiceFee = state === 'won' ? chargedFeeLamports : serviceFeeLamports;
@@ -200,7 +210,7 @@ export function CloserTool() {
       setConnected(true);
       setState('scanning');
       setNotice('Checking empty SPL Token and Token-2022 accounts on mainnet…');
-      const scan = await scanClosableTokenAccounts(owner);
+      const scan = await scanClosableTokenAccounts(owner, proMode);
       setAccounts(scan.accounts);
       setScannedCount(scan.scannedCount);
       setState('ready');
@@ -263,6 +273,7 @@ export function CloserTool() {
         new PublicKey(wallet),
         selectedAccounts,
         (completed, total) => setProgress(`Confirmed ${completed} of ${total} transaction${total === 1 ? '' : 's'}`),
+        proMode,
       );
       setSignatures(result.signatures);
       setChargedFeeLamports(result.serviceFeeLamports);
@@ -357,7 +368,7 @@ export function CloserTool() {
                       <input type="checkbox" checked={account.selected} onChange={() => toggleAccount(account.address)} disabled={busy || state === 'won'} />
                       <i>{account.selected ? '✓' : ''}</i>
                       <TokenPortrait mint={account.mint} />
-                      <span><b>{account.program === 'token-2022' ? 'Empty Token-2022 account' : 'Empty token account'}</b><small>{shortenAddress(account.address, 6)} · token mint {shortenAddress(account.mint, 4)} is not deleted</small></span>
+                      <span><b>{account.rawAmount === '0' ? (account.program === 'token-2022' ? 'Empty Token-2022 account' : 'Empty token account') : `HOLDS ${account.uiAmount} — will be burned`}</b><small>{shortenAddress(account.address, 6)} · token mint {shortenAddress(account.mint, 4)} is not deleted</small></span>
                       <strong>+{formatSol(account.recoverableLamports, 6)} SOL</strong>
                     </label>
                   )) : (
@@ -428,7 +439,7 @@ export function CloserTool() {
         <a className="hero-scroll-cue" href="#how-it-works">MORE DETAILS <span>↓</span></a>
       </section>
 
-      <div className="closer-modebar"><span><i /> DESTRUCTIVE CLOSER MODE</span><b>ZERO-BALANCE ONLY</b><b>TOKEN ACCOUNT DELETED</b><b>TOKENS NEVER BURNED</b><a href={SOURCE_URL} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a></div>
+      <div className={proMode ? 'closer-modebar is-pro' : 'closer-modebar'}><span><i /> {proMode ? 'PRO MODE · BURNS TOKENS' : 'DESTRUCTIVE CLOSER MODE'}</span><b>{proMode ? `${PRO_SERVICE_FEE_PERCENT}% FEE` : 'ZERO-BALANCE ONLY'}</b><b>TOKEN ACCOUNT DELETED</b><b>{proMode ? 'BALANCES BURNED FOREVER' : 'TOKENS NEVER BURNED'}</b><button type="button" className="pro-switch" onClick={() => { setProMode(value => !value); setAccounts([]); }} disabled={busy}>{proMode ? 'PRO ON' : 'PRO OFF'}</button><a href={SOURCE_URL} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a></div>
 
       <section className="rent-lifecycle" id="how-it-works">
         <div className="closer-section-head">
@@ -483,7 +494,7 @@ export function CloserTool() {
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', description: `${SERVICE_FEE_PERCENT}% success fee on recovered rent.` },
       }) }} />
 
-      <footer className="game-footer"><a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/">Keep token accounts</a><a href="/blog">Blog</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">Solana&rsquo;s rollout</a><a href="/legal/risk">Risk</a><a href="/legal/terms">Terms</a><a href="/legal/privacy">Privacy</a></div></footer>
+      <footer className="game-footer"><a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/api/v1">API</a><a href="/">Keep token accounts</a><a href="/blog">Blog</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">Solana&rsquo;s rollout</a><a href="/legal/risk">Risk</a><a href="/legal/terms">Terms</a><a href="/legal/privacy">Privacy</a></div></footer>
     </main>
   );
 }

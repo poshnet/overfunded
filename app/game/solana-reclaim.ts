@@ -9,10 +9,12 @@ import {
   type ParsedAccountData,
 } from '@solana/web3.js';
 import {
+  BURN_DISCRIMINATOR as TOKEN_BURN_DISCRIMINATOR,
   CLOSE_ACCOUNT_DISCRIMINATOR as TOKEN_CLOSE_DISCRIMINATOR,
   WITHDRAW_EXCESS_LAMPORTS_DISCRIMINATOR as TOKEN_WITHDRAW_DISCRIMINATOR,
 } from '@solana-program/token';
 import {
+  BURN_DISCRIMINATOR as TOKEN_2022_BURN_DISCRIMINATOR,
   CLOSE_ACCOUNT_DISCRIMINATOR as TOKEN_2022_CLOSE_DISCRIMINATOR,
   WITHDRAW_EXCESS_LAMPORTS_DISCRIMINATOR as TOKEN_2022_WITHDRAW_DISCRIMINATOR,
 } from '@solana-program/token-2022';
@@ -190,7 +192,14 @@ export type ClosableTokenAccount = {
   program: 'token' | 'token-2022';
   recoverableLamports: number;
   selected: boolean;
+  /** Raw base-unit balance. Anything above zero has to be burned before closing. */
+  rawAmount: string;
+  decimals: number;
+  uiAmount: string;
 };
+
+/** Pro mode charges more because it is doing something irreversible. */
+export const PRO_SERVICE_FEE_PERCENT = 7;
 
 export type WalletCloseScan = {
   accounts: ClosableTokenAccount[];
@@ -202,7 +211,7 @@ type ParsedTokenInfo = {
   isNative?: boolean;
   mint?: string;
   owner?: string;
-  tokenAmount?: { amount?: string };
+  tokenAmount?: { amount?: string; decimals?: number; uiAmountString?: string };
 };
 
 /**
@@ -393,7 +402,10 @@ export async function scanReclaimableAccounts(owner: PublicKey): Promise<WalletS
  * allowed to close. Accounts delegated to a different close authority are
  * omitted rather than presented as actions that will fail later.
  */
-export async function scanClosableTokenAccounts(owner: PublicKey): Promise<WalletCloseScan> {
+export async function scanClosableTokenAccounts(
+  owner: PublicKey,
+  includeFunded = false,
+): Promise<WalletCloseScan> {
   const [legacyResponse, token2022Response] = await Promise.all([
     connection.getParsedTokenAccountsByOwner(owner, { programId: TOKEN_PROGRAM_ID }, 'confirmed'),
     connection.getParsedTokenAccountsByOwner(owner, { programId: TOKEN_2022_PROGRAM_ID }, 'confirmed'),
@@ -409,12 +421,14 @@ export async function scanClosableTokenAccounts(owner: PublicKey): Promise<Walle
     const data = entry.account.data as ParsedAccountData;
     const info = data.parsed?.info as ParsedTokenInfo | undefined;
     const walletCanClose = !info?.closeAuthority || info.closeAuthority === ownerAddress;
+    const rawAmount = info?.tokenAmount?.amount ?? '0';
+    const isEmpty = rawAmount === '0';
     if (
       !info?.mint
       || info.owner !== ownerAddress
       || info.isNative
-      || info.tokenAmount?.amount !== '0'
       || !walletCanClose
+      || (!isEmpty && !includeFunded)
     ) return [];
 
     return [{
@@ -422,7 +436,12 @@ export async function scanClosableTokenAccounts(owner: PublicKey): Promise<Walle
       mint: info.mint,
       program,
       recoverableLamports: entry.account.lamports,
-      selected: true,
+      // Anything still holding tokens is never pre-selected. Closing it destroys
+      // what is inside, so that has to be a deliberate act every single time.
+      selected: isEmpty,
+      rawAmount,
+      decimals: info.tokenAmount?.decimals ?? 0,
+      uiAmount: info.tokenAmount?.uiAmountString ?? '0',
     }];
   }).sort((a, b) => b.recoverableLamports - a.recoverableLamports);
 
@@ -479,7 +498,11 @@ async function getFreshInstruction(account: ReclaimableAccount, authority: Publi
 }
 
 /** Revalidates every irreversible close against raw on-chain data. */
-async function getFreshCloseInstruction(account: ClosableTokenAccount, authority: PublicKey) {
+async function getFreshCloseInstruction(
+  account: ClosableTokenAccount,
+  authority: PublicKey,
+  allowFunded = false,
+) {
   const source = new PublicKey(account.address);
   const expectedProgram = account.program === 'token' ? TOKEN_PROGRAM_ID : TOKEN_2022_PROGRAM_ID;
   const freshAccount = await connection.getAccountInfo(source, 'confirmed');
@@ -495,8 +518,15 @@ async function getFreshCloseInstruction(account: ClosableTokenAccount, authority
   if (!tokenOwner.equals(authority)) {
     throw new Error(`Wallet ownership changed for ${shortenAddress(account.address)}.`);
   }
-  if (freshAccount.data.readBigUInt64LE(64) !== 0n) {
+  const onChainAmount = freshAccount.data.readBigUInt64LE(64);
+  if (!allowFunded && onChainAmount !== 0n) {
     throw new Error(`${shortenAddress(account.address)} received tokens after the scan and was not closed.`);
+  }
+  // In pro mode the balance is burned, so it must still be exactly what the
+  // visitor reviewed. If anything arrived or left since the scan, stop: burning
+  // a different amount than the one they approved is not recoverable.
+  if (allowFunded && onChainAmount !== BigInt(account.rawAmount)) {
+    throw new Error(`Balance of ${shortenAddress(account.address)} changed after the scan, so nothing was burned.`);
   }
   if (freshAccount.data[108] === 0) {
     throw new Error(`${shortenAddress(account.address)} is not an initialized token account.`);
@@ -520,8 +550,26 @@ async function getFreshCloseInstruction(account: ClosableTokenAccount, authority
     ? TOKEN_CLOSE_DISCRIMINATOR
     : TOKEN_2022_CLOSE_DISCRIMINATOR;
 
+  const instructions: TransactionInstruction[] = [];
+  if (onChainAmount > 0n) {
+    // Burn is opcode 8 on both programs: [account, mint, authority] and a u64.
+    const burnData = new Uint8Array(9);
+    burnData[0] = account.program === 'token' ? TOKEN_BURN_DISCRIMINATOR : TOKEN_2022_BURN_DISCRIMINATOR;
+    new DataView(burnData.buffer).setBigUint64(1, onChainAmount, true);
+    instructions.push(new TransactionInstruction({
+      programId: expectedProgram,
+      keys: [
+        { pubkey: source, isSigner: false, isWritable: true },
+        { pubkey: new PublicKey(freshAccount.data.subarray(0, 32)), isSigner: false, isWritable: true },
+        { pubkey: authority, isSigner: true, isWritable: false },
+      ],
+      data: burnData as unknown as Buffer,
+    }));
+  }
+
   return {
     recoverableLamports: freshAccount.lamports,
+    instructions,
     instruction: new TransactionInstruction({
       programId: expectedProgram,
       keys: [
@@ -718,6 +766,7 @@ export async function closeTokenAccounts(
   owner: PublicKey,
   accounts: ClosableTokenAccount[],
   onProgress?: (completed: number, total: number) => void,
+  proMode = false,
 ): Promise<ReclaimOutcome> {
   const signatures: string[] = [];
   const batches = chunk(accounts, ACCOUNTS_PER_TRANSACTION);
@@ -733,23 +782,27 @@ export async function closeTokenAccounts(
   for (let batchIndex = 0; batchIndex < batches.length; batchIndex += 1) {
     try {
       const freshAccounts = await Promise.all(
-        batches[batchIndex].map(account => getFreshCloseInstruction(account, owner)),
+        batches[batchIndex].map(account => getFreshCloseInstruction(account, owner, proMode)),
       );
       const batchRecoveredLamports = freshAccounts.reduce((sum, account) => sum + account.recoverableLamports, 0);
+      const feeBasisPoints = proMode ? PRO_SERVICE_FEE_PERCENT * 100 : SERVICE_FEE_BASIS_POINTS;
       const chargeableFeeLamports = Math.floor(
-        (batchRecoveredLamports * SERVICE_FEE_BASIS_POINTS) / 10_000,
+        (batchRecoveredLamports * feeBasisPoints) / 10_000,
       );
       const batchServiceFeeLamports = chargeableFeeLamports >= minimumFeeTransfer ? chargeableFeeLamports : 0;
       if (chargeableFeeLamports > 0 && batchServiceFeeLamports === 0) serviceFeeWaived = true;
 
+      // A funded account costs two instructions instead of one, so the budget is
+      // sized on what is actually being sent rather than the account count.
+      const closeInstructions = freshAccounts.flatMap(account => [...account.instructions, account.instruction]);
       const latestBlockhash = await connection.getLatestBlockhash('confirmed');
       const transaction = new Transaction({
         feePayer: owner,
         recentBlockhash: latestBlockhash.blockhash,
       }).add(
-        ComputeBudgetProgram.setComputeUnitLimit({ units: computeUnitLimitFor(freshAccounts.length) }),
+        ComputeBudgetProgram.setComputeUnitLimit({ units: computeUnitLimitFor(closeInstructions.length) }),
         ComputeBudgetProgram.setComputeUnitPrice({ microLamports: priorityMicroLamports }),
-        ...freshAccounts.map(account => account.instruction),
+        ...closeInstructions,
       );
 
       if (batchServiceFeeLamports > 0) {
