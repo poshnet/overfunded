@@ -320,9 +320,9 @@
 .closer-idle .closer-chest .chest-body i{animation:lock-glint 5.2s ease-in-out infinite}
 
 /* Reading the wallet: it rattles. */
-.closer-connecting .closer-chest,.closer-scanning .closer-chest{animation:chest-rattle .19s steps(2) infinite}
-.closer-connecting .closer-chest .chest-glow,.closer-scanning .closer-chest .chest-glow{animation:chest-glow-search .5s ease-in-out infinite}
-.closer-connecting .closer-chest .chest-lid,.closer-scanning .closer-chest .chest-lid{animation:chest-lid-jitter .24s steps(2) infinite}
+.closer-connecting .closer-chest,.closer-scanning .closer-chest{animation:chest-rattle .62s ease-in-out infinite}
+.closer-connecting .closer-chest .chest-glow,.closer-scanning .closer-chest .chest-glow{animation:chest-glow-search 1.5s ease-in-out infinite}
+.closer-connecting .closer-chest .chest-lid,.closer-scanning .closer-chest .chest-lid{animation:chest-lid-jitter 1.05s ease-in-out infinite}
 
 /* Empty accounts found: the lid opens and the rent pours out. */
 .has-closers.closer-ready .closer-chest .chest-lid,.closer-demo .closer-chest .chest-lid,.has-closers.closer-closing .closer-chest .chest-lid,.closer-won .closer-chest .chest-lid{animation:chest-lid-open .72s linear both}

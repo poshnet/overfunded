@@ -73,9 +73,9 @@
 .quest-idle .chest-glow{animation:chest-glow-idle 3.2s ease-in-out infinite}
 .quest-idle .chest-body i{animation:chest-glint 4.2s ease-in-out infinite}
 
-.quest-connecting .game-chest,.quest-scanning .game-chest{animation:chest-rattle .19s steps(2) infinite}
-.quest-connecting .chest-glow,.quest-scanning .chest-glow{animation:chest-glow-search .5s ease-in-out infinite}
-.quest-scanning .chest-lid{animation:chest-lid-jitter .24s steps(2) infinite}
+.quest-connecting .game-chest,.quest-scanning .game-chest{animation:chest-rattle .62s ease-in-out infinite}
+.quest-connecting .chest-glow,.quest-scanning .chest-glow{animation:chest-glow-search 1.5s ease-in-out infinite}
+.quest-scanning .chest-lid{animation:chest-lid-jitter 1.05s ease-in-out infinite}
 
 .has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.has-loot.quest-reclaiming .chest-lid{animation:chest-lid-open .72s linear both}
 .has-loot.quest-ready .coin,.quest-demo .coin,.has-loot.quest-reclaiming .coin{animation:coin-x 3.2s linear both}
@@ -96,9 +96,14 @@
 @keyframes chest-breathe{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.015)}}
 @keyframes chest-glint{0%,88%,100%{filter:brightness(1)}92%{filter:brightness(1.9)}}
 @keyframes chest-glow-idle{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:.8;transform:scale(1.07)}}
-@keyframes chest-rattle{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(3px,-2px) rotate(1.6deg)}50%{transform:translate(-3px,1px) rotate(-1.6deg)}75%{transform:translate(2px,-1px) rotate(.9deg)}100%{transform:translate(0,0) rotate(0)}}
+@keyframes chest-rattle{
+  0%,100%{transform:translate(0,0) rotate(0deg)}
+  25%{transform:translate(1.5px,-1.5px) rotate(.6deg)}
+  50%{transform:translate(0,.5px) rotate(0deg)}
+  75%{transform:translate(-1.5px,-1.5px) rotate(-.6deg)}
+}
 
-@keyframes chest-glow-search{0%,100%{opacity:.4;transform:scale(.94)}50%{opacity:.95;transform:scale(1.1)}}
+@keyframes chest-glow-search{0%,100%{opacity:.5;transform:scale(.98)}50%{opacity:.85;transform:scale(1.06)}}
 
 
 @keyframes chest-pop{0%{transform:scale(1)}35%{transform:scale(1.07) translateY(-4px)}100%{transform:scale(1)}}
@@ -600,7 +605,7 @@ a.battle-card:hover{opacity:1}
   100%{transform:rotateX(-24deg)}
 }
 /* Rattling shut. */
-@keyframes chest-lid-jitter{0%,100%{transform:rotateX(0deg)}50%{transform:rotateX(-9deg)}}
+@keyframes chest-lid-jitter{0%,100%{transform:rotateX(0deg)}50%{transform:rotateX(-5deg)}}
 
 /* Both empty-state controls sit at the same size — the back button inherits
    the demo-link styling, which was two pixels taller and a point larger. */
@@ -840,3 +845,40 @@ a.battle-card:hover{opacity:1}
   .reduction-delta strong{font-size:20px}
   .reduction-note{font-size:11px}
 }
+
+
+/* ---- Chest craft pass ----
+   The chest renders at 78% on desktop and 58% on a phone. At that size only
+   silhouette and value contrast survive, so everything here is spent on those
+   two rather than on detail that would disappear. */
+
+/* A barrel lid instead of a pill. A 54px circular radius on a 66px-tall box
+   rounded away most of its height; an elliptical radius keeps the top a wide,
+   shallow arc. The vertical gradient puts the highlight band a quarter of the
+   way down and rolls the ends off, which is what makes it read as curved. */
+.chest-lid{
+  border-radius:99px 99px 6px 6px/54px 54px 6px 6px;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.36),transparent 19%,transparent 81%,rgba(0,0,0,.36)),
+    linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.30) 25%,rgba(255,255,255,.04) 56%,rgba(0,0,0,.10)),
+    repeating-linear-gradient(90deg,var(--chest-lid-a,#3d6a29) 0 25px,var(--chest-lid-b,#4d8531) 25px 50px);
+  background-blend-mode:normal;
+  box-shadow:0 -4px 0 var(--chest-lid-top,#79b940);
+}
+
+/* The body sat at nearly the same value as the lid, so at phone scale the two
+   merged into a single green shape. Darkening it and rolling its ends off gives
+   the lid an edge to sit on. */
+.chest-body{
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.32),transparent 15%,transparent 85%,rgba(0,0,0,.32)),
+    linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,.30)),
+    repeating-linear-gradient(90deg,var(--chest-body-a,#345b25) 0 26px,var(--chest-body-b,#44752d) 26px 52px);
+  background-blend-mode:normal;
+  box-shadow:0 7px 0 #040704,inset 0 -12px 18px rgba(0,0,0,.45);
+}
+
+/* Keyhole sized to survive the phone scale: a wider bore and a squatter slot
+   read where the old needle-thin one vanished. */
+.chest-body i:before{top:6px;width:11px;height:11px;margin-left:-5.5px}
+.chest-body i:after{top:14px;margin-left:-4.5px;border-left-width:4.5px;border-right-width:4.5px;border-top-width:10px}
