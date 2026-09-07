@@ -27,3 +27,10 @@ export const IntroContext = createContext(true);
 export function useIntro() {
   return useContext(IntroContext);
 }
+
+/**
+ * Survives full page loads, which the context cannot: ToolCompare links and the
+ * back button are real navigations, so without this the intro replays every
+ * time someone moves between the two tools by any route other than the toggle.
+ */
+export const INTRO_SESSION_KEY = 'overfunded.introPlayed';

@@ -38,7 +38,7 @@ import { ToolCompare } from '../tool-compare';
 import { TokenPortrait } from '../token-portrait';
 import { BrandMark } from '../brand-mark';
 import { ToolToggle } from './tool-toggle';
-import { useIntro } from '../tool-mode';
+import { INTRO_SESSION_KEY, useIntro } from '../tool-mode';
 import { CoinBar } from '../coin-bar';
 import { ScrollReveal } from '../scroll-reveal';
 
@@ -130,7 +130,16 @@ export default function GamePrototype() {
   // clears it. Reduced motion is handled in CSS, where every chest animation is
   // silenced outright, so no media query is needed here.
   useEffect(() => {
-    const settle = window.setTimeout(() => setAttract(false), 2700);
+    let alreadyPlayed = false;
+    try {
+      alreadyPlayed = window.sessionStorage.getItem(INTRO_SESSION_KEY) === '1';
+      window.sessionStorage.setItem(INTRO_SESSION_KEY, '1');
+    } catch {
+      // Private browsing can throw on sessionStorage. Treat that as a first visit.
+    }
+    // Cleared from inside the timeout rather than synchronously, so React is not
+    // asked to re-render during the effect body.
+    const settle = window.setTimeout(() => setAttract(false), alreadyPlayed ? 0 : 2700);
     return () => window.clearTimeout(settle);
   }, []);
 
