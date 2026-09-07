@@ -103,7 +103,8 @@ export default function GamePrototype() {
   const [needsWallet, setNeedsWallet] = useState(false);
   // One claim plays as the page opens, so a first-time visitor sees what the
   // tool does before reading a word or touching anything.
-  const [attract, setAttract] = useState(useIntro());
+  const introAllowed = useIntro();
+  const [attract, setAttract] = useState(false);
   const [wallet, setWallet] = useState('');
   const [accounts, setAccounts] = useState<ReclaimableAccount[]>([]);
   const [notice, setNotice] = useState('Connect a wallet to scan live Solana mainnet data.');
@@ -129,7 +130,12 @@ export default function GamePrototype() {
   // Starts on so the very first paint already carries the class; the effect only
   // clears it. Reduced motion is handled in CSS, where every chest animation is
   // silenced outright, so no media query is needed here.
+  // The intro is switched on after mount, never server-rendered. Shipping the
+  // class in the first paint meant the animation began immediately and could
+  // only be cancelled once React had hydrated — hundreds of milliseconds on a
+  // page this size — so on a reload the lid visibly swung open and snapped shut.
   useEffect(() => {
+    if (!introAllowed) return;
     let alreadyPlayed = false;
     try {
       alreadyPlayed = window.sessionStorage.getItem(INTRO_SESSION_KEY) === '1';
@@ -137,11 +143,14 @@ export default function GamePrototype() {
     } catch {
       // Private browsing can throw on sessionStorage. Treat that as a first visit.
     }
-    // Cleared from inside the timeout rather than synchronously, so React is not
-    // asked to re-render during the effect body.
-    const settle = window.setTimeout(() => setAttract(false), alreadyPlayed ? 0 : 2700);
-    return () => window.clearTimeout(settle);
-  }, []);
+    if (alreadyPlayed) return;
+    const start = window.setTimeout(() => setAttract(true), 0);
+    const settle = window.setTimeout(() => setAttract(false), 2700);
+    return () => {
+      window.clearTimeout(start);
+      window.clearTimeout(settle);
+    };
+  }, [introAllowed]);
 
   // Read the cluster's own rent-exempt minimum so the reduction section quotes a
   // number the visitor can verify instead of a marketing figure.
