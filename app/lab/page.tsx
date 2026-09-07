@@ -45,7 +45,8 @@ const LIDS = [
 
 /** Coin studies, all on the chosen body + strongbox lid so the read is honest. */
 const COINS = [
-  { id: 'coin1', name: 'Shipped', note: 'What the live chest now uses (fountain)' },
+  { id: 'live', name: 'LIVE CHEST', note: 'No lab overrides at all — exactly what the tools render' },
+  { id: 'coin1', name: 'Lab shipped', note: 'Same thing via the lab variant classes' },
   { id: 'coin2', name: 'Burst arc', note: 'Thrown out hard, gravity takes them down past the chest' },
   { id: 'coin3', name: 'Fountain', note: 'Up and back down into the open lid' },
   { id: 'coin4', name: 'Spiral', note: 'Rising while circling an invisible axis' },
@@ -160,7 +161,7 @@ export default function ChestLab() {
       <h2 className="lab-section">Coin studies &mdash; strongbox lid</h2>
       <div className={`lab-grid${big ? ' lab-big' : ''}`}>
         {COINS.map(coin => (
-          <figure key={coin.id} className={`lab-cell lab-v5 lab-lid2 lab-${coin.id}`} onClick={() => replay(coin.id)}>
+          <figure key={coin.id} className={coin.id === 'live' ? 'lab-cell lab-live' : `lab-cell lab-v5 lab-lid2 lab-${coin.id}`} onClick={() => replay(coin.id)}>
             <div className="lab-stage">
               <div
                 key={cellKey(coin.id)}

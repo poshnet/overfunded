@@ -274,3 +274,8 @@
 .lab-cell{cursor:pointer}
 .lab-cell:hover{border-color:#3d5540}
 .lab-cell figcaption b:after{content:' · click to replay';color:#5c6d60;font-size:9px;font-weight:400;letter-spacing:.04em}
+
+/* The shipped chest with no lab overrides whatsoever, so it can be compared
+   like for like against the variant-class version sitting next to it. */
+.lab-live{outline:1px solid #aaff3e}
+.lab-live figcaption b{color:#aaff3e}

@@ -56,7 +56,7 @@ transaction before signing.
 
 - Withdraw surplus (account stays open): 5%
 - Close an empty account: 1.75%
-- Burn a balance and close the account: 4%
+- Burn a balance and close the account: 5%
 
 Burning an NFT closes its metadata and master edition accounts too, not just the
 token account, so roughly 10.5M lamports come back rather than 2M.

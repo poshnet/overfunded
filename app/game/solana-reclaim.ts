@@ -205,7 +205,7 @@ export type ClosableTokenAccount = {
 };
 
 /** Pro mode charges more because it is doing something irreversible. */
-export const PRO_SERVICE_FEE_PERCENT = 4;
+export const PRO_SERVICE_FEE_PERCENT = 5;
 
 /**
  * Metaplex token metadata. Burning an NFT through BurnNft (opcode 29) closes its

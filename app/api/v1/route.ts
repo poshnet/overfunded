@@ -35,7 +35,7 @@ export function GET(request: Request) {
     fees: {
       withdrawSurplus: '5% — account stays open, tokens untouched',
       closeEmptyAccount: '1.75%',
-      burnAndClose: '4% — an NFT burn also closes its metadata and master edition, so ~10.5M lamports are reclaimed, not ~2M',
+      burnAndClose: '5% — an NFT burn also closes its metadata and master edition, so ~10.5M lamports are reclaimed, not ~2M',
       note: 'Proportional and success-only, so the fee never outruns the amount recovered.',
     },
     signing: 'This API never signs or submits. You sign and send with the wallet owner as fee payer.',
