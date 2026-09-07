@@ -77,11 +77,11 @@
 .quest-connecting .chest-glow,.quest-scanning .chest-glow{animation:chest-glow-search .9s ease-in-out infinite}
 .quest-scanning .chest-lid{animation:chest-lid-jitter 1.05s ease-in-out infinite}
 
-.has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.has-loot.quest-reclaiming .chest-lid{animation:chest-lid-open .42s linear both}
+.has-loot.quest-ready .chest-lid,.quest-demo .chest-lid,.has-loot.quest-reclaiming .chest-lid{animation:chest-lid-open .38s linear .16s both}
 .has-loot.quest-ready .coin,.quest-demo .coin,.has-loot.quest-reclaiming .coin{animation:coin-x 1.25s linear both}
 .has-loot.quest-ready .chest-glow,.quest-demo .chest-glow{animation:chest-glow-flare .6s ease-out both}
 
-.quest-won .chest-lid{animation:chest-lid-open .42s linear both}
+.quest-won .chest-lid{animation:chest-lid-open .38s linear .16s both}
 .quest-won .game-chest{animation:chest-pop .5s cubic-bezier(.34,1.5,.64,1) both}
 .quest-won .coin{animation:coin-x 1.1s linear both}
 .quest-won .chest-glow{animation:chest-glow-win 1.1s ease-out both}
@@ -894,12 +894,13 @@ a.battle-card:hover{opacity:1}
    and a small rebound is what makes the click feel answered; without it the
    lid opening reads as something the page decided to do on its own. */
 @keyframes chest-punch{
-  0%{transform:scale(1,1) translateY(0)}
-  22%{transform:scale(1.09,.93) translateY(2px)}
-  52%{transform:scale(.97,1.05) translateY(-4px)}
+  0%{transform:scale(1,1) translateY(0);animation-timing-function:cubic-bezier(.3,.1,.5,1)}
+  32%{transform:scale(1.13,1.11) translateY(-4px);animation-timing-function:cubic-bezier(.7,0,.9,.4)}
+  46%{transform:scale(1.07,.88) translateY(4px);animation-timing-function:cubic-bezier(.2,1.2,.4,1)}
+  66%{transform:scale(.97,1.06) translateY(-3px)}
   100%{transform:scale(1,1) translateY(0)}
 }
-.has-loot.quest-ready .game-chest,.quest-demo .game-chest{animation:chest-punch .38s cubic-bezier(.2,1.4,.4,1) both}
+.has-loot.quest-ready .game-chest,.quest-demo .game-chest{animation:chest-punch .5s linear both}
 
 /* The way out of an in-app browser. For anyone arriving from a link inside
    Twitter or Telegram this is the only route to a wallet at all, so it is the
@@ -921,4 +922,4 @@ a.battle-card:hover{opacity:1}
 .quest-idle.chest-attract .chest-lid,.closer-idle.chest-attract .chest-lid{animation:chest-attract-lid 2.6s linear both}
 .quest-idle.chest-attract .coin,.closer-idle.chest-attract .coin{animation:coin-x 1.25s linear both}
 .quest-idle.chest-attract .chest-glow,.closer-idle.chest-attract .chest-glow{animation:chest-glow-flare .6s ease-out both}
-.quest-idle.chest-attract .game-chest,.closer-idle.chest-attract .game-chest{animation:chest-punch .38s cubic-bezier(.2,1.4,.4,1) both}
+.quest-idle.chest-attract .game-chest,.closer-idle.chest-attract .game-chest{animation:chest-punch .5s linear both}

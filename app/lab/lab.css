@@ -27,8 +27,9 @@
 .lab-cell figcaption span{color:#75837a;font-family:Arial,sans-serif;font-size:11px}
 
 /* Replay is driven by remounting the chest, so these need no state class. */
-.lab .lab-open .chest-lid{animation:chest-lid-open .42s linear both}
+.lab .lab-open .chest-lid{animation:chest-lid-open .38s linear .16s both}
 .lab .lab-open .coin{animation:coin-x 1.25s linear both}
+.lab .lab-open{animation:chest-punch .5s linear both}
 
 /* v2 — deeper dome. Bottom edge stays on the 136px hinge line. */
 .lab-v2 .chest-lid{top:52px;height:84px;border-radius:99px 99px 8px 8px/80px 80px 8px 8px}
