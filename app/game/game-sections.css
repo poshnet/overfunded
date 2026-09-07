@@ -567,10 +567,9 @@ a.battle-card:hover{opacity:1}
 /* Coins are spat out of the mouth, then drift upward and fade. No corner to
    aim at — they spread both ways and disappear before they reach anything. */
 @keyframes coin-x{
-  0%{opacity:1;z-index:1;transform:translateX(var(--sx))}
-  12%{z-index:5;transform:translateX(calc(var(--sx) + var(--cx) * .4))}
+  0%{opacity:1;transform:translateX(var(--sx))}
+  12%{transform:translateX(calc(var(--sx) + var(--cx) * .4))}
   86%{opacity:1;transform:translateX(calc(var(--sx) + var(--cx)))}
-  88%{z-index:1;opacity:1}
   100%{opacity:0;transform:translateX(calc(var(--sx) + var(--cx)))}
 }
 @keyframes coin-y{
@@ -951,3 +950,10 @@ a.battle-card:hover{opacity:1}
   background-blend-mode:normal;
   box-shadow:0 7px 0 #040704,inset 0 -12px 18px rgba(0,0,0,.45);
 }
+
+
+/* Coins sit behind the chest for their entire flight. The body's front wall is
+   the only thing hiding them, so they are invisible inside the chest, visible
+   the moment they clear its rim, and swallowed again on the way down. No
+   animated z-index, so there is no stacking behaviour left to get wrong. */
+.coin{z-index:1}
