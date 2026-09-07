@@ -821,3 +821,22 @@ a.battle-card:hover{opacity:1}
 @media(max-width:900px){
   .reduction-key{grid-template-columns:1fr;gap:10px}
 }
+
+/* The reduction panel on a phone. Its header was a flex row holding a long
+   label beside a nowrap "LIVE FROM MAINNET" badge, inside a panel that clips
+   overflow, so both ends were crushed. It stacks now, and the rest of the
+   panel gives back the padding it was spending at full-desktop scale. */
+@media(max-width:700px){
+  .reduction-panel-head{align-items:flex-start;flex-direction:column;gap:9px;padding-bottom:13px}
+  .reduction-panel-head>span{line-height:1.5}
+}
+@media(max-width:640px){
+  .reduction-panel{padding:16px}
+  .reduction-figure{padding:18px 0 16px}
+  .reduction-figure strong{font-size:52px}
+  .reduction-figure span{line-height:1.6}
+  .reduction-bars{gap:13px}
+  .reduction-delta{padding:14px}
+  .reduction-delta strong{font-size:20px}
+  .reduction-note{font-size:11px}
+}
