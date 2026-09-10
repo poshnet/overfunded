@@ -13,10 +13,11 @@ const LABEL: Record<BatchPhase, string> = {
 
 /**
  * One row per transaction, because a batched reclaim is not one payment.
- * Solana's transaction size limit forces several, each needing its own wallet
- * approval and each landing its own SOL separately — so someone watching their
- * balance sees it arrive in instalments. Showing "1 of 3" only after the fact
- * made that look like a partial refund or a stuck job.
+ * Accounts are chunked purely by count (ACCOUNTS_PER_TRANSACTION), since a
+ * Solana transaction is capped at 1232 bytes — not by token type. Each chunk
+ * needs its own wallet approval and lands its own SOL, so someone watching
+ * their balance sees it arrive in instalments. Showing "1 of 3" only after the
+ * fact made that look like a partial refund or a stuck job.
  */
 export function BatchSteps({ steps, total }: { steps: BatchProgress[]; total: number }) {
   if (total === 0) return null;
@@ -31,8 +32,9 @@ export function BatchSteps({ steps, total }: { steps: BatchProgress[]; total: nu
       </div>
       {total > 1 && (
         <p className="batch-why">
-          Too many accounts for one Solana transaction, so this is split. Each one
-          is approved separately and its SOL arrives separately.
+          Solana caps how much fits in a single transaction, so your accounts are
+          spread across several. Each needs its own approval and pays out its own
+          SOL &mdash; your balance goes up in steps, not all at once.
         </p>
       )}
       <ol>
