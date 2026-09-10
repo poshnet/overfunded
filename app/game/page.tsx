@@ -32,13 +32,12 @@ import {
   TREASURY_ADDRESS,
   type ReclaimableAccount,
 } from './solana-reclaim';
-import { SITE_NAME, SITE_URL, SOURCE_URL } from '../site-config';
+import { SITE_NAME, SITE_URL, SOURCE_URL, TWITTER_HANDLE } from '../site-config';
 import { StageAmount, type AmountMode } from './stage-amount';
 import { ToolCompare } from '../tool-compare';
 import { TokenPortrait } from '../token-portrait';
 import { BrandMark } from '../brand-mark';
 import { ToolToggle } from './tool-toggle';
-import { INTRO_SESSION_KEY, useIntro } from '../tool-mode';
 import { CoinBar } from '../coin-bar';
 import { ScrollReveal } from '../scroll-reveal';
 
@@ -92,10 +91,6 @@ export default function GamePrototype() {
   const [connected, setConnected] = useState(false);
   // Set when no injected provider exists at all, which is every in-app browser.
   const [needsWallet, setNeedsWallet] = useState(false);
-  // One claim plays as the page opens, so a first-time visitor sees what the
-  // tool does before reading a word or touching anything.
-  const introAllowed = useIntro();
-  const [attract, setAttract] = useState(false);
   const [wallet, setWallet] = useState('');
   const [accounts, setAccounts] = useState<ReclaimableAccount[]>([]);
   const [notice, setNotice] = useState('Connect a wallet to scan live Solana mainnet data.');
@@ -105,6 +100,14 @@ export default function GamePrototype() {
   const [liveFloorLamports, setLiveFloorLamports] = useState<number | null>(null);
   const [scannedCount, setScannedCount] = useState(0);
   const [treasury, setTreasury] = useState<{ reclaimedLamports: number; feesCollectedLamports: number } | null>(null);
+
+  // Read-only lookup. Someone arriving from a link should be able to see their
+  // own number before deciding whether to trust the site with a wallet
+  // connection, so this path signs nothing and asks for nothing.
+  const [lookup, setLookup] = useState('');
+  const [lookupState, setLookupState] = useState<'idle' | 'busy' | 'done' | 'error'>('idle');
+  const [lookupResult, setLookupResult] = useState<{ accounts: number; lamports: number } | null>(null);
+  const [lookupNotice, setLookupNotice] = useState('');
 
   // The root layout survives the client-side tool switch, and sessionStorage
   // keeps the public wallet identity visible if either page remounts.
@@ -117,31 +120,6 @@ export default function GamePrototype() {
     }, 0);
     return () => window.clearTimeout(syncWallet);
   }, []);
-
-  // Starts on so the very first paint already carries the class; the effect only
-  // clears it. Reduced motion is handled in CSS, where every chest animation is
-  // silenced outright, so no media query is needed here.
-  // The intro is switched on after mount, never server-rendered. Shipping the
-  // class in the first paint meant the animation began immediately and could
-  // only be cancelled once React had hydrated — hundreds of milliseconds on a
-  // page this size — so on a reload the lid visibly swung open and snapped shut.
-  useEffect(() => {
-    if (!introAllowed) return;
-    let alreadyPlayed = false;
-    try {
-      alreadyPlayed = window.sessionStorage.getItem(INTRO_SESSION_KEY) === '1';
-      window.sessionStorage.setItem(INTRO_SESSION_KEY, '1');
-    } catch {
-      // Private browsing can throw on sessionStorage. Treat that as a first visit.
-    }
-    if (alreadyPlayed) return;
-    const start = window.setTimeout(() => setAttract(true), 0);
-    const settle = window.setTimeout(() => setAttract(false), 2700);
-    return () => {
-      window.clearTimeout(start);
-      window.clearTimeout(settle);
-    };
-  }, [introAllowed]);
 
   // Read the cluster's own rent-exempt minimum so the reduction section quotes a
   // number the visitor can verify instead of a marketing figure.
@@ -232,6 +210,31 @@ export default function GamePrototype() {
     setProgress('');
     setQuest('idle');
     setNotice('Connect a wallet to scan live Solana mainnet data.');
+  }
+
+  async function checkAddress(event: React.FormEvent) {
+    event.preventDefault();
+    const address = lookup.trim();
+    if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)) {
+      setLookupState('error');
+      setLookupNotice('That does not look like a Solana address. Paste the wallet address itself, not a transaction or a domain.');
+      return;
+    }
+    setLookupState('busy');
+    setLookupNotice('');
+    try {
+      const response = await fetch(`/api/v1/scan?wallet=${address}`);
+      const payload = await response.json() as { error?: string; reclaimableAccounts?: number; totalExcessLamports?: number };
+      if (!response.ok || payload.error) throw new Error(payload.error || 'Lookup failed.');
+      setLookupResult({
+        accounts: payload.reclaimableAccounts ?? 0,
+        lamports: payload.totalExcessLamports ?? 0,
+      });
+      setLookupState('done');
+    } catch (error) {
+      setLookupState('error');
+      setLookupNotice(error instanceof Error ? error.message : 'Lookup failed.');
+    }
   }
 
   async function connectAndScan() {
@@ -384,7 +387,7 @@ export default function GamePrototype() {
             };
 
   return (
-    <main className={`game-shell quest-${quest} ${accounts.length ? 'has-loot' : 'no-loot'}${attract ? ' chest-attract' : ''}`}>
+    <main className={`game-shell quest-${quest} ${accounts.length ? 'has-loot' : 'no-loot'}`}>
       <CoinBar />
       <ScrollReveal />
       <nav className="game-nav">
@@ -465,6 +468,16 @@ export default function GamePrototype() {
               </p>
             )}
             {!foundNothing && <p className={quest === 'error' ? 'live-notice error' : 'live-notice'}>{notice}</p>}
+            {quest === 'won' && (
+              <a className="follow-strip" href="https://x.com/reclaimsol" target="_blank" rel="noreferrer">
+                <b>ONE GATE OF FIVE IS LIVE</b>
+                <span>
+                  When the next one activates, these same accounts are worth roughly ten times this.
+                  Follow {TWITTER_HANDLE} and we&rsquo;ll post the moment it lands.
+                </span>
+                <em>FOLLOW ON X <i aria-hidden="true">↗</i></em>
+              </a>
+            )}
             {signatures.length > 0 && (
               <div className="live-signatures">
                 {signatures.map((signature, index) => (
@@ -495,6 +508,38 @@ export default function GamePrototype() {
               <button className="scan-primary" type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN ▶</button>
               <button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button>
                 <a className="game-text-link verify-link" href={SOURCE_URL} target="_blank" rel="noreferrer">VERIFY THE CODE <span aria-hidden="true">↗</span></a>
+            </div>
+            <div className="peek">
+              <form className="peek-form" onSubmit={checkAddress}>
+                <label htmlFor="peek-address">OR CHECK ANY WALLET &mdash; NO CONNECTION NEEDED</label>
+                <div className="peek-row">
+                  <input
+                    id="peek-address"
+                    value={lookup}
+                    onChange={event => setLookup(event.target.value)}
+                    placeholder="Paste a Solana address"
+                    spellCheck={false}
+                    autoComplete="off"
+                  />
+                  <button type="submit" disabled={lookupState === 'busy'}>
+                    {lookupState === 'busy' ? 'CHECKING…' : 'CHECK'}
+                  </button>
+                </div>
+              </form>
+              {lookupState === 'error' && <p className="peek-note error">{lookupNotice}</p>}
+              {lookupState === 'done' && lookupResult && (
+                lookupResult.accounts === 0 ? (
+                  <p className="peek-note">Nothing above the floor in that wallet. Every account it owns is already funded at the current minimum.</p>
+                ) : (
+                  <div className="peek-result">
+                    <b>{formatSol(lookupResult.lamports, 6)} SOL</b>
+                    <span>
+                      across {lookupResult.accounts} account{lookupResult.accounts === 1 ? '' : 's'} &mdash; read straight from
+                      mainnet, nothing signed. Connect that wallet to withdraw it.
+                    </span>
+                  </div>
+                )
+              )}
             </div>
             {quest === 'error' && <p className="live-notice error">{notice}</p>}
             {needsWallet && (

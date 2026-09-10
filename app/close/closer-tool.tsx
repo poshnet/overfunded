@@ -3,9 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import { BrandMark } from '../brand-mark';
-import { SITE_NAME, SITE_URL, SOURCE_URL } from '../site-config';
+import { SITE_NAME, SITE_URL, SOURCE_URL, TWITTER_HANDLE } from '../site-config';
 import { ToolToggle } from '../game/tool-toggle';
-import { INTRO_SESSION_KEY, useIntro } from '../tool-mode';
 import { ToolCompare } from '../tool-compare';
 import { StageAmount, type AmountMode } from '../game/stage-amount';
 import { RENT_SOURCE_URL } from '../game/solana-reclaim';
@@ -93,10 +92,6 @@ export function CloserTool() {
   // as zero: a token we cannot price is never treated as dust.
   const [prices, setPrices] = useState<Record<string, number | null>>({});
   const [dustLimit, setDustLimit] = useState(0.1);
-  // One claim plays as the page opens, so a first-time visitor sees what the
-  // tool does before reading a word or touching anything.
-  const introAllowed = useIntro();
-  const [attract, setAttract] = useState(false);
   const [wallet, setWallet] = useState('');
   const [accounts, setAccounts] = useState<ClosableTokenAccount[]>([]);
   const [scannedCount, setScannedCount] = useState(0);
@@ -114,31 +109,6 @@ export function CloserTool() {
     }, 0);
     return () => window.clearTimeout(syncWallet);
   }, []);
-
-  // Starts on so the very first paint already carries the class; the effect only
-  // clears it. Reduced motion is handled in CSS, where every chest animation is
-  // silenced outright, so no media query is needed here.
-  // The intro is switched on after mount, never server-rendered. Shipping the
-  // class in the first paint meant the animation began immediately and could
-  // only be cancelled once React had hydrated — hundreds of milliseconds on a
-  // page this size — so on a reload the lid visibly swung open and snapped shut.
-  useEffect(() => {
-    if (!introAllowed) return;
-    let alreadyPlayed = false;
-    try {
-      alreadyPlayed = window.sessionStorage.getItem(INTRO_SESSION_KEY) === '1';
-      window.sessionStorage.setItem(INTRO_SESSION_KEY, '1');
-    } catch {
-      // Private browsing can throw on sessionStorage. Treat that as a first visit.
-    }
-    if (alreadyPlayed) return;
-    const start = window.setTimeout(() => setAttract(true), 0);
-    const settle = window.setTimeout(() => setAttract(false), 2700);
-    return () => {
-      window.clearTimeout(start);
-      window.clearTimeout(settle);
-    };
-  }, [introAllowed]);
 
   function valueLabel(account: ClosableTokenAccount) {
     const value = usdValue(account);
@@ -407,7 +377,7 @@ export function CloserTool() {
             : accounts.length ? 'READY TO CLOSE' : 'RECLAIM SOL';
 
   return (
-    <main className={`game-shell closer-shell closer-${state} ${accounts.length ? 'has-closers' : 'no-closers'}${attract ? ' chest-attract' : ''}`}>
+    <main className={`game-shell closer-shell closer-${state} ${accounts.length ? 'has-closers' : 'no-closers'}`}>
       <CoinBar />
       <ScrollReveal />
       <nav className="game-nav">
@@ -529,16 +499,26 @@ export function CloserTool() {
               </>
             )}
             <p className={state === 'error' ? 'live-notice error' : 'live-notice'}>{notice}</p>
+            {state === 'won' && (
+              <a className="follow-strip" href="https://x.com/reclaimsol" target="_blank" rel="noreferrer">
+                <b>ONE GATE OF FIVE IS LIVE</b>
+                <span>
+                  When the next one activates, these same accounts are worth roughly ten times this.
+                  Follow {TWITTER_HANDLE} and we&rsquo;ll post the moment it lands.
+                </span>
+                <em>FOLLOW ON X <i aria-hidden="true">↗</i></em>
+              </a>
+            )}
             {signatures.length > 0 && <div className="live-signatures">{signatures.map((signature, index) => (
               <a key={signature} href={`https://solscan.io/tx/${signature}`} target="_blank" rel="noreferrer">Transaction {index + 1}: {shortenAddress(signature, 7)} ↗</a>
             ))}</div>}
           </div>
         ) : (
           <div className="closer-copy">
-            <h1>Dead accounts.<br /><em>Live SOL.</em></h1>
-            <p className="hero-lead">There&rsquo;s SOL trapped in every token you&rsquo;ve already sold. Each account cost a deposit to open, and selling the token never gave it back. Reclaim <strong>every lamport</strong> from all of them at once &mdash; only the empty shells are removed, your wallet and your tokens stay exactly as they are. <a className="lead-more" href="#how-it-works">Learn more <span aria-hidden="true">→</span></a></p>
+            <h1>Empty accounts.<br /><em>Full refund.</em></h1>
+            <p className="hero-lead">Sell or move a token and the account it lived in stays open behind you &mdash; holding nothing, still holding the ~0.002 SOL you paid to create it. This finds those empty shells and refunds the deposit from all of them at once. <strong>Accounts that still hold a token are never touched</strong>, and nothing is ever sold, swapped or burned. <a className="lead-more" href="#how-it-works">Learn more <span aria-hidden="true">→</span></a></p>
             <div className="closer-rules">
-              <span><b>0</b> TOKEN BALANCE REQUIRED</span>
+              <span><b>0</b> BALANCE ONLY &mdash; TOKENS YOU HOLD ARE SKIPPED</span>
               <span><b>✓</b> YOU REVIEW EVERY ADDRESS</span>
               <span><b>5%</b> SUCCESS FEE</span>
             </div>

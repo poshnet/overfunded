@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import GamePrototype from './game/page';
 import { CloserTool } from './close/closer-tool';
-import { IntroContext, ToolModeContext, type ToolMode } from './tool-mode';
+import { ToolModeContext, type ToolMode } from './tool-mode';
 
 const PATH_FOR: Record<ToolMode, string> = { reclaim: '/', close: '/close' };
 
@@ -22,14 +22,12 @@ const TITLE_FOR: Record<ToolMode, string> = {
  */
 export function ToolSurface({ initial }: { initial: ToolMode }) {
   const [mode, setMode] = useState<ToolMode>(initial);
-  const [intro, setIntro] = useState(true);
 
   const switchTo = useCallback((next: ToolMode) => {
     if (next === mode) return;
     window.history.pushState({ toolMode: next }, '', PATH_FOR[next]);
     document.title = TITLE_FOR[next];
     window.scrollTo(0, 0);
-    setIntro(false);
     setMode(next);
   }, [mode]);
 
@@ -46,9 +44,7 @@ export function ToolSurface({ initial }: { initial: ToolMode }) {
 
   return (
     <ToolModeContext.Provider value={switchTo}>
-      <IntroContext.Provider value={intro}>
-        {mode === 'close' ? <CloserTool /> : <GamePrototype />}
-      </IntroContext.Provider>
+      {mode === 'close' ? <CloserTool /> : <GamePrototype />}
     </ToolModeContext.Provider>
   );
 }
