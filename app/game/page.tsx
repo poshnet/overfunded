@@ -560,6 +560,20 @@ export default function GamePrototype() {
           </div>
         ) : (
           <div className="game-copy">
+            <div className="rollout-panel rollout-compact">
+              <div className="rollout-head">
+                <span>SIMD-0437 · LIVE RENT UPDATE</span>
+                <b className={liveFloorLamports === null ? 'pending' : ''}>
+                  {liveFloorLamports === null ? 'READING MAINNET…' : `STAGE ${stagesLive} OF ${RENT_STAGES.length} LIVE`}
+                </b>
+              </div>
+
+              <div className="rollout-pips" aria-hidden="true">
+                {RENT_STAGES.map((stage, index) => (
+                  <i key={stage.id} className={index <= stageIndex ? 'on' : ''} />
+                ))}
+              </div>
+            </div>
             <h1>Rent dropped.<br /><em>Your accounts didn’t notice.</em></h1>
             <p className="hero-lead">Solana lowered the rent-exempt minimum, in a network upgrade called <a className="source-link" href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">SIMD-0437<span aria-hidden="true">↗</span></a>. Your token accounts were funded at the old floor, and nothing sweeps the difference back to you. <a className="lead-more" href="/solana-rent-reduction">Learn more <span aria-hidden="true">→</span></a></p>
             <div className="peek peek-lead">
@@ -594,20 +608,7 @@ export default function GamePrototype() {
                 )
               )}
             </div>
-            <div className="rollout-panel rollout-compact">
-              <div className="rollout-head">
-                <span>SIMD-0437 · LIVE RENT UPDATE</span>
-                <b className={liveFloorLamports === null ? 'pending' : ''}>
-                  {liveFloorLamports === null ? 'READING MAINNET…' : `STAGE ${stagesLive} OF ${RENT_STAGES.length} LIVE`}
-                </b>
-              </div>
 
-              <div className="rollout-pips" aria-hidden="true">
-                {RENT_STAGES.map((stage, index) => (
-                  <i key={stage.id} className={index <= stageIndex ? 'on' : ''} />
-                ))}
-              </div>
-            </div>
             <div className="game-actions">
               <button className="scan-primary" type="button" onClick={connectAndScan} disabled={busy}>CONNECT + SCAN ▶</button>
               <button className="game-demo-link" type="button" onClick={playDemo} disabled={busy}>TRY DEMO</button>

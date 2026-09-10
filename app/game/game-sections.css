@@ -1034,3 +1034,12 @@ a.battle-card:hover{opacity:1}
 .peek-lead .peek-row input{padding:17px 16px;font-size:14px}
 .peek-lead .peek-row button{padding:17px 26px;font-size:11px}
 .peek-lead .peek-note{font-size:13px}
+
+/* Match the lead paragraph's measure rather than running the full column, and
+   sit just clear of it. Input colours are set explicitly: the inherited ink
+   token resolved against the tinted panel and the typing was invisible. */
+.peek-lead{max-width:545px;margin-top:26px}
+.peek-lead .peek-row input{color:#f2f7ee;-webkit-text-fill-color:#f2f7ee;caret-color:var(--g-lime);background:#070d08}
+.peek-lead .peek-row input::placeholder{color:#7d8f80;-webkit-text-fill-color:#7d8f80}
+.rollout-panel.rollout-compact{margin-bottom:24px}
+@media(min-width:941px){.peek-lead{max-width:600px}}
