@@ -1025,3 +1025,12 @@ a.battle-card:hover{opacity:1}
 .closer-shell .batch-steps li.batch-confirmed>i{border-color:var(--closer-red);color:var(--closer-red)}
 .closer-shell .batch-steps li.batch-confirmed>span,.closer-shell .batch-steps li.batch-confirmed>strong{color:var(--closer-red)}
 .closer-shell .batch-steps li>a:hover{color:var(--closer-red);border-bottom-color:var(--closer-red)}
+
+/* Promoted lookup. This is the only thing on the page that asks nothing of a
+   stranger, so it sits above the connect button rather than beneath it. */
+.peek-lead{margin:0 0 22px;padding:20px 22px;border:1px solid var(--g-lime);border-top:none;border-radius:4px;background:linear-gradient(180deg,rgba(170,255,62,.09),rgba(170,255,62,.03))}
+.peek-lead{border-top:1px solid var(--g-lime)}
+.peek-lead .peek-form label{margin-bottom:12px;color:var(--g-lime);font-size:11px;letter-spacing:.11em}
+.peek-lead .peek-row input{padding:17px 16px;font-size:14px}
+.peek-lead .peek-row button{padding:17px 26px;font-size:11px}
+.peek-lead .peek-note{font-size:13px}
