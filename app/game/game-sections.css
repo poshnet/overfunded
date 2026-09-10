@@ -977,3 +977,51 @@ a.battle-card:hover{opacity:1}
 .closer-shell .follow-strip b,.closer-shell .follow-strip em{color:var(--closer-red)}
 .closer-shell .follow-strip em{border-color:var(--closer-red)}
 .closer-shell .follow-strip:hover{border-color:var(--closer-red);background:rgba(226,141,105,.12)}
+
+/* Claim confirmation. Fires on every successful claim, because a wallet popup
+   confirming and vanishing is easy to miss and left people unsure whether
+   anything had happened at all. */
+.claim-overlay{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:22px;background:rgba(2,5,3,.86);backdrop-filter:blur(5px);animation:claim-fade .18s ease-out both}
+@keyframes claim-fade{from{opacity:0}to{opacity:1}}
+.claim-card{position:relative;width:min(680px,100%);padding:16px;border:1px solid var(--g-lime);border-radius:4px;background:#070d08;box-shadow:0 26px 70px rgba(0,0,0,.7);animation:claim-rise .26s cubic-bezier(.2,.9,.3,1) both}
+@keyframes claim-rise{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.claim-card.claim-close{border-color:var(--closer-red,#e28d69)}
+.claim-card canvas{display:block;width:100%;border-radius:2px}
+.claim-close{position:absolute;top:-13px;right:-13px;width:34px;height:34px;border:1px solid var(--panel-line,#304332);border-radius:50%;background:#0b120c;color:#c6d3c0;font-size:18px;line-height:1;cursor:pointer}
+.claim-close:hover{border-color:var(--g-lime);color:var(--g-lime)}
+.claim-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.claim-actions button,.claim-actions a{flex:1;min-width:150px;padding:14px 16px;border:1px solid var(--btn-edge,#dfffaf);border-radius:3px;background:var(--g-lime);color:#071008;font:inherit;font-size:10px;font-weight:950;letter-spacing:.1em;text-align:center;text-decoration:none;cursor:pointer}
+.claim-actions button{background:transparent;border-color:var(--panel-line,#304332);color:#c6d3c0}
+.claim-actions button:hover{border-color:var(--g-lime);color:var(--g-lime)}
+.claim-close-tone .claim-actions a{background:var(--closer-red)}
+.claim-card.claim-close .claim-actions a{border-color:#f0b49a;background:var(--closer-red,#e28d69);color:#1d0e08}
+.claim-signatures{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:12px;padding-top:11px;border-top:1px solid var(--panel-line,#304332)}
+.claim-signatures a{color:var(--muted,#8fa093);font-size:10px;letter-spacing:.05em;text-decoration:none}
+.claim-signatures a:hover{color:var(--g-lime)}
+
+/* Batched payouts. A reclaim that needs several transactions pays out several
+   times, and a single "1 of 3" status line read as a stuck job or a partial
+   refund. Each transaction gets a row, named and priced. */
+.batch-steps{margin-top:14px;padding:14px 16px;border:1px solid var(--panel-line,#304332);border-radius:3px;background:rgba(4,8,5,.5)}
+.batch-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.batch-head b{color:var(--ink,#e9f4e4);font-size:10px;letter-spacing:.12em}
+.batch-head span{color:var(--muted,#8fa093);font-size:10px;letter-spacing:.06em}
+.batch-why{margin:8px 0 0;color:var(--muted,#8fa093);font-family:Arial,sans-serif;font-size:11px;line-height:1.55}
+.batch-steps ol{margin:11px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px}
+.batch-steps li{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:2px;background:rgba(255,255,255,.02);font-size:11px}
+.batch-steps li>i{display:grid;width:17px;height:17px;flex:none;place-items:center;border:1px solid var(--panel-line,#304332);border-radius:50%;color:var(--muted,#8fa093);font-size:9px;font-style:normal}
+.batch-steps li>b{flex:none;color:var(--muted,#8fa093);font-size:10px;letter-spacing:.06em}
+.batch-steps li>span{flex:1;min-width:0;color:var(--muted,#8fa093);font-family:Arial,sans-serif;font-size:11.5px}
+.batch-steps li>strong{flex:none;color:var(--muted,#8fa093);font-size:11px}
+.batch-steps li>a{flex:none;color:var(--muted,#8fa093);font-size:10px;text-decoration:none;border-bottom:1px solid transparent}
+.batch-steps li>a:hover{color:var(--g-lime);border-bottom-color:var(--g-lime)}
+.batch-steps li.batch-approving{background:rgba(255,214,102,.09)}
+.batch-steps li.batch-approving>span,.batch-steps li.batch-approving>i{color:#ffd666;border-color:#ffd666}
+.batch-steps li.batch-confirming>span{color:var(--ink,#e9f4e4)}
+.batch-steps li.batch-confirmed{background:rgba(170,255,62,.08)}
+.batch-steps li.batch-confirmed>i{border-color:var(--g-lime);color:var(--g-lime)}
+.batch-steps li.batch-confirmed>span,.batch-steps li.batch-confirmed>strong{color:var(--g-lime)}
+.closer-shell .batch-steps li.batch-confirmed{background:rgba(226,141,105,.1)}
+.closer-shell .batch-steps li.batch-confirmed>i{border-color:var(--closer-red);color:var(--closer-red)}
+.closer-shell .batch-steps li.batch-confirmed>span,.closer-shell .batch-steps li.batch-confirmed>strong{color:var(--closer-red)}
+.closer-shell .batch-steps li>a:hover{color:var(--closer-red);border-bottom-color:var(--closer-red)}

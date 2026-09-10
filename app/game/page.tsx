@@ -35,7 +35,10 @@ import {
 import { SITE_NAME, SITE_URL, SOURCE_URL, TWITTER_HANDLE } from '../site-config';
 import { StageAmount, type AmountMode } from './stage-amount';
 import { ToolCompare } from '../tool-compare';
-import { TokenPortrait } from '../token-portrait';
+import { TokenMetaContext, TokenPortrait, type TokenMeta } from '../token-portrait';
+import { ClaimCard } from '../claim-card';
+import { BatchSteps } from '../batch-steps';
+import type { BatchProgress } from './solana-reclaim';
 import { BrandMark } from '../brand-mark';
 import { ToolToggle } from './tool-toggle';
 import { CoinBar } from '../coin-bar';
@@ -79,6 +82,14 @@ function buildDemoAccounts(rentFloorLamports: number): ReclaimableAccount[] {
   }));
 }
 
+const PHASE_TEXT = {
+  preparing: 'reading accounts…',
+  approving: 'approve it in your wallet',
+  confirming: 'confirming on-chain…',
+  confirmed: 'paid',
+  skipped: 'nothing left to send',
+} as const;
+
 export default function GamePrototype() {
   const [quest, setQuest] = useState<QuestState>('idle');
   // Bumped on every scan so the coin elements remount. CSS animations do not
@@ -99,6 +110,14 @@ export default function GamePrototype() {
   const [chargedFeeLamports, setChargedFeeLamports] = useState(0);
   const [liveFloorLamports, setLiveFloorLamports] = useState<number | null>(null);
   const [scannedCount, setScannedCount] = useState(0);
+  // Shown after every successful claim. A wallet popup confirming and closing
+  // is easy to miss, and people were left unsure anything had happened.
+  const [claimCard, setClaimCard] = useState<{ amount: string; accounts: number } | null>(null);
+  // One entry per transaction, updated as each is prepared, approved and paid.
+  const [batchSteps, setBatchSteps] = useState<BatchProgress[]>([]);
+  const [batchTotal, setBatchTotal] = useState(0);
+  // Logos and symbols, filled in after a scan. Missing entries are normal.
+  const [tokenMeta, setTokenMeta] = useState<Record<string, TokenMeta | null>>({});
   const [treasury, setTreasury] = useState<{ reclaimedLamports: number; feesCollectedLamports: number } | null>(null);
 
   // Read-only lookup. Someone arriving from a link should be able to see their
@@ -237,6 +256,20 @@ export default function GamePrototype() {
     }
   }
 
+  /** Cosmetic only: a failure leaves the generated chips in place. */
+  async function loadTokenMeta(mints: string[]) {
+    const unique = [...new Set(mints)].slice(0, 60);
+    if (!unique.length) return;
+    try {
+      const response = await fetch(`/api/v1/tokens?mints=${unique.join(',')}`);
+      if (!response.ok) return;
+      const payload = await response.json() as { tokens?: Record<string, TokenMeta | null> };
+      if (payload.tokens) setTokenMeta(current => ({ ...current, ...payload.tokens }));
+    } catch {
+      // Leave the chips as they are.
+    }
+  }
+
   async function connectAndScan() {
     focusQuest();
     setScanRun(run => run + 1);
@@ -267,6 +300,7 @@ export default function GamePrototype() {
       setNotice('Reading Token Program and Token-2022 accounts from mainnet…');
       const scan = await scanReclaimableAccounts(owner);
       setAccounts(scan.accounts);
+      void loadTokenMeta(scan.accounts.map(account => account.mint));
       setScannedCount(scan.scannedCount);
       setQuest('ready');
       setNotice(scan.accounts.length
@@ -312,6 +346,13 @@ export default function GamePrototype() {
   }
 
   async function reclaimSelected() {
+    // A connected wallet stays connected through a demo, so this is reachable
+    // with sample accounts loaded. Refuse outright rather than relying on which
+    // handler the button happens to be wired to.
+    if (quest === 'demo') {
+      setNotice('This is sample data. Connect a wallet and run a real scan before reclaiming anything.');
+      return;
+    }
     const provider = getWalletProvider();
     if (!provider || !wallet || selectedAccounts.length === 0) return;
     if (estimatedReceiveLamports <= 0) {
@@ -321,11 +362,21 @@ export default function GamePrototype() {
 
     try {
       setQuest('reclaiming');
+      setBatchSteps([]);
+      setBatchTotal(0);
       setProgress('Preparing transaction 1…');
       setNotice(`Your wallet will ask you to approve each transaction. Verify the WithdrawExcessLamports instructions and the disclosed fee transfer to ${TREASURY_ADDRESS}.`);
       const owner = new PublicKey(wallet);
-      const result = await reclaimAccounts(provider, owner, selectedAccounts, (completed, total) => {
-        setProgress(`Confirmed ${completed} of ${total} transaction${total === 1 ? '' : 's'}`);
+      const result = await reclaimAccounts(provider, owner, selectedAccounts, (progress) => {
+        setBatchTotal(progress.total);
+        setBatchSteps(current => {
+          const next = current.slice();
+          next[progress.index - 1] = progress;
+          return next;
+        });
+        setProgress(progress.total === 1
+          ? PHASE_TEXT[progress.phase]
+          : `Transaction ${progress.index} of ${progress.total} — ${PHASE_TEXT[progress.phase]}`);
       });
 
       // Confirmed batches are on-chain and already paid for, so they are always
@@ -343,6 +394,10 @@ export default function GamePrototype() {
       }
 
       setQuest('won');
+      setClaimCard({
+        amount: formatSol(result.recoveredLamports - result.serviceFeeLamports, 5),
+        accounts: selectedAccounts.length,
+      });
       setProgress('Quest complete');
       setNotice(result.signatures.length
         ? `Recovered ${formatSol(result.recoveredLamports - result.serviceFeeLamports)} SOL before network fees. ${result.serviceFeeWaived ? 'The service fee was waived on this reclaim.' : `The disclosed ${formatSol(result.serviceFeeLamports)} SOL service fee went to the treasury.`} No token accounts were closed.`
@@ -387,6 +442,16 @@ export default function GamePrototype() {
             };
 
   return (
+    <TokenMetaContext.Provider value={tokenMeta}>
+    {claimCard && (
+      <ClaimCard
+        amountSol={claimCard.amount}
+        accounts={claimCard.accounts}
+        signatures={signatures}
+        tone="reclaim"
+        onClose={() => setClaimCard(null)}
+      />
+    )}
     <main className={`game-shell quest-${quest} ${accounts.length ? 'has-loot' : 'no-loot'}`}>
       <CoinBar />
       <ScrollReveal />
@@ -431,13 +496,19 @@ export default function GamePrototype() {
               <div><span>Total fees</span><b>~{formatSol(totalFeeLamports, 6)} SOL</b><em>service {formatSol(chargedOrQuotedFee, 6)} + network ~{formatSol(networkFeeLamports, 6)}</em></div>
             </div>
 
+            {quest === 'demo' && (
+              <div className="demo-banner">
+                <b>SAMPLE DATA</b>
+                <span>Nothing here is real and nothing can be signed. These accounts do not exist on mainnet.</span>
+              </div>
+            )}
             <div className="live-account-list">
               {accounts.length ? accounts.map(account => (
                 <label key={account.address} className={account.selected ? 'selected' : ''}>
                   <input type="checkbox" checked={account.selected} onChange={() => toggleAccount(account.address)} disabled={busy || quest === 'won'} />
                   <i>{account.selected ? '✓' : ''}</i>
                   <TokenPortrait mint={account.mint} />
-                  <span><b>{account.program === 'token-2022' ? 'Token-2022 account' : 'Token account'}</b><small>{shortenAddress(account.address, 6)} · mint {shortenAddress(account.mint, 4)}</small></span>
+                  <span><b>{tokenMeta[account.mint]?.symbol ? `${tokenMeta[account.mint]?.symbol} · ${account.program === 'token-2022' ? 'Token-2022' : 'Token account'}` : (account.program === 'token-2022' ? 'Token-2022 account' : 'Token account')}</b><small>{shortenAddress(account.address, 6)} · mint {shortenAddress(account.mint, 4)}</small></span>
                   <strong>+{formatSol(account.excessLamports, 6)} SOL</strong>
                 </label>
               )) : (
@@ -467,6 +538,7 @@ export default function GamePrototype() {
                 </span>
               </p>
             )}
+            {batchTotal > 0 && <BatchSteps steps={batchSteps} total={batchTotal} />}
             {!foundNothing && <p className={quest === 'error' ? 'live-notice error' : 'live-notice'}>{notice}</p>}
             {quest === 'won' && (
               <a className="follow-strip" href="https://x.com/reclaimsol" target="_blank" rel="noreferrer">
@@ -792,5 +864,6 @@ export default function GamePrototype() {
 
       <footer className="game-footer"><a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/api/v1">API</a><a href="/blog">Blog</a><a href="/solana-rent-reduction">How the cut works</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">Solana&rsquo;s rollout</a><a href="/legal/risk">Risk</a><a href="/legal/terms">Terms</a><a href="/legal/privacy">Privacy</a></div></footer>
     </main>
+    </TokenMetaContext.Provider>
   );
 }

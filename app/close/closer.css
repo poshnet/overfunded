@@ -449,3 +449,15 @@
 }
 .dust-limits{display:flex;gap:5px}
 .dust-limits button{padding:8px 10px;font-size:9px}
+
+/* A real logo where the mint is listed. The border and radius match the
+   generated chip exactly so a list mixing both does not look ragged. */
+.token-portrait.has-icon{border:1px solid rgba(255,255,255,.16);background:#0b120c}
+.token-portrait.has-icon img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Sample data has to announce itself. The chest, the coins and the headline
+   number look identical to a real claim, so a small label in the panel header
+   was not enough to tell the two apart at a glance. */
+.demo-banner{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin-bottom:12px;padding:11px 14px;border:1px dashed #a98a3c;border-radius:3px;background:rgba(255,214,102,.08)}
+.demo-banner b{color:#ffd666;font-size:10px;letter-spacing:.14em}
+.demo-banner span{flex:1;min-width:200px;color:#b9a26a;font-family:Arial,sans-serif;font-size:11px;line-height:1.55}

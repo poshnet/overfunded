@@ -8,7 +8,10 @@ import { ToolToggle } from '../game/tool-toggle';
 import { ToolCompare } from '../tool-compare';
 import { StageAmount, type AmountMode } from '../game/stage-amount';
 import { RENT_SOURCE_URL } from '../game/solana-reclaim';
-import { TokenPortrait } from '../token-portrait';
+import { TokenMetaContext, TokenPortrait, type TokenMeta } from '../token-portrait';
+import { ClaimCard } from '../claim-card';
+import { BatchSteps } from '../batch-steps';
+import type { BatchProgress } from '../game/solana-reclaim';
 import { CoinBar } from '../coin-bar';
 import { ScrollReveal } from '../scroll-reveal';
 import {
@@ -68,12 +71,28 @@ function buildDemoAccounts(): ClosableTokenAccount[] {
 }
 
 
+const PHASE_TEXT = {
+  preparing: 'reading accounts…',
+  approving: 'approve it in your wallet',
+  confirming: 'confirming on-chain…',
+  confirmed: 'paid',
+  skipped: 'nothing left to send',
+} as const;
+
 export function CloserTool() {
   const [state, setState] = useState<CloserState>('idle');
   // Bumped on every scan so the coin elements remount. CSS animations do not
   // replay when the same class is simply reapplied, which left the coins frozen
   // at the end of their first run on a second scan.
   const [scanRun, setScanRun] = useState(0);
+  // Shown after every successful claim. A wallet popup confirming and closing
+  // is easy to miss, and people were left unsure anything had happened.
+  const [claimCard, setClaimCard] = useState<{ amount: string; accounts: number } | null>(null);
+  // One entry per transaction, updated as each is prepared, approved and paid.
+  const [batchSteps, setBatchSteps] = useState<BatchProgress[]>([]);
+  const [batchTotal, setBatchTotal] = useState(0);
+  // Logos and symbols, filled in after a scan. Missing entries are normal.
+  const [tokenMeta, setTokenMeta] = useState<Record<string, TokenMeta | null>>({});
   // Only offer to disconnect when this session actually connected. A trusted
   // wallet exposes a publicKey on load without any handshake, which turned the
   // nav button into a disconnect prompt for people who had not connected yet.
@@ -195,6 +214,20 @@ export function CloserTool() {
     }
   }
 
+  /** Cosmetic only: a failure leaves the generated chips in place. */
+  async function loadTokenMeta(mints: string[]) {
+    const unique = [...new Set(mints)].slice(0, 60);
+    if (!unique.length) return;
+    try {
+      const response = await fetch(`/api/v1/tokens?mints=${unique.join(',')}`);
+      if (!response.ok) return;
+      const payload = await response.json() as { tokens?: Record<string, TokenMeta | null> };
+      if (payload.tokens) setTokenMeta(current => ({ ...current, ...payload.tokens }));
+    } catch {
+      // Leave the chips as they are.
+    }
+  }
+
   function connectAndScan() {
     return runScan(proMode);
   }
@@ -202,6 +235,10 @@ export function CloserTool() {
   /** Turns pro mode on and immediately rescans with it, so the wider list is one click away. */
   function enableProAndScan() {
     setProMode(true);
+    // Dust-only by default. Pro mode's unfiltered list puts real holdings —
+    // USDC included — in a list whose button says "close", and the only thing
+    // standing between that and a burn is the visitor reading carefully.
+    setDustOnly(true);
     setAccounts([]);
     return runScan(true);
   }
@@ -242,6 +279,7 @@ export function CloserTool() {
       setNotice('Checking empty SPL Token and Token-2022 accounts on mainnet…');
       const scan = await scanClosableTokenAccounts(owner, pro);
       setAccounts(scan.accounts);
+      void loadTokenMeta(scan.accounts.map(account => account.mint));
       setScannedCount(scan.scannedCount);
       if (pro) void loadPrices(scan.accounts);
       setState('ready');
@@ -307,6 +345,13 @@ export function CloserTool() {
   }
 
   async function closeSelected() {
+    // A connected wallet stays connected through a demo, so this is reachable
+    // with sample accounts loaded. Refuse outright rather than relying on which
+    // handler the button happens to be wired to.
+    if (state === 'demo') {
+      setNotice('This is sample data. Connect a wallet and run a real scan before closing anything.');
+      return;
+    }
     const provider = getWalletProvider();
     if (!provider || !wallet || selectedAccounts.length === 0) return;
     if (estimatedReceiveLamports <= 0) {
@@ -316,13 +361,25 @@ export function CloserTool() {
 
     try {
       setState('closing');
+      setBatchSteps([]);
+      setBatchTotal(0);
       setProgress('Preparing transaction 1…');
       setNotice(`Review the CloseAccount instructions and the disclosed fee transfer to ${TREASURY_ADDRESS} in your wallet.`);
       const result = await closeTokenAccounts(
         provider,
         new PublicKey(wallet),
         selectedAccounts,
-        (completed, total) => setProgress(`Confirmed ${completed} of ${total} transaction${total === 1 ? '' : 's'}`),
+        (progress) => {
+        setBatchTotal(progress.total);
+        setBatchSteps(current => {
+          const next = current.slice();
+          next[progress.index - 1] = progress;
+          return next;
+        });
+        setProgress(progress.total === 1
+          ? PHASE_TEXT[progress.phase]
+          : `Transaction ${progress.index} of ${progress.total} — ${PHASE_TEXT[progress.phase]}`);
+      },
         proMode,
       );
       setSignatures(result.signatures);
@@ -338,6 +395,10 @@ export function CloserTool() {
       }
 
       setState('won');
+      setClaimCard({
+        amount: formatSol(result.recoveredLamports - result.serviceFeeLamports, 5),
+        accounts: selectedAccounts.length,
+      });
       setProgress('Cleanup complete');
       setNotice(`Closed ${selectedAccounts.length} empty token account${selectedAccounts.length === 1 ? '' : 's'} and returned ${formatSol(result.recoveredLamports - result.serviceFeeLamports)} SOL before network fees. ${result.serviceFeeWaived ? 'The service fee was waived.' : `${formatSol(result.serviceFeeLamports)} SOL went to the disclosed fee wallet.`}`);
     } catch (error) {
@@ -377,6 +438,16 @@ export function CloserTool() {
             : accounts.length ? 'READY TO CLOSE' : 'RECLAIM SOL';
 
   return (
+    <TokenMetaContext.Provider value={tokenMeta}>
+    {claimCard && (
+      <ClaimCard
+        amountSol={claimCard.amount}
+        accounts={claimCard.accounts}
+        signatures={signatures}
+        tone="close"
+        onClose={() => setClaimCard(null)}
+      />
+    )}
     <main className={`game-shell closer-shell closer-${state} ${accounts.length ? 'has-closers' : 'no-closers'}`}>
       <CoinBar />
       <ScrollReveal />
@@ -447,7 +518,7 @@ export function CloserTool() {
                       className={dustOnly ? 'on' : ''}
                       onClick={toggleDustOnly}
                       disabled={busy || state === 'won'}
-                    >{dustOnly ? `DUST ONLY · ${dustCount}` : `SHOW DUST ONLY (${dustCount})`}</button>
+                    >{dustOnly ? `DUST ONLY · ${dustCount}` : `SHOWING EVERYTHING (${accounts.length})`}</button>
                     <span>
                       Worth under ${dustLimit.toFixed(2)}. Priced live &mdash; anything we cannot price,
                       and every NFT, stays out of this list.
@@ -475,6 +546,12 @@ export function CloserTool() {
                     >CLEAR</button>
                   </div>
                 )}
+                {state === 'demo' && (
+                  <div className="demo-banner">
+                    <b>SAMPLE DATA</b>
+                    <span>Nothing here is real and nothing can be signed. These accounts do not exist on mainnet.</span>
+                  </div>
+                )}
                 <div className="live-account-list">
                   {visibleAccounts.length ? visibleAccounts.map(account => (
                     <label key={account.address} className={account.selected ? 'selected' : ''}>
@@ -498,6 +575,7 @@ export function CloserTool() {
                 </div>
               </>
             )}
+            {batchTotal > 0 && <BatchSteps steps={batchSteps} total={batchTotal} />}
             <p className={state === 'error' ? 'live-notice error' : 'live-notice'}>{notice}</p>
             {state === 'won' && (
               <a className="follow-strip" href="https://x.com/reclaimsol" target="_blank" rel="noreferrer">
@@ -619,5 +697,6 @@ export function CloserTool() {
 
       <footer className="game-footer"><a className="game-brand" href="/"><i><BrandMark /></i><span><b>OVERFUNDED</b><small>SOLANA RENT</small></span></a><p>BUILT FOR SOLANA’S REDUCED-RENT ERA</p><div><a href="/api/v1">API</a><a href="/">Keep token accounts</a><a href="/blog">Blog</a><a href={SOURCE_URL} target="_blank" rel="noreferrer">Source</a><a href={RENT_SOURCE_URL} target="_blank" rel="noreferrer">Solana&rsquo;s rollout</a><a href="/legal/risk">Risk</a><a href="/legal/terms">Terms</a><a href="/legal/privacy">Privacy</a></div></footer>
     </main>
+    </TokenMetaContext.Provider>
   );
 }

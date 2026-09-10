@@ -132,21 +132,56 @@ async function getPriorityMicroLamports() {
   }
 }
 
+/** web3.js puts no deadline on its fetches, so one hung request stalls forever. */
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
+  let timer: ReturnType<typeof setTimeout>;
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new Error(`${label} timed out.`)), ms);
+    }),
+  ]).finally(() => clearTimeout(timer)) as Promise<T>;
+}
+
+/**
+ * Polls until the transaction confirms.
+ *
+ * Two rules learned the hard way. A poll that fails is not a transaction that
+ * failed — the previous version treated any RPC hiccup as fatal and left people
+ * staring at a spinner while their SOL had in fact arrived — so transient errors
+ * simply cost an attempt. And the block height check, which only guards against
+ * expiry, ran on every pass and doubled the request rate against a rate-limited
+ * relay; once every few seconds is enough.
+ */
 async function confirmSignature(signature: string, lastValidBlockHeight: number) {
-  for (let attempt = 0; attempt < 45; attempt += 1) {
-    const [statuses, blockHeight] = await Promise.all([
-      connection.getSignatureStatuses([signature], { searchTransactionHistory: true }),
-      connection.getBlockHeight('confirmed'),
-    ]);
-    const status = statuses.value[0];
-    if (status?.err) throw new Error(`Transaction ${shortenAddress(signature, 7)} failed on-chain.`);
-    if (status?.confirmationStatus === 'confirmed' || status?.confirmationStatus === 'finalized') return;
-    if (blockHeight > lastValidBlockHeight) {
-      throw new Error(`Transaction ${shortenAddress(signature, 7)} expired before confirmation.`);
+  const short = shortenAddress(signature, 7);
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    try {
+      const statuses = await withTimeout(
+        connection.getSignatureStatuses([signature], { searchTransactionHistory: true }),
+        7_000,
+        'Confirmation check',
+      );
+      const status = statuses.value[0];
+      if (status?.err) throw new Error(`Transaction ${short} failed on-chain.`);
+      if (status?.confirmationStatus === 'confirmed' || status?.confirmationStatus === 'finalized') return;
+
+      if (attempt % 6 === 5) {
+        const blockHeight = await withTimeout(connection.getBlockHeight('confirmed'), 7_000, 'Block height check');
+        if (blockHeight > lastValidBlockHeight) {
+          throw new Error(`Transaction ${short} expired before confirmation.`);
+        }
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+      if (message.includes('failed on-chain') || message.includes('expired before confirmation')) throw error;
+      // Anything else is the RPC being unreliable. Keep waiting.
     }
-    await wait(1_000);
+    await wait(1_200);
   }
-  throw new Error(`Transaction ${shortenAddress(signature, 7)} is still pending. Check it on Solscan.`);
+  throw new Error(
+    `Transaction ${short} did not confirm within a minute. It may still land — check ${signature} on Solscan before trying again.`,
+  );
 }
 
 export type WalletProvider = {
@@ -747,11 +782,31 @@ async function assertBatchSimulates(transaction: Transaction, operation: 'withdr
  * error instead of throwing them away, because earlier batches are already
  * on-chain and the user has already paid for them.
  */
+/**
+ * Per-batch progress. The old callback only reported a count after a batch had
+ * already confirmed, which left the longest part of the wait — waiting on the
+ * wallet, then on the chain — with nothing to show. Refunds arrive as separate
+ * payments, one per batch, so the UI has to name which one is in flight.
+ */
+export type BatchPhase = 'preparing' | 'approving' | 'confirming' | 'confirmed' | 'skipped';
+
+export type BatchProgress = {
+  /** 1-based, for display. */
+  index: number;
+  total: number;
+  phase: BatchPhase;
+  accounts: number;
+  lamports: number;
+  signature?: string;
+};
+
+export type BatchReporter = (progress: BatchProgress) => void;
+
 export async function reclaimAccounts(
   provider: WalletProvider,
   owner: PublicKey,
   accounts: ReclaimableAccount[],
-  onProgress?: (completed: number, total: number) => void,
+  onProgress?: BatchReporter,
 ): Promise<ReclaimOutcome> {
   const signatures: string[] = [];
   const batches = chunk(accounts, ACCOUNTS_PER_TRANSACTION);
@@ -766,13 +821,15 @@ export async function reclaimAccounts(
 
   for (let batchIndex = 0; batchIndex < batches.length; batchIndex += 1) {
     try {
+      const step = { index: batchIndex + 1, total: batches.length, accounts: batches[batchIndex].length };
+      onProgress?.({ ...step, phase: 'preparing', lamports: 0 });
       const freshAccounts = (await Promise.all(
         batches[batchIndex].map(account => getFreshInstruction(account, owner)),
       )).filter((result): result is NonNullable<typeof result> => result !== null);
 
       if (freshAccounts.length === 0) {
         completedBatches += 1;
-        onProgress?.(completedBatches, batches.length);
+        onProgress?.({ ...step, phase: 'skipped', lamports: 0 });
         continue;
       }
 
@@ -803,6 +860,7 @@ export async function reclaimAccounts(
       }
 
       await assertBatchSimulates(transaction, 'withdraw');
+      onProgress?.({ ...step, phase: 'approving', lamports: batchRecoveredLamports });
 
       let signature: string;
       if (provider.signTransaction) {
@@ -818,12 +876,13 @@ export async function reclaimAccounts(
         throw new Error('This wallet cannot sign Solana transactions from the browser.');
       }
 
+      onProgress?.({ ...step, phase: 'confirming', lamports: batchRecoveredLamports, signature });
       await confirmSignature(signature, latestBlockhash.lastValidBlockHeight);
       signatures.push(signature);
       recoveredLamports += batchRecoveredLamports;
       serviceFeeLamports += batchServiceFeeLamports;
       completedBatches += 1;
-      onProgress?.(completedBatches, batches.length);
+      onProgress?.({ ...step, phase: 'confirmed', lamports: batchRecoveredLamports, signature });
     } catch (error) {
       return {
         completedBatches,
@@ -859,7 +918,7 @@ export async function closeTokenAccounts(
   provider: WalletProvider,
   owner: PublicKey,
   accounts: ClosableTokenAccount[],
-  onProgress?: (completed: number, total: number) => void,
+  onProgress?: BatchReporter,
   proMode = false,
 ): Promise<ReclaimOutcome> {
   const signatures: string[] = [];
@@ -875,6 +934,8 @@ export async function closeTokenAccounts(
 
   for (let batchIndex = 0; batchIndex < batches.length; batchIndex += 1) {
     try {
+      const step = { index: batchIndex + 1, total: batches.length, accounts: batches[batchIndex].length };
+      onProgress?.({ ...step, phase: 'preparing', lamports: 0 });
       const freshAccounts = await Promise.all(
         batches[batchIndex].map(account => getFreshCloseInstruction(account, owner, proMode)),
       );
@@ -910,6 +971,7 @@ export async function closeTokenAccounts(
       }
 
       await assertBatchSimulates(transaction, 'close');
+      onProgress?.({ ...step, phase: 'approving', lamports: batchRecoveredLamports });
 
       let signature: string;
       if (provider.signTransaction) {
@@ -925,12 +987,13 @@ export async function closeTokenAccounts(
         throw new Error('This wallet cannot sign Solana transactions from the browser.');
       }
 
+      onProgress?.({ ...step, phase: 'confirming', lamports: batchRecoveredLamports, signature });
       await confirmSignature(signature, latestBlockhash.lastValidBlockHeight);
       signatures.push(signature);
       recoveredLamports += batchRecoveredLamports;
       serviceFeeLamports += batchServiceFeeLamports;
       completedBatches += 1;
-      onProgress?.(completedBatches, batches.length);
+      onProgress?.({ ...step, phase: 'confirmed', lamports: batchRecoveredLamports, signature });
     } catch (error) {
       return {
         completedBatches,
